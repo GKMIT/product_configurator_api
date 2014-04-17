@@ -18,7 +18,7 @@ module.exports = function(){
 
 
 	// rfq general product data
-	app.get("/rfq_product_lines/:user_id", rfq_product.rfq_product_lines);
+	app.get("/rfq_product_lines/:user_id/:rfq_id", rfq_product.rfq_product_lines);
 	app.get("/rfq_tendering_teams/:user_id/:product_lines_id", rfq_product.rfq_tendering_teams);
 	app.get("/rfq_tendering_teams_members/:user_id/:tendering_teams_id", rfq_product.rfq_tendering_teams_members);
 	app.put("/general_product_data_save", rfq_product.general_product_data_save);

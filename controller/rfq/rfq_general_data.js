@@ -432,7 +432,7 @@ exports.update_rfq_general_data = function(req, res){
 							// queryValue=queryValue+",";
 						}
 					}
-					query=query+queryparam+ " WHERE "+req.body.rfq_id;
+					query=query+queryparam+ " WHERE 'id'="+req.body.rfq_id+" AND created_by='"+req.body.user_id+"'";
 					console.log(query);
 					connection.query(query, function(err, info) {
 						if(err){
