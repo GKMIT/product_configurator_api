@@ -1,23 +1,12 @@
-var app = require('../helper/app');
+var app = require('../../helper/app');
+var testConnection = require('../../helper/connection');
 
 var should = require('should'),
 	supertest = require('supertest');
 
 describe('Login ', function () {
-	// it('should return everything is ok', 
-	// function (done) {
 
-	// 	supertest(app)
-	// 	.get('/')
-	// 	.expect(200)
-	// 	.end(function (err, res) {
-	// 		res.status.should.equal(200);
-	// 		done();
-	// 	});
-
-	// });
-
-	it('should return not ok for incorrect login', 
+	it('should return ok for correct login', 
 	function (done) {
 		supertest(app)
 		.post('/login')
