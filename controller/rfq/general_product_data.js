@@ -20,7 +20,28 @@ console.log(req.params);
 										res.json(500, {"success":"false", "message": "internal error"});
 								}
 								else{
-									res.json(200, {"success":"true", "message":"", "product_lines":product_lines, "selected_rfq":rfq});
+									// if(rfq[0].tenderinr_teams_id>0){}
+									// if(rfq[0].tendering_teams_members_id>0){}
+
+									connection.query("SELECT `id`,`name` FROM `tendering_teams` WHERE product_lines_id='"+rfq[0].product_lines_id+"'", function(err, tendering_teams) {
+										if(err){
+											console.log(err);
+												res.json(500, {"success":"false", "message": "internal error"});
+										}
+										else{
+											connection.query("SELECT `id`,`user_name` FROM `organization_users` WHERE tendering_teams_id='"+rfq[0].tendering_teams_id+"'", function(err, tendering_teams_members) {
+												if(err){
+													console.log(err);
+														res.json(500, {"success":"false", "message": "internal error"});
+												}
+												else{
+													res.json(200, {"success":"true", "message":"", "product_lines":product_lines, "selected_rfq":rfq, "tendering_teams": tendering_teams, "tendering_teams_members": tendering_teams_members});
+												}
+											});
+										}
+									});
+
+									
 								}
 							});
 						}
@@ -160,6 +181,7 @@ exports.rfq_tendering_teams_members = function(req, res){
 
 
 exports.general_product_data_save = function(req, res){
+	console.log(req.body);
   	if(req.header("authentication_token") && typeof req.body.user_id!=="undefined" && req.body.user_id!==""){
   		var token=req.header("authentication_token");
   	  connection.query("SELECT `id`,`authentication_token` FROM `organization_users` WHERE authentication_token='"+token+"' AND id="+req.body.user_id, function(err, organization_users) {
@@ -169,15 +191,47 @@ exports.general_product_data_save = function(req, res){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("UPDATE `rfq` SET `product_lines_id`='"+req.body.product_lines_id+"', `tendering_teams_id`='"+req.body.tendering_teams_id+"', `tendering_teams_members_id`='"+req.body.tendering_teams_members_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, tendering_teams_members) {
-					if(err){
-						console.log(err);
-							res.json(500, {"success":"false", "message": "internal error"});
-					}
-					else{
-						res.json(200, {"success":"true", "message":"", "rfq_id":req.body.rfq_id});
-					}
-				});
+					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+						if(err){
+							console.log(err);
+								res.json(500, {"success":"false", "message": "internal error"});
+						}
+						else{
+							var param = new Array();
+  							var paramValue = new Array();
+  							if(typeof req.body.product_lines_id!=="undefined" || req.body.product_lines_id!==""){
+  								param.push("product_lines_id");
+  								paramValue.push(req.body.product_lines_id);
+  							}
+  							if(typeof req.body.tendering_teams_id!=="undefined" || req.body.tendering_teams_id!==""){
+  								param.push("tendering_teams_id");
+  								paramValue.push(req.body.tendering_teams_id);
+  							}
+  							if(typeof req.body.tendering_teams_members_id!=="undefined" || req.body.tendering_teams_members_id!==""){
+  								param.push("tendering_teams_members_id");
+  								paramValue.push(req.body.tendering_teams_members_id);
+  							}
+  							var query="UPDATE `rfq` SET ";
+  							for (var i = 0; i < param.length; i++) {
+  								query=query+param[i]+"="+paramValue[i];
+  								if(i+1<param.length){
+  									query+=",";
+  								}
+  							};
+  							query=query+" WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'";
+  							console.log(query);
+							connection.query(query, function(err, tendering_teams_members) {
+								if(err){
+									console.log(err);
+										res.json(500, {"success":"false", "message": "internal error"});
+								}
+								else{
+									res.json(200, {"success":"true", "message":"", "rfq_id":req.body.rfq_id, "selected_rfq": rfq});
+								}
+							});
+						}
+					});
+					
 				}else{
 					res.json(404, {"success": "false", "message": "Authentication token not valid or user id not valid"});
 				}

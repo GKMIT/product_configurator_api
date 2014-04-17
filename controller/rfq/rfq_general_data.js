@@ -75,20 +75,20 @@ exports.rfq_general_data = function(req, res){
 						}
 					});
 				}else{
-					res.json(404, {"success": "false", "message": "Authentication token not valid or user id not valid"});
+					res.json(404, {"success": "false", "message": "unauthenticated access"});
 				}
 			}
 		});
   	}
   	else{
   		if(req.header("authentication_token")){
-  			res.json(404, {"success": "false", "message": "Authentication token"});
+  			res.json(422, {"success": "false", "message": "Authentication token"});
   		}
   		else if(req.params.id!==""){
-  			res.json(404, {"success": "false", "message": "id not found"});
+  			res.json(422, {"success": "false", "message": "id not found"});
   		}
   		else{
-  			res.json(404, {"success": "false", "message": "parameter not defined !"});
+  			res.json(422, {"success": "false", "message": "parameter not defined !"});
   		}
   		
   	}
@@ -163,8 +163,8 @@ exports.rfq_general_data_sales_persons=function(req, res){
 
 
 exports.save_rfq_general_data = function(req, res){
-	console.log(req.body);
-	console.log(req.body.user_id);
+	// console.log(req.body);
+	// console.log(req.body.user_id);
 	if(req.header("authentication_token") && typeof req.body.user_id!=="undefined" && req.body.user_id!==""){
 
 		connection.query("SELECT `id`,`authentication_token` FROM `organization_users` WHERE authentication_token='"+req.header("authentication_token")+"' AND id="+req.body.user_id, function(err, organization_users) {
