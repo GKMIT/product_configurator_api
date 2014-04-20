@@ -6,8 +6,8 @@ var rfq_finalize = require('../controller/rfq/rfq_finalize');
 module.exports = function(){
 	// rfq general data
 	app.post("/login", users.login);
-	app.get("/rfq_general_data/:id/:rfq_id", rfq.rfq_general_data);
-	// country_id is customer country in the below call 
+	app.get("/rfq_general_data/:user_id/:rfq_id", rfq.rfq_general_data);
+	// NOTE :  country_id is customer country in the below call 
 	app.get("/rfq_general_data_sales_agents/:user_id/:country_id", rfq.rfq_general_data_sales_agents);
 	app.get("/rfq_general_data_sales_persons/:user_id/:sales_hubs_id", rfq.rfq_general_data_sales_persons);
 
@@ -30,7 +30,5 @@ module.exports = function(){
 
 	// rfq finalize
 	app.get("/rfq_partial_show/:user_id", rfq_finalize.rfq_partial_show);
-
-
 
 };

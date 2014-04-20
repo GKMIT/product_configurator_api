@@ -2,68 +2,93 @@ var validator=require('validator');
 
  
 exports.login = function(req, res){
+	validateUser(req, res, function(email, password, req, res, checkValid){
+		testUser(email, password, req, res, checkValid);
+	});
+};
 
-if(typeof req.body.email==="undefined" || typeof req.body.password==="undefined" || req.body.password==="" || req.body.email===""){
-	if(req.body.email===""){
-		res.json(422, {"success":"false","message":"Email value not found"});
-	}
-	if(req.body.password===""){
-		res.json(422, {"success":"false","message":"password value not found"});
-	}
-	if(typeof req.body.email==="undefined"){
-		res.json(422, {"success":"false","message":"Email not found"});
-	}
-	if(typeof req.body.password==="undefined"){
-		res.json(422, {"success":"false", "message":"password not found"});
-	}
-}
-else{
+function validateUser(req, res, callback){
+	var fields = new Array();
+	fields.push("email");
+	fields.push("password");
+	var parameterValue=JSON.parse(JSON.stringify(req.body));
+	var i=0;
+	var checkValid=1;
+
+	
+	
+	
+	for (i = 0; i < fields.length; i++) {
+		if(typeof parameterValue[fields[i]]=="undefined"){
+			checkValid=0;
+			res.json({statusCode: 404, "success":"false", "message": "paramter "+fields[i]+" not found"});
+		}
+		if(parameterValue[fields[i]] == ""){
+			checkValid=0;
+			res.json({statusCode: 404, "success":"false", "message": fields[i]+" value not found"});
+		}
+	}	
 		var email=req.body.email;
 		var password=req.body.password;
-
-		// password = crypto.createHash('md5').update(password).digest('hex');
-		// password=secrate.encrypt(password);
-
-		if(!validator.isEmail(email)){
-			res.json(422, {"success":"false","message" : "email not valid"});
+		if(checkValid==1){
+			if(!validator.isEmail(req.body.email)){
+				checkValid=0;
+				res.json({statusCode: 422, "success":"false", "message": "invalid email "});
+			}
 		}
-		connection.query("SELECT `id`,`tendering_teams_id`, `sales_hubs_id`, `sysadmin`, `user_name`, `email` FROM `organization_users` WHERE `email`='"+email+"' AND `password`='"+password+"' AND `user_status`=1 limit 1 ", function(err, rows) {
-			if(err){
-				console.log(err);
-						res.json(500,{"success":"false", message: "internal error"});
-					}
-			else{
-				
-				if(rows.length > 0 ){
+		
+		
+		if(i==fields.length){
+			if(checkValid==1){
+				callback(email, password, req, res, checkValid);
+			}
+		}
+}
+
+function testUser(email, password, req, res){
+	connection.query("SELECT `id`,`tendering_teams_id`, `sales_hubs_id`, `sysadmin`, `user_name`, `email`, `user_status` FROM `organization_users` WHERE `email`='"+email+"' AND `password`='"+password+"' limit 1 ", function(err, rows) {
+		if(err){
+				res.json({statusCode: 500, "success":"false", message: "internal error"});
+		}
+		else{
+			if(rows.length > 0 ){
+				if(rows[0].user_status!=1)
+				{
+					res.json({statusCode: 401, "success":"false", message: "unathorised user"});
+				}
+				else if(rows[0].user_status==1){
 					var time = new Date().getTime();
 					var auth_token=email+time;
 					auth_token=crypto.createHash('md5').update(auth_token).digest('hex');
 					connection.query("UPDATE `organization_users` SET `authentication_token`='"+auth_token+"' WHERE `email`='"+email+"' AND password='"+password+"'", function(
 							err, result) {
 						if(err){
-							res.json(500, {"success":"false", message: "internal error"});
+							res.json({statusCode: 500, "success":"false", message: "internal error"});
 						}
 						else{
 							var priv=0;
-							if(rows[0].sales_hubs_id){
-								priv=1;
-							}
-							if(rows[0].tendering_teams_id){
-								priv=2;
-							}
 							if(rows[0].sysadmin){
 								priv=4;
-							}
-							if(rows[0].sales_hubs_id && rows[0].tendering_teams_id){
+							} else if(rows[0].sales_hubs_id && rows[0].tendering_teams_id){
 								priv=3;
+							}else if(rows[0].sales_hubs_id){
+								priv=1;
+							}else if(rows[0].tendering_teams_id){
+								priv=2;
 							}
-							res.json(200, {"success":"true", "message":"", "priv": priv, "authentication_token":auth_token, "data":rows});
+							
+							if (priv==0)
+								res.json({statusCode: 500, "success":"false", message: "internal error"});
+							else
+								res.json({statusCode: 200, "success":"true", "message":"", "priv": priv, "authentication_token":auth_token, "data":rows});
 						}
 					});
-				} else {
-					res.json(404, {"success":"false","message":"user not found"});
 				}
+				
+			} 
+			else {
+				res.json({statusCode: 404, "success":"false","message":"user not found"});
 			}
+		}
 	});
 }
-};

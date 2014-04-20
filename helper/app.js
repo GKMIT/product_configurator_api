@@ -1,6 +1,3 @@
-var app = require('../app')();
+var app = require('../app-test')();
 
 module.exports = app;
-
- 
-
