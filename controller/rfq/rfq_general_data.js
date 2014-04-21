@@ -272,7 +272,7 @@ exports.rfq_general_data_sales_persons=function(req, res){
 function save_rfq_general_dataValidation(req, res, callback){
 	var checkValid=1;
 	var query="";
-	var param = ["user_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "date_rfq_in", "sales_segments_id", "requested_quotation_date", "probability"];
+	var param = ["user_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "date_rfq_in", "sales_segments_id", "requested_quotation_date", "probability", "rfq_status_id"];
 	if(req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -328,7 +328,6 @@ function save_rfq_general_dataValidation(req, res, callback){
 exports.save_rfq_general_data = function(req, res){
 	save_rfq_general_dataValidation(req, res, function(req, res, checkValid){
 		if(checkValid==1){
-			console.log("valid");
 				var param = new Array();
   				var paramValue = new Array();
 				// var flag="true";
@@ -349,7 +348,7 @@ exports.save_rfq_general_data = function(req, res){
 
 					var query="INSERT INTO rfq (";
 					var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, requested_quotation_date, created_by, rfq_status_id, probability";
-					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"','"+req.body.requested_quotation_date+"','"+req.body.user_id+"','0','"+req.body.probability+"'";
+					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"','"+req.body.requested_quotation_date+"','"+req.body.user_id+"','"+req.body.rfq_status_id+"','"+req.body.probability+"'";
 					for(var i=0; i<param.length; i++){
 						if(i==0){
 							queryparam=queryparam+",";
@@ -379,7 +378,7 @@ exports.save_rfq_general_data = function(req, res){
 // API Code for the update call rfq
 function update_rfq_general_dataValidation(req, res, callback){
 	var checkValid=1;
-	var param = ["user_id", "rfq_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "date_rfq_in", "sales_segments_id", "requested_quotation_date", "probability"];
+	var param = ["user_id", "rfq_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "date_rfq_in", "sales_segments_id", "requested_quotation_date", "probability", "rfq_status_id"];
 	if(req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -457,7 +456,7 @@ exports.update_rfq_general_data = function(req, res){
 			
 				param.push("rfq_status_id");
 				// partial status code is 1
-				paramValue.push("1");
+				paramValue.push(req.body.rfq_status_id);
 
 			if(typeof req.body.sales_agents_id!=="undefined" && req.body.sales_agents_id!==""){
 				param.push("sales_agents_id");
@@ -487,7 +486,6 @@ exports.update_rfq_general_data = function(req, res){
 					}
 				}
 				query=query+queryparam+ " WHERE id='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'";
-				// console.log(query);
 				connection.query(query, function(err, info) {
 					if(err){
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
