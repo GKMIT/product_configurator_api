@@ -200,6 +200,7 @@ exports.rfq_tendering_teams_members = function(req, res){
 
 
 exports.general_product_data_save = function(req, res){
+	console.log("hello");
 	var param = new Array();
 	var paramValue = new Array();
 	if(typeof req.body.product_lines_id!=="undefined" || req.body.product_lines_id!==""){
@@ -214,6 +215,10 @@ exports.general_product_data_save = function(req, res){
 		param.push("tendering_teams_members_id");
 		paramValue.push(req.body.tendering_teams_members_id);
 	}
+
+	param.push("rfq_status_id");
+	paramValue.push(req.body.rfq_status_id);
+	
 	var query="UPDATE `rfq` SET ";
 	for (var i = 0; i < param.length; i++) {
 		query=query+param[i]+"='"+paramValue[i]+"' ";
