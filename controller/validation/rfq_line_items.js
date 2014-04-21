@@ -40,7 +40,7 @@ exports.product_line = function(req, res, next){
 
 
 
-exports.fetch_production_plants = function(req, res, next){
+exports.fetch_product_plants_properties = function(req, res, next){
 	var checkValid=1;
 	if(req.header("authentication_token")=="" || typeof req.header("authentication_token")=="undefined"){
 		checkValid=0;
@@ -90,7 +90,7 @@ exports.fetch_rfq_line_items = function(req, res, next){
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
-			for(var i=0; i<param.length; i++){
+			for(var i=0; i<fields.length; i++){
 			if(typeof req.params[fields[i]]=="undefined" || req.params[fields[i]]==""){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
@@ -100,7 +100,7 @@ exports.fetch_rfq_line_items = function(req, res, next){
 			}
 		}
 	}
-	else if(checkValid==1){
+	if(checkValid==1){
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.params.user_id, function(err, organization_users) {
 			if(err){
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -123,3 +123,5 @@ exports.fetch_rfq_line_items = function(req, res, next){
 		});
 	}
 }
+
+

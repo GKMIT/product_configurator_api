@@ -32,10 +32,11 @@ module.exports = function(){
 	// rfq line items API's
 	app.get("/rfq_new_line_item/:user_id/:rfq_id", rfq_line_items_validation.product_line, rfq_line_items.product_lines);
 	app.get("/all_rfq_line_items/:user_id/:rfq_id", rfq_line_items_validation.product_line, rfq_line_items.all_rfq_product_lines);
-	app.get("/fetch_production_plants/:user_id/:product_lines_id", rfq_line_items_validation.fetch_production_plants, rfq_line_items.fetch_production_plants);
-	app.get("/fetch_product_properties/:user_id/:product_lines_id", rfq_line_items_validation.fetch_production_plants, rfq_line_items.product_properties);
+	app.get("/fetch_product_plants_properties/:user_id/:product_lines_id", rfq_line_items_validation.fetch_product_plants_properties, rfq_line_items.fetch_product_plants_properties);
+	// app.get("/fetch_product_properties/:user_id/:product_lines_id", rfq_line_items_validation.fetch_production_plants, rfq_line_items.product_properties);
 
 	app.get("/fetch_rfq_line_items/:user_id/:rfq_id/:rfq_lines_id", rfq_line_items_validation.fetch_rfq_line_items, rfq_line_items.fetch_rfq_line_items);
+	// app.post("/save_line_item", rfq_line_items_validation.save_line_item, rfq_line_items.save_line_item);
 
 
 	// rfq finalize
