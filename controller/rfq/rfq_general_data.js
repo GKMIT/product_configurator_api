@@ -285,11 +285,7 @@ function save_rfq_general_dataValidation(req, res, callback){
 		var parameterValue=JSON.parse(JSON.stringify(req.body));
 			for(var i=0; i<param.length; i++){
 				var fieldName=param[i];
-			if(typeof parameterValue[param[i]]=="undefined"){
-				checkValid=0;
-				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
-			}
-			else if(parameterValue[param[i]]==""){
+			if(typeof parameterValue[param[i]]=="undefined" || parameterValue[param[i]]==""){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
 			}
@@ -391,11 +387,7 @@ function update_rfq_general_dataValidation(req, res, callback){
 			for(var i=0; i<param.length; i++){
 				var fieldName=param[i];
 				// console.log(param[i]);
-			if(typeof parameterValue[param[i]]=="undefined"){
-				checkValid=0;
-				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
-			}
-			else if(parameterValue[param[i]]==""){
+			if(typeof parameterValue[param[i]]=="undefined" || parameterValue[param[i]]==""){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
 			}

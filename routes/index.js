@@ -35,7 +35,7 @@ module.exports = function(){
 	app.get("/fetch_production_plants/:user_id/:product_lines_id", rfq_line_items_validation.fetch_production_plants, rfq_line_items.fetch_production_plants);
 	app.get("/fetch_product_properties/:user_id/:product_lines_id", rfq_line_items_validation.fetch_production_plants, rfq_line_items.product_properties);
 
-	// app.get("/fetch_rfq_line_items/:user_id/:rfq_id/:rfq_lines_id", rfq_line_items_validation.fetch_rfq_line_items, rfq_line_items.fetch_rfq_line_items);
+	app.get("/fetch_rfq_line_items/:user_id/:rfq_id/:rfq_lines_id", rfq_line_items_validation.fetch_rfq_line_items, rfq_line_items.fetch_rfq_line_items);
 
 
 	// rfq finalize

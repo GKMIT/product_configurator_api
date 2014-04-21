@@ -61,7 +61,41 @@ exports.product_properties = function(req, res){
 				res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"true", "message":"", "product_properties":product_properties});
+			res.json({"statusCode":200, "success":"true", "massage":"", "product_properties":product_properties});
+		}
+	});
+}
+
+
+exports.fetch_rfq_line_items = function(req, res){
+	connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
+		if(err){
+				res.json({"statusCode":500, "success":"false", "message": "internal error"});
+		}
+		else{
+			connection.query("SELECT `id`, `name` FROM `plants` WHERE `product_lines_id`='"+rfq_lines[0].product_lines_id+"'", function(err, plants) {
+				if(err){
+						res.json({"statusCode":500, "success":"false", "message": "internal error"});
+				}
+				else{
+					connection.query("SELECT `id`,`property_name` FROM `product_properties` WHERE product_lines_id='"+rfq_lines[0].product_lines_id+"'", function(err, product_properties) {
+						if(err){
+								res.json({"statusCode":500, "success":"false", "message": "internal error"});
+						}
+						else{
+							connection.query("SELECT `id`,`product_properties_id`, `value`, `remarks` FROM `product_properties` WHERE product_lines_id='"+rfq_lines[0].id+"'", function(err, product_properties) {
+								if(err){
+									console.log(err);
+										res.json({"statusCode":500, "success":"false", "message": "internal error"});
+								}
+								else{
+									res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "production_plants":rfq_lines, "product_properties":product_properties, "technical_specifications":technical_specifications});
+								}
+							});
+						}
+					});
+				}
+			});
 		}
 	});
 }
