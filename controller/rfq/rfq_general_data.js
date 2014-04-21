@@ -16,14 +16,14 @@ function get_rfq_generalValidation(req, res, callback){
 		res.json({"statusCode": 404, "success": "false", "message": "user_id not found"});
 	}
 	else if(checkValid==1){
-		connection.query("SELECT `id`,`authentication_token`, `user_status` FROM `organization_users` WHERE authentication_token='"+req.header('authentication_token')+"' AND id='"+req.params.user_id+"'", function(err, organization_users) {
+		connection.query("SELECT `id`,`authentication_token`, `user_status` FROM `organization_users` WHERE `authentication_token`='"+req.header('authentication_token')+"' AND `id`='"+req.params.user_id+"'", function(err, organization_users) {
 			if(err){
 				checkValid=0
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 			}
 			else{
 
-				// console.log("welcome"+organization_users);
+				console.log("welcome"+organization_users.length);
 				if(organization_users.length>0){
 					if(organization_users[0].user_status!=1){
 						checkValid=0;
@@ -278,6 +278,7 @@ function save_rfq_general_dataValidation(req, res, callback){
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(typeof req.header("authentication_token")=="undefined"){
+		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not defined"});	
 	}
 	if(checkValid==1){
@@ -348,7 +349,7 @@ exports.save_rfq_general_data = function(req, res){
 
 					var query="INSERT INTO rfq (";
 					var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, requested_quotation_date, created_by, rfq_status_id, probability";
-					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"','"+req.body.requested_quotation_date+"','"+req.body.user_id+"','1','"+req.body.probability+"'";
+					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"','"+req.body.requested_quotation_date+"','"+req.body.user_id+"','0','"+req.body.probability+"'";
 					for(var i=0; i<param.length; i++){
 						if(i==0){
 							queryparam=queryparam+",";
