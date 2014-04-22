@@ -38,6 +38,7 @@ module.exports = function(){
 	app.get("/fetch_rfq_line_items/:user_id/:rfq_id/:rfq_lines_id", rfq_line_items_validation.fetch_rfq_line_items, rfq_line_items.fetch_rfq_line_items);
 	app.post("/save_line_item", rfq_line_items_validation.save_line_item, rfq_line_items.save_line_item);
 	app.post("/update_line_item", rfq_line_items_validation.update_line_item, rfq_line_items.update_line_item);
+	app.delete("/delete_line_item/:user_id/:rfq_lines_id", rfq_line_items_validation.delete_line_item, rfq_line_items.delete_line_item);
 
 
 	// rfq finalize

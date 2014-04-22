@@ -191,3 +191,14 @@ exports.update_line_item = function(req, res){
 		}
 	});
 }
+
+exports.delete_line_item = function(req, res){
+	connection.query("DELETE FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params.rfq_lines_id+"'", function(err, info_tech){
+		if(err){
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode":200, "success":"false", "message":"data deleted successfully",});
+		}
+	});
+}
