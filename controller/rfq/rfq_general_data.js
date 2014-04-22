@@ -339,6 +339,10 @@ exports.save_rfq_general_data = function(req, res){
 					param.push("sales_agents_id");
 					paramValue.push(req.body.sales_agents_id);
 				}
+				if(typeof req.body.win!=="undefined" && req.body.win!==""){
+					param.push("win");
+					paramValue.push(req.body.win);
+				}
 					
 
 
@@ -463,6 +467,10 @@ exports.update_rfq_general_data = function(req, res){
 			if(typeof req.body.installation_country!=="undefined" && req.body.installation_country!==""){
 				param.push("installation_country");
 				paramValue.push(req.body.installation_country);
+			}
+			if(typeof req.body.win!=="undefined" && req.body.win!==""){
+				param.push("win");
+				paramValue.push(req.body.win);
 			}
 
 				var query="UPDATE rfq ";
