@@ -317,7 +317,7 @@ function save_rfq_general_dataValidation(req, res, callback){
 			}
 		});
 	}
-						callback(req, res, checkValid);	
+		callback(req, res, checkValid);	
 	
 } 
 
@@ -466,7 +466,7 @@ exports.update_rfq_general_data = function(req, res){
 			}
 
 				var query="UPDATE rfq ";
-				var queryparam=" SET `sales_hub_id`='"+req.body.sales_hubs_id+"', `sales_person_id`='"+req.body.sales_person_id +"', `customers_id`='"+req.body.customers_id+"', `customer_country`='"+req.body.customer_country+"', `type_of_quote_id`='"+req.body.type_of_quote_id+"', `date_rfq_in`='"+req.body.date_rfq_in+"', `sales_segments_id`='"+req.body.requested_quotation_date+"', `created_by`='"+req.body.user_id+"', `probability`='"+req.body.probability+"'";
+				var queryparam=" SET `sales_hub_id`='"+req.body.sales_hub_id+"', `sales_person_id`='"+req.body.sales_person_id +"', `customers_id`='"+req.body.customers_id+"', `customer_country`='"+req.body.customer_country+"', `type_of_quote_id`='"+req.body.type_of_quote_id+"', `date_rfq_in`='"+req.body.date_rfq_in+"', `sales_segments_id`='"+req.body.sales_segments_id+"', `requested_quotation_date`='"+req.body.requested_quotation_date+"', `created_by`='"+req.body.user_id+"', `probability`='"+req.body.probability+"'";
 				var queryValue="";
 				for(var i=0; i<param.length; i++){
 					if(i==0){
