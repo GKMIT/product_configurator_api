@@ -202,3 +202,14 @@ exports.delete_line_item = function(req, res){
 		}
 	});
 }
+
+exports.complete_rfq = function(req, res){
+	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_status_id+"'", function(err, info_tech){
+		if(err){
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode":200, "success":"false", "message":"status updated successfully",});
+		}
+	});
+}
