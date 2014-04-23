@@ -82,32 +82,18 @@ exports.fetch_rfq_line_items = function(req, res){
 		}
 		else{
 			if(rfq_lines.length>0){
-				connection.query("SELECT `id`, `name` FROM `plants` WHERE `product_lines_id`='"+rfq_lines[0].product_lines_id+"'", function(err, plants) {
+				connection.query("SELECT `product_properties_id`, `value`, `remark` FROM `rfq_lines_technical_specs` WHERE rfq_lines_id='"+req.params.rfq_lines_id+"'", function(err, technical_specifications) {
 					if(err){
+						console.log(err);
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
 					}
 					else{
-						connection.query("SELECT `id`, `property_name` FROM `product_properties`", function(err, product_properties) {
+						connection.query("SELECT `id`, `name` FROM `product_lines`", function(err, product_lines) {
 							if(err){
-									res.json({"statusCode":500, "success":"false", "message": "internal error"});
+								res.json({"statusCode":500, "success":"false", "message": "internal error"});
 							}
 							else{
-								connection.query("SELECT `product_properties_id`, `value`, `remark` FROM `rfq_lines_technical_specs` WHERE rfq_lines_id='"+req.params.rfq_lines_id+"'", function(err, technical_specifications) {
-									if(err){
-										console.log(err);
-											res.json({"statusCode":500, "success":"false", "message": "internal error"});
-									}
-									else{
-										connection.query("SELECT `id`, `name` FROM `product_lines`", function(err, product_lines) {
-											if(err){
-												res.json({"statusCode":500, "success":"false", "message": "internal error"});
-											}
-											else{
-												res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "product_lines": product_lines, "production_plants":plants, "product_properties":product_properties, "technical_specifications":technical_specifications});
-											}
-										});
-									}
-								});
+								res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "product_lines": product_lines, "technical_specifications":technical_specifications});
 							}
 						});
 					}

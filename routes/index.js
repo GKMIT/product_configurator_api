@@ -2,7 +2,7 @@ var users = require('../controller/users');
 // validations
 var rfq_product_validation = require('../controller/validation/general_product_data.js');
 var rfq_line_items_validation = require('../controller/validation/rfq_line_items.js');
-
+var rfq_finalize_validation = require('../controller/validation/rfq_finalize');
 // calls
 var rfq = require('../controller/rfq/rfq_general_data');
 var rfq_product = require('../controller/rfq/general_product_data');
@@ -45,6 +45,6 @@ module.exports = function(){
 
 
 	// rfq finalize
-	app.get("/rfq_finalize/:user_id", rfq_finalize.rfq_partial_show);
+	app.get("/rfq_finalize/:user_id",rfq_finalize_validation.rfq_partial_show, rfq_finalize.rfq_partial_show);
 
 };
