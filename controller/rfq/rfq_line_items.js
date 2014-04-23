@@ -188,7 +188,7 @@ exports.update_line_item = function(req, res){
 									res.json({"statusCode":500, "success": "false", "message": "internal error"});
 								}
 								else{
-									res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
+									res.json({"statusCode":200, "success":"true", "message":"data update successfully",});
 								}
 							});
 						}
