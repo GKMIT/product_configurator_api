@@ -319,7 +319,7 @@ function save_rfq_general_dataValidation(req, res, callback){
 	}
 		callback(req, res, checkValid);	
 	
-} 
+}
 
 exports.save_rfq_general_data = function(req, res){
 	save_rfq_general_dataValidation(req, res, function(req, res, checkValid){

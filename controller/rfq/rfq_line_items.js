@@ -76,7 +76,7 @@ exports.product_properties = function(req, res){
 
 
 exports.fetch_rfq_line_items = function(req, res){
-	connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
+	connection.query("SELECT * FROM `rfq_lines` WHERE `id`='"+req.params.rfq_lines_id+"'", function(err, rfq_lines) {
 		if(err){
 				res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
