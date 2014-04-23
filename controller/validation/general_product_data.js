@@ -17,7 +17,7 @@ exports.general_product_data_saveValidation = function(req, res, next){
 		}
 	}
 	if(checkValid==1){
-		console.log("dsd");
+		// console.log("dsd");
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
 			if(err){
 				console.log(err);
@@ -28,11 +28,15 @@ exports.general_product_data_saveValidation = function(req, res, next){
 				if (organization_users.length>0) {
 					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, rfq) {
 						if(err){
-							console.log(err);
-								res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							next();
+							if(rfq.length>0){
+								next();
+							}
+							else{
+								res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
+							}
 						}
 					});
 				}

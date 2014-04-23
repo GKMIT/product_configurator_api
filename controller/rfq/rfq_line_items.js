@@ -143,7 +143,7 @@ exports.save_line_item = function(req, res){
 					res.json({"statusCode":500, "success": "false", "message": "internal error"});
 				}
 				else{
-					res.json({"statusCode":200, "success":"false", "message":"data insterted successfully",});
+					res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
 				}
 			});
 		}
@@ -183,7 +183,7 @@ exports.update_line_item = function(req, res){
 							res.json({"statusCode":500, "success": "false", "message": "internal error"});
 						}
 						else{
-							res.json({"statusCode":200, "success":"false", "message":"data insterted successfully",});
+							res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
 						}
 					});
 				}
@@ -198,7 +198,7 @@ exports.delete_line_item = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"false", "message":"data deleted successfully",});
+			res.json({"statusCode":200, "success":"true", "message":"data deleted successfully",});
 		}
 	});
 }
@@ -209,7 +209,7 @@ exports.complete_rfq = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"false", "message":"status updated successfully",});
+			res.json({"statusCode":200, "success":"true", "message":"status updated successfully",});
 		}
 	});
 }

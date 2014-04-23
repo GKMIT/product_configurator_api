@@ -14,9 +14,6 @@ function validateUser(req, res, callback){
 	var parameterValue=JSON.parse(JSON.stringify(req.body));
 	var i=0;
 	var checkValid=1;
-
-	
-	
 	
 	for (i = 0; i < fields.length; i++) {
 		if(typeof parameterValue[fields[i]]=="undefined"){
@@ -60,7 +57,7 @@ function testUser(email, password, req, res){
 					var time = new Date().getTime();
 					var auth_token=email+time;
 					auth_token=crypto.createHash('md5').update(auth_token).digest('hex');
-					connection.query("UPDATE `organization_users` SET `authentication_token`='"+auth_token+"' WHERE `email`='"+email+"' AND password='"+password+"'", function(
+					connection.query("UPDATE `organization_users` SET `authentication_token`='"+auth_token+"' WHERE `id`='"+rows[0].id+"'", function(
 							err, result) {
 						if(err){
 							res.json({statusCode: 500, "success":"false", message: "internal error"});
