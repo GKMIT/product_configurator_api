@@ -113,32 +113,32 @@ exports.save_line_item = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			var rfq_lines_id=info.insertId;
-			var fields=["product_properties_id", "value", "remark"];
-			var query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES (";
-			for (var i = 0; i < req.body.technical_specifications.length; i++) {
-				query=query+"'"+rfq_lines_id+"'";
-				for (var j = 0; j < fields.length; j++) {
-					query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
-					if(j+1==fields.length){
-						query=query+")";
+			console.log(req.body.technical_specifications.length);
+			if(req.body.technical_specifications.length>0){
+				var rfq_lines_id=info.insertId;
+				var fields=["product_properties_id", "value", "remark"];
+				var query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES (";
+				for (var i = 0; i < req.body.technical_specifications.length; i++) {
+					query=query+"'"+rfq_lines_id+"'";
+					for (var j = 0; j < fields.length; j++) {
+						query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+						if(j+1==fields.length){
+							query=query+")";
+						}
 					}
-					// else{
-						
-					// }
+					if(i+1<req.body.technical_specifications.length){
+						query=query+", (";
+					}
 				}
-				if(i+1<req.body.technical_specifications.length){
-					query=query+", (";
-				}
+				connection.query(query, function(err, info_tech){
+					if(err){
+						res.json({"statusCode":500, "success": "false", "message": "internal error"});
+					}
+						res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
+					
+				});
 			}
-			connection.query(query, function(err, info_tech){
-				if(err){
-					res.json({"statusCode":500, "success": "false", "message": "internal error"});
-				}
-				else{
-					res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
-				}
-			});
+			res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
 		}
 	});
 }

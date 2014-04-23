@@ -4,7 +4,7 @@ var testConnection = require('../../helper/connection');
 var should = require('should'),
 	supertest = require('supertest');
 
-	var global = require("../global/global_spec");
+	// var global = require("../global/global_spec");
 	var general = require("../global/general");
 
 // test cases for the general data of the rfq creation
@@ -16,7 +16,21 @@ describe('finalize RFQ', function () {
 	var parameter="";
 	var token ="";
 	it("Should OK all the valid data in finalize rfq", function (done) {
-		supertest(app)
+		var data=login("/login", email, password);
+		console.log(data);
+		// done();
+	});
+});
+
+
+
+
+
+
+
+
+function login(url, email, password){
+	supertest(app)
 		.post('/login')
 		.type('form')
 		.field('email', email)
@@ -26,8 +40,7 @@ describe('finalize RFQ', function () {
 			}
 			token=res.body.authentication_token;
 			parameter="/"+res.body.data[0].id;
-			general.TestGetCall("Should OK all the valid data in finalize rfq", url, parameter, 200, token, "GET");
-			// done();
-		});
+			console.log(res.body);
+			return JSON.stringify(res.body);
 	});
-});
+}
