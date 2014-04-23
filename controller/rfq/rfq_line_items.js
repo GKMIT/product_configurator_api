@@ -157,33 +157,40 @@ exports.update_line_item = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			connection.query("DELETE  FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
+			connection.query("DELETE  FROM `rfq_lines` WHERE `rfq_id` = '"+req.body.rfq_id+"'", function(err, info){
 				if(err){
 					res.json({"statusCode":500, "success": "false", "message": "internal error"});
 				}
-				else{
-					var rfq_lines_id=req.body.rfq_lines_id;
-					var fields=["product_properties_id", "value", "remark"];
-					var query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES (";
-					for (var i = 0; i < req.body.technical_specifications.length; i++) {
-						query=query+"'"+rfq_lines_id+"'";
-						for (var j = 0; j < fields.length; j++) {
-							query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
-							if(j+1==fields.length){
-								query=query+")";
-							}
-						}
-						if(i+1<req.body.technical_specifications.length){
-							query=query+", (";
-						}
-					}
-					console.log(query);
-					connection.query(query, function(err, info_tech){
+				else{ 
+					connection.query("DELETE  FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
 						if(err){
 							res.json({"statusCode":500, "success": "false", "message": "internal error"});
 						}
 						else{
-							res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
+							var rfq_lines_id=req.body.rfq_lines_id;
+							var fields=["product_properties_id", "value", "remark"];
+							var query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES (";
+							for (var i = 0; i < req.body.technical_specifications.length; i++) {
+								query=query+"'"+rfq_lines_id+"'";
+								for (var j = 0; j < fields.length; j++) {
+									query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+									if(j+1==fields.length){
+										query=query+")";
+									}
+								}
+								if(i+1<req.body.technical_specifications.length){
+									query=query+", (";
+								}
+							}
+							console.log(query);
+							connection.query(query, function(err, info_tech){
+								if(err){
+									res.json({"statusCode":500, "success": "false", "message": "internal error"});
+								}
+								else{
+									res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
+								}
+							});
 						}
 					});
 				}

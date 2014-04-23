@@ -21,7 +21,7 @@ exports.product_line = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
 						if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
@@ -169,7 +169,7 @@ exports.save_line_item = function(req, res, next){
 				}
 				else{
 					if (organization_users.length>0) {
-						connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+						connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
 							if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
@@ -235,12 +235,15 @@ exports.update_line_item = function(req, res, next){
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
+					console.log(organization_users);
 					if (organization_users.length>0) {
-						connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+						console.log("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'");
+						connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
 							if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
+							console.log(rfq);
 							if(rfq.length>0){
 								next();
 							}
@@ -282,7 +285,7 @@ exports.delete_line_item = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `rfq` LEFT JOIN rfq_lines ON rfq.id=rfq_lines.rfq_id WHERE rfq.created_by='"+req.params.user_id+"' AND rfq_lines.id='"+req.params.rfq_lines_id+"'", function(err, rfq) {
+					connection.query("SELECT * FROM `rfq` LEFT JOIN rfq_lines ON rfq.id=rfq_lines.rfq_id WHERE rfq.created_by='"+organization_users[0].id+"' AND rfq_lines.id='"+req.params.rfq_lines_id+"'", function(err, rfq) {
 						if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
@@ -329,7 +332,7 @@ exports.complete_rfq = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, rfq) {
+					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
 						if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
