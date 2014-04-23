@@ -98,7 +98,14 @@ exports.fetch_rfq_line_items = function(req, res){
 											res.json({"statusCode":500, "success":"false", "message": "internal error"});
 									}
 									else{
-										res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "production_plants":plants, "product_properties":product_properties, "technical_specifications":technical_specifications});
+										connection.query("SELECT `id`, `name` FROM `product_lines`", function(err, product_lines) {
+											if(err){
+												res.json({"statusCode":500, "success":"false", "message": "internal error"});
+											}
+											else{
+												res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "product_lines": product_lines, "production_plants":plants, "product_properties":product_properties, "technical_specifications":technical_specifications});
+											}
+										});
 									}
 								});
 							}
