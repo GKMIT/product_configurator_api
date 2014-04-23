@@ -4,7 +4,7 @@ exports.product_lines = function(req, res){
 			res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT * FROM `rfq_lines` WHERE rfq_id='"+req.params.rfq_id+"'", function(err, rfq_lines_items) {
+			connection.query("SELECT `rfq_lines`.id, `rfq_lines`.product_lines_id, `rfq_lines`.plants_id, `rfq_lines`.rfq_id, `rfq_lines`.number_of_units, `rfq_lines`.`req_delivery_date`, `product_lines`.name as `product_lines_name`, `plants`.name as `plant_name` FROM `rfq_lines`, `product_lines`, `plants` WHERE rfq_id='"+req.params.rfq_id+"' AND rfq_lines.product_lines_id=product_lines.id AND rfq_lines.plants_id=plants.id", function(err, rfq_lines_items) {
 				if(err){
 					res.json({"statusCode":500, "success":"false", "message": "internal error"});
 				}

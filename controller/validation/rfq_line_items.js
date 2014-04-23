@@ -127,19 +127,22 @@ exports.fetch_rfq_line_items = function(req, res, next){
 
 exports.save_line_item = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "product_lines_id", "plant_id", "rfq_id", "number_of_units", "req_delivery_date","rfq_status_id"];
+	var fields = ["user_id", "product_lines_id", "plant_id", "rfq_id", "number_of_units","rfq_status_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]==""){
+			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
 				break;
 			}
 		}
+	}
+	else if(typeof req.body.req_delivery_date=="undefined" || req.body.req_delivery_date==""){
+		res.json({"statusCode": 404, "success": "false", "message": "requested_deliver_date not defined"});
 	}
 	if(checkValid==1){
 		var subfields=["product_properties_id", "value", "remark"];
