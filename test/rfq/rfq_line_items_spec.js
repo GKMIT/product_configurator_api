@@ -262,6 +262,143 @@ describe('All RFQ Line Items', function () {
 
 });
 
+describe('Fetch Product Plants And Properties', function () {
+	var email="govindaraj.sethuraman@cgglobal.com";
+	var password="5e8ff9bf55ba3508199d22e984129be6";
+	var url="/fetch_product_plants_properties"
+
+	it("Should ok All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_product_lines", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall(url, parameter, token, 200, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should not ok becouse authentication_token not set", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_product_lines", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcallWithoutToken(url, parameter, 404, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should not ok authentication_token set but value not define", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_product_lines", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					token="";
+					getcall(url, parameter, token, 404, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should not ok becouse authentication_token value invalid", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_product_lines", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					token="invalid";
+					getcall(url, parameter, token, 404, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should not ok user_id is invalid", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_product_lines", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					user_id="00001212121240404";
+					parameter=user_id+"/"+product_lines_id;
+					getcall(url, parameter, token, 404, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should not ok becouse user_id is not numeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_product_lines", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					user_id="nonnumeric";
+					parameter=user_id+"/"+product_lines_id;
+					getcall(url, parameter, token, 404, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should not ok becouse product_lines_id is non numeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_product_lines", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					product_lines_id="nonNumeric";
+					parameter=user_id+"/"+product_lines_id;
+					getcall(url, parameter, token, 404, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+});
 
 
 
