@@ -112,6 +112,121 @@ describe('RFQ General Data', function () {
 });
 
 
+describe('RFQ General Data Sales Agent Get call', function () {
+	var email="govindaraj.sethuraman@cgglobal.com";
+	var password="5e8ff9bf55ba3508199d22e984129be6";
+	var url="/rfq_general_data_sales_agents";
+	var parameter="";
+	var token ="";
+	var data="";
+	it("Should OK all the valid data", function (done) {
+		login("/login", email, password, function(out){
+			rfq_finalize(out.data[0].id, out.authentication_token, function(obj){
+				var rfq_id=obj.partial_rfq[0].id;
+				var user_id=out.data[0].id;
+				rfq_general_data("/rfq_general_data", user_id, rfq_id, out.authentication_token,200, function(obj){
+					var country_id=obj.countries[0].id;
+					rfq_general_data_sales_agents(url, user_id, country_id, out.authentication_token,200, function(obj){
+						done();
+					});
+				});
+			})
+	 	});
+	});
+
+	it("Should  not OK becouse authentication_token not set in the header", function (done) {
+		login("/login", email, password, function(out){
+			rfq_finalize(out.data[0].id, out.authentication_token, function(obj){
+				var rfq_id=obj.partial_rfq[0].id;
+				var user_id=out.data[0].id;
+				rfq_general_data("/rfq_general_data", user_id, rfq_id, out.authentication_token,200, function(obj){
+					var country_id=obj.countries[0].id;
+					var parameter=user_id+"/"+country_id;
+					TokenNotSetTest(url, parameter, 404, function(){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK becouse authentication_token set in header but value not set", function (done) {
+		login("/login", email, password, function(out){
+			rfq_finalize(out.data[0].id, out.authentication_token, function(obj){
+				var rfq_id=obj.partial_rfq[0].id;
+				var user_id=out.data[0].id;
+				rfq_general_data("/rfq_general_data", user_id, rfq_id, out.authentication_token,200, function(obj){
+					var country_id=obj.countries[0].id;
+					rfq_general_data_sales_agents(url, user_id, country_id, "",404, function(obj){
+						done();
+					});
+				});
+			})
+	 	});
+	});
+
+	it("Should NOT OK becouse authentication_token set in header but value invalid set", function (done) {
+		login("/login", email, password, function(out){
+			rfq_finalize(out.data[0].id, out.authentication_token, function(obj){
+				var rfq_id=obj.partial_rfq[0].id;
+				var user_id=out.data[0].id;
+				rfq_general_data("/rfq_general_data", user_id, rfq_id, out.authentication_token,200, function(obj){
+					var country_id=obj.countries[0].id;
+					rfq_general_data_sales_agents(url, user_id, country_id, "invalid", 404, function(obj){
+						done();
+					});
+				});
+			})
+	 	});
+	});
+
+
+	it("Should NOT OK becouse user_id is a Not A Number", function (done) {
+		login("/login", email, password, function(out){
+			rfq_finalize(out.data[0].id, out.authentication_token, function(obj){
+				var rfq_id=obj.partial_rfq[0].id;
+				var user_id=out.data[0].id;
+				rfq_general_data("/rfq_general_data", user_id, rfq_id, out.authentication_token,200, function(obj){
+					var country_id=obj.countries[0].id;
+					rfq_general_data_sales_agents(url, "not a number", country_id, out.authentication_token,404, function(obj){
+						done();
+					});
+				});
+			})
+	 	});
+	});
+
+	it("Should NOT OK becouse country_id is a Not A Number", function (done) {
+		login("/login", email, password, function(out){
+			rfq_finalize(out.data[0].id, out.authentication_token, function(obj){
+				var rfq_id=obj.partial_rfq[0].id;
+				var user_id=out.data[0].id;
+				rfq_general_data("/rfq_general_data", user_id, rfq_id, out.authentication_token,200, function(obj){
+					var country_id=obj.countries[0].id;
+					rfq_general_data_sales_agents(url, user_id, "not a number", out.authentication_token,404, function(obj){
+						done();
+					});
+				});
+			})
+	 	});
+	});
+
+	it("Should NOT OK becouse user_id is a invalid", function (done) {
+		login("/login", email, password, function(out){
+			rfq_finalize(out.data[0].id, out.authentication_token, function(obj){
+				var rfq_id=obj.partial_rfq[0].id;
+				var user_id=out.data[0].id;
+				rfq_general_data("/rfq_general_data", user_id, rfq_id, out.authentication_token,200, function(obj){
+					var country_id=obj.countries[0].id;
+					rfq_general_data_sales_agents(url, 01010101010101, country_id, out.authentication_token,404, function(obj){
+						done();
+					});
+				});
+			})
+	 	});
+	});
+});
+
 
 
 
