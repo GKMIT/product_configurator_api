@@ -203,14 +203,53 @@ exports.delete_line_item = function(req, res){
 }
 
 exports.complete_rfq = function(req, res){
-	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
-		if(err){
-			res.json({"statusCode":500, "success": "false", "message": "internal error"});
-		}
-		else{
-			res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
-		}
-	});
+	if(req.body.rfq_status_id==2){
+		connection.query("SELECT r.id, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
+			if(err){
+				res.json({"statusCode":500, "success": "false", "message": "internal error"});
+			}
+			else{
+				// TODO : code this will optimize after some discussion
+				var document_no="";
+				var version_no="1.0";
+				var country=rfq_detail[0].iso_code;
+				var year=""+rfq_detail[0].year;
+				year=year.toString();
+				year=year[2]+year[3];
+				var number=rfq_detail[0].id;
+				var product_line=rfq_detail[0].product_lines_id;
+				var product_line_name="";
+				var rfq_id=rfq_detail[0].id;
+				if(product_line==1){
+					product_line_name="D";
+				}
+				if(product_line==2){
+					product_line_name="P";
+				}
+				document_no=country+year+product_line_name+number+"/"+version_no;
+
+				connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+					if(err){
+						res.json({"statusCode":500, "success": "false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+					}
+				});
+			}
+		});
+	}
+	else
+	{
+		connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+			if(err){
+				res.json({"statusCode":500, "success": "false", "message": "internal error"});
+			}
+			else{
+				res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+			}
+		});
+	}
 }
 
 
@@ -221,7 +260,7 @@ exports.fetch_property_detail = function(req, res, next){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"true", "message":"", "property": property});
+			res.json({"statusCode":200, "success":"true", "message":"", "process.assert();perty": property});
 		}
 	});
 }

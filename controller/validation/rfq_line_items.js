@@ -309,7 +309,7 @@ exports.delete_line_item = function(req, res, next){
 
 exports.complete_rfq = function(req, res, next){
 	var checkValid=1;
-	console.log(req.body);
+	// console.log("body is ::::::::::::::  "+req.body.rfq_status_id);
 	var fields = ["user_id", "rfq_id", "rfq_status_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
