@@ -146,7 +146,7 @@ exports.save_line_item = function(req, res, next){
 	}
 	if(checkValid==1){
 		var subfields=["product_properties_id", "value", "remark"];
-			if(typeof req.body.techincal_specifications=="object" || !Array.isArray(req.body.technical_specifications)){
+			if(typeof req.body.technical_specifications!="object" || !Array.isArray(req.body.technical_specifications)){
 				checkValid=0;
 				res.json({"statusCode": 404, "success":"false", "message": "technical_specifications not found !"});
 			}
@@ -309,7 +309,6 @@ exports.delete_line_item = function(req, res, next){
 
 exports.complete_rfq = function(req, res, next){
 	var checkValid=1;
-	// console.log("body is ::::::::::::::  "+req.body.rfq_status_id);
 	var fields = ["user_id", "rfq_id", "rfq_status_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;

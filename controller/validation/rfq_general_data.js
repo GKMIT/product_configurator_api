@@ -1,7 +1,7 @@
 var validator=require("validator");
 
 exports.rfq_general_data = function(req, res, next){
-		var checkValid=1;
+	var checkValid=1;
 	var fields = ["user_id", "rfq_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;

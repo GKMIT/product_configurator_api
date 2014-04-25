@@ -33,7 +33,6 @@ exports.ready_rfq_bid = function(req, res, next){
 
 
 exports.ready_rfq_bid_detail = function(req, res, next){
-	
 	var checkValid=1;
 	var fields = ["user_id", "rfq_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
@@ -53,7 +52,6 @@ exports.ready_rfq_bid_detail = function(req, res, next){
 			}
 		}
 	}
-
 	if(checkValid==1){
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.params.user_id, function(err, organization_users) {
 			if(err){
@@ -84,3 +82,71 @@ exports.ready_rfq_bid_detail = function(req, res, next){
 	}
 }
 
+
+exports.save_rfq_questions = function(req, res, next){
+	var checkValid=1;
+	var fields = ["user_id", "rfq_id"];
+	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
+		checkValid=0;
+		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
+	}
+	else if(checkValid==1){
+			for(var i=0; i<fields.length; i++){
+				if(typeof req.body[fields[i]]=="undefined"){
+					checkValid=0;
+					res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
+				}
+				else if(!validator.isNumeric(req.body[fields[i]])){
+					checkValid=0;
+					res.json({"statusCode": 404, "success": "false", "message": fields[i]+" value not valid"});
+					break;
+				}
+			}
+	}
+	if(checkValid==1){
+		var subfields=["question_id", "value"];
+			if(typeof req.body.questions!="object" || !Array.isArray(req.body.questions)){
+				checkValid=0;
+				res.json({"statusCode": 404, "success":"false", "message": "questions not found !"});
+			}
+			else{
+			for(var i=0; i<req.body.questions.length; i++){
+				for(var j=0; j<subfields.length; j++){
+					if(typeof req.body.questions[i][subfields[j]]=="undefined" || !validator.isNumeric(req.body.questions[i][subfields[j]])){
+						checkValid=0;
+						res.json({"statusCode": 404, "success": "false", "message": subfields[j]+" not defined"});
+						break;
+					}
+				}
+			}
+		}
+		if(checkValid==1){
+			connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
+				if(err){
+					console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					if (organization_users.length>0) {
+						connection.query("SELECT * FROM rfq WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, rfq) {
+							if(err){
+								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							}
+							else{
+								if (rfq.length>0) {
+									next();
+								}
+								else{
+									res.json({"statusCode": 401, "success":"false", "message": "invalid access"});
+								}
+							}
+						});
+					}
+					else{
+						res.json({"statusCode": 404, "success":"false", "message": "user not found"});
+					}
+				}
+			});
+		}
+	}
+}

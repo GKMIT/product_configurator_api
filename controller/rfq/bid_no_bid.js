@@ -28,3 +28,33 @@ exports.ready_rfq_bid_detail = function(req, res){
 		}
 	});
 };
+
+exports.save_rfq_questions = function(req, res){
+	// if(req.body.questions.length>0){
+				var rfq_id=req.body.rfq_id;
+				var fields=["question_id", "value"];
+				var query="INSERT INTO `rfq_lines_questions`(`rfq_id`, `rfq_questions_id`, `question_value`) VALUES (";
+				for (var i = 0; i < req.body.questions.length; i++) {
+					query=query+"'"+rfq_id+"'";
+					for (var j = 0; j < fields.length; j++) {
+						query=query+", '"+req.body.questions[i][fields[j]]+"'";
+						if(j+1==fields.length){
+							query=query+")";
+						}
+					}
+					if(i+1<req.body.questions.length){
+						query=query+", (";
+					}
+				}
+				console.log(query);
+				connection.query(query, function(err, info){
+					if(err){
+						console.log(err);
+						res.json({"statusCode":500, "success": "false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode":200, "success":"true", "message": "data insterted successfully"});
+					}					
+				});
+			// }
+};
