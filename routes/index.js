@@ -1,5 +1,6 @@
 var users = require('../controller/users');
 // validations
+var rfq_general_data_validation = require('../controller/validation/rfq_general_data.js');
 var rfq_product_validation = require('../controller/validation/general_product_data.js');
 var rfq_line_items_validation = require('../controller/validation/rfq_line_items.js');
 var rfq_finalize_validation = require('../controller/validation/rfq_finalize');
@@ -12,7 +13,7 @@ module.exports = function(){
 	
 	app.post("/login", users.login);
 	// rfq general data
-	app.get("/rfq_general_data/:user_id/:rfq_id", rfq.rfq_general_data);
+	app.get("/rfq_general_data/:user_id/:rfq_id", rfq_general_data_validation.rfq_general_data, rfq.rfq_general_data);
 	// NOTE :  country_id is customer country in the below call 
 	app.get("/rfq_general_data_sales_agents/:user_id/:country_id", rfq.rfq_general_data_sales_agents);
 	app.get("/rfq_general_data_sales_persons/:user_id/:sales_hubs_id", rfq.rfq_general_data_sales_persons);
@@ -26,7 +27,7 @@ module.exports = function(){
 	// rfq general product data API's
 	app.get("/rfq_product_lines/:user_id/:rfq_id", rfq_product.rfq_product_lines);
 	app.get("/rfq_tendering_teams/:user_id/:product_lines_id", rfq_product.rfq_tendering_teams);
-	app.get("/rfq_tendering_teams_members/:user_id/:tendering_teams_id", rfq_product.rfq_tendering_teams_members);
+	app.get("/rfq_tendering_teams_members/:user_id/:tendering_teams_id",rfq_product_validation.rfq_tendering_teams_members, rfq_product.rfq_tendering_teams_members);
 	app.put("/general_product_data_save", rfq_product_validation.general_product_data_saveValidation, rfq_product.general_product_data_save);
 	
 

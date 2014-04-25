@@ -1,62 +1,7 @@
-function get_rfq_generalValidation(req, res, callback){
-	var checkValid=1;
-	if(req.header("authentication_token")==""){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
-	}
-	else if(typeof req.header("authentication_token")=="undefined"){
-		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not defined"});	
-	}
-	else if(typeof req.params.user_id=="undefined"){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "parameter user_id not defined !"});
-	}
-	else if(req.params.user_id==""){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "user_id not found"});
-	}
-	else if(checkValid==1){
-		connection.query("SELECT `id`,`authentication_token`, `user_status` FROM `organization_users` WHERE `authentication_token`='"+req.header('authentication_token')+"' AND `id`='"+req.params.user_id+"'", function(err, organization_users) {
-			if(err){
-				checkValid=0
-				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-			}
-			else{
+var validator = require("validator");
 
-				console.log("welcome"+organization_users.length);
-				if(organization_users.length>0){
-					if(organization_users[0].user_status!=1){
-						checkValid=0;
-						res.json({statusCode: 401, "success":"false", message: "unauthorised user"});
-					}
-				}
-				else{
-					checkValid=0;
-					res.json({"statusCode": 404, "success": "false", "message": "User not found !"});
-				}
-			}
-		});
-	}
-	else if(checkValid==1){
-		if(typeof req.params.rfq_id=="undefined"){
-			checkValid=0;
-			res.json({"statusCode": 404, "success": "false", "message": "parameter rfq_id not defined !"});
-		}
-		else if(req.params.rfq_id!==""){
-			checkValid=0;
-			res.json({"statusCode": 404, "success": "false", "message": "parameter rfq_id not defined !"});
-		}
-	}
-	// else if(checkValid==1){
-	// 	console.log("reach to callaback");
-		callback(req, res, checkValid);
-	// }
-	// else if(ch)
-	
-}
-
-function get_rfq_genereral_data(req, res, checkValid){
-		connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+exports.rfq_general_data = function(req, res){
+	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
 			if(err){
 				console.log(err);
 				res.json({"statusCode":500, "success":"false", "message": "internal error"});
@@ -120,43 +65,31 @@ function get_rfq_genereral_data(req, res, checkValid){
 				});
 			}
 		});
-}
-
-exports.rfq_general_data = function(req, res){
-	get_rfq_generalValidation(req, res, function(req, res, checkValid){
-		// console.log("welcome"+checkValid);
-		if(checkValid==1)
-		get_rfq_genereral_data(req, res, checkValid);
-	});
 };
 
 // API Code for GET Agents
 function get_rfq_general_data_sales_agentsValidation(req, res, callback){
 	var checkValid=1;
-	if(req.header("authentication_token")==""){
+	var fields = ["user_id", "country_id"];
+	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
-	else if(typeof req.header("authentication_token")=="undefined"){
-		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not defined"});	
-	}
-	else if(typeof req.params.country_id=="undefined"){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "parameter country_id not defined !"});
-	}
-	else if(req.params.country_id==""){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "country_id not found"});
-	}
-	else if(typeof req.params.user_id=="undefined"){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "parameter user_id not defined !"});
-	}
-	else if(req.params.user_id==""){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "user_id not found"});
-	}
 	else if(checkValid==1){
+			for(var i=0; i<fields.length; i++){
+			if(typeof req.params[fields[i]]=="undefined" || req.params[fields[i]]==""){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
+			}
+			else if(!validator.isNumeric(req.params[fields[i]])){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" non Numeric"});
+				break;
+			}
+		}
+	}
+
+	if(checkValid==1){
 		connection.query("SELECT `id`,`authentication_token`, `user_status` FROM `organization_users` WHERE authentication_token='"+req.header('authentication_token')+"' AND id='"+req.params.user_id+"'", function(err, organization_users) {
 			if(err){
 				checkValid=0
@@ -200,32 +133,27 @@ exports.rfq_general_data_sales_agents = function(req, res){
 
 // API Code for the sales_persons
 function rfq_general_data_sales_personsValidation(req, res, callback){
-	// if(req.header("authentication_token") && req.params.user_id && req.params.sales_hubs_id){
 	var checkValid=1;
-	if(req.header("authentication_token")==""){
+	var fields = ["user_id", "sales_hubs_id"];
+	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
-	else if(typeof req.header("authentication_token")=="undefined"){
-		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not defined"});	
-	}
-	else if(typeof req.params.user_id=="undefined"){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "parameter user_id not defined !"});
-	}
-	else if(req.params.user_id==""){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "user_id not found"});
-	}
-	else if(typeof req.params.sales_hubs_id=="undefined"){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "parameter sales_hubs_id not defined !"});
-	}
-	else if(req.params.sales_hubs_id==""){
-		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "sales_hubs_id value not found"});
-	}
 	else if(checkValid==1){
+			for(var i=0; i<fields.length; i++){
+			if(typeof req.params[fields[i]]=="undefined" || req.params[fields[i]]==""){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
+			}
+			else if(!validator.isNumeric(req.params[fields[i]])){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" non Numeric"});
+				break;
+			}
+		}
+	}
+
+	if(checkValid==1){
 		connection.query("SELECT `id`,`authentication_token`, `user_status` FROM `organization_users` WHERE authentication_token='"+req.header('authentication_token')+"' AND id='"+req.params.user_id+"'", function(err, organization_users) {
 			if(err){
 				checkValid=0
@@ -271,8 +199,7 @@ exports.rfq_general_data_sales_persons=function(req, res){
 // API Code for the save new rfq
 function save_rfq_general_dataValidation(req, res, callback){
 	var checkValid=1;
-	var query="";
-	var param = ["user_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "date_rfq_in", "sales_segments_id", "requested_quotation_date", "probability", "rfq_status_id"];
+	var param = ["user_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "sales_segments_id", "probability", "rfq_status_id"];
 	if(req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -285,11 +212,31 @@ function save_rfq_general_dataValidation(req, res, callback){
 		var parameterValue=JSON.parse(JSON.stringify(req.body));
 			for(var i=0; i<param.length; i++){
 				var fieldName=param[i];
-			if(typeof parameterValue[param[i]]=="undefined" || parameterValue[param[i]]==""){
+			if(typeof parameterValue[param[i]]=="undefined"){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
+				break;
 			}
-			if(checkValid==0){
+			if(!validator.isNumeric(parameterValue[param[i]])){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": param[i]+" value not appropriate"});
+				break;
+			}
+		}
+	}
+	if(checkValid==1){
+		var param = ["date_rfq_in", "requested_quotation_date"];
+		var parameterValue=JSON.parse(JSON.stringify(req.body));
+			for(var i=0; i<param.length; i++){
+				var fieldName=param[i];
+			if(typeof parameterValue[param[i]]=="undefined"){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
+				break;
+			}
+			if(parameterValue[param[i]]==""){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": param[i]+" value not appropriate"});
 				break;
 			}
 		}
@@ -297,33 +244,29 @@ function save_rfq_general_dataValidation(req, res, callback){
 	if(checkValid==1){
 		connection.query("SELECT `id`,`authentication_token`, `user_status` FROM `organization_users` WHERE authentication_token='"+req.header('authentication_token')+"' AND id='"+req.body.user_id+"'", function(err, organization_users) {
 			if(err){
-				checkValid=0
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 			}
 			else{
 				if(organization_users.length>0){
 					if(organization_users[0].user_status!=1){
-						checkValid=0;
 						res.json({statusCode: 401, "success":"false", message: "unauthorised user"});
 					}
 					else{
-
+						callback(req, res);
 					}
 				}
 				else{
-					checkValid=0;
 					res.json({"statusCode": 404, "success": "false", "message": "User not found !"});
 				}
 			}
 		});
 	}
-		callback(req, res, checkValid);	
+			
 	
 }
 
 exports.save_rfq_general_data = function(req, res){
-	save_rfq_general_dataValidation(req, res, function(req, res, checkValid){
-		if(checkValid==1){
+	save_rfq_general_dataValidation(req, res, function(req, res){
 				var param = new Array();
   				var paramValue = new Array();
 				// var flag="true";
@@ -335,11 +278,11 @@ exports.save_rfq_general_data = function(req, res){
 					param.push("project_name");
 					paramValue.push(req.body.project_name);
 				}
-				if(typeof req.body.sales_agents_id!=="undefined" && req.body.sales_agents_id!==""){
+				if(typeof req.body.sales_agents_id!=="undefined" && req.body.sales_agents_id!=="" && validator.isNumeric(req.body.sales_agents_id)){
 					param.push("sales_agents_id");
 					paramValue.push(req.body.sales_agents_id);
 				}
-				if(typeof req.body.win!=="undefined" && req.body.win!==""){
+				if(typeof req.body.win!=="undefined" && req.body.win!=="" && validator.isNumeric(req.body.win)){
 					param.push("win");
 					paramValue.push(req.body.win);
 				}
@@ -370,7 +313,6 @@ exports.save_rfq_general_data = function(req, res){
 							res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": info.insertId});
 						}
 					});
-		}
 	});
 		
 };
@@ -378,24 +320,44 @@ exports.save_rfq_general_data = function(req, res){
 // API Code for the update call rfq
 function update_rfq_general_dataValidation(req, res, callback){
 	var checkValid=1;
-	var param = ["user_id", "rfq_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "date_rfq_in", "sales_segments_id", "requested_quotation_date", "probability", "rfq_status_id"];
+	var param = ["user_id", "rfq_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "sales_segments_id", "probability", "rfq_status_id"];
 	if(req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(typeof req.header("authentication_token")=="undefined"){
+		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not defined"});	
 	}
 	if(checkValid==1){
 		var parameterValue=JSON.parse(JSON.stringify(req.body));
 			for(var i=0; i<param.length; i++){
 				var fieldName=param[i];
-				// console.log(param[i]);
-			if(typeof parameterValue[param[i]]=="undefined" || parameterValue[param[i]]==""){
+			if(typeof parameterValue[param[i]]=="undefined"){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
+				break;
 			}
-			if(checkValid==0){
+			if(!validator.isNumeric(parameterValue[param[i]])){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": param[i]+" value not appropriate"});
+				break;
+			}
+		}
+	}
+	if(checkValid==1){
+		var param = ["date_rfq_in", "requested_quotation_date"];
+		var parameterValue=JSON.parse(JSON.stringify(req.body));
+			for(var i=0; i<param.length; i++){
+				var fieldName=param[i];
+			if(typeof parameterValue[param[i]]=="undefined"){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": param[i]+" not defined"});
+				break;
+			}
+			if(parameterValue[param[i]]==""){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": param[i]+" value not appropriate"});
 				break;
 			}
 		}
@@ -413,62 +375,53 @@ function update_rfq_general_dataValidation(req, res, callback){
 						res.json({statusCode: 401, "success":"false", message: "unauthorised user"});
 					}
 					else{
-
+						connection.query("SELECT `id` FROM `rfq` WHERE id='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, created_by) {
+							if(err){
+								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							}
+							else{
+								if(created_by.length==0){
+									res.json({statusCode: 401, "success":"false", message: "unauthorised access of RFQ"});
+								}
+								else{
+									callback(req, res);
+								}
+							}
+						});
 					}
 				}
 				else{
-					checkValid=0;
 					res.json({"statusCode": 404, "success": "false", "message": "User not found !"});
 				}
 			}
 		});
 	}
-		callback(req, res, checkValid);	
-	// }
-
-	
 
 }
 
 
 exports.update_rfq_general_data = function(req, res){
-	update_rfq_general_dataValidation(req, res, function(req, res, checkValid){
-		connection.query("SELECT `id` FROM `rfq` WHERE id='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, created_by) {
-			if(err){
-				checkValid=0
-				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-			}
-			else{
-
-				if(created_by.length==0){
-					checkValid=0;
-					res.json({statusCode: 401, "success":"false", message: "unauthorised access of RFQ"});
-				}
-			}
-		});
-		if(checkValid==1){
+	update_rfq_general_dataValidation(req, res, function(req, res){
 			var param = new Array();
 				var paramValue = new Array();
 			
 				param.push("rfq_status_id");
-				// partial status code is 1
+				// partial status code is 0 OR 1
 				paramValue.push(req.body.rfq_status_id);
 
-			if(typeof req.body.sales_agents_id!=="undefined" && req.body.sales_agents_id!==""){
+			if(typeof req.body.sales_agents_id!=="undefined" && validator.isNumeric(req.body.sales_agents_id)){
 				param.push("sales_agents_id");
 				paramValue.push(req.body.sales_agents_id);
 			}
-
 			if(typeof req.body.project_name!=="undefined" && req.body.project_name!==""){
 				param.push("project_name");
 				paramValue.push(req.body.project_name);
 			}
-
-			if(typeof req.body.installation_country!=="undefined" && req.body.installation_country!==""){
+			if(typeof req.body.installation_country!=="undefined" && validator.isNumeric(req.body.installation_country)){
 				param.push("installation_country");
 				paramValue.push(req.body.installation_country);
 			}
-			if(typeof req.body.win!=="undefined" && req.body.win!==""){
+			if(typeof req.body.win!=="undefined" && validator.isNumeric(req.body.win)){
 				param.push("win");
 				paramValue.push(req.body.win);
 			}
@@ -494,6 +447,5 @@ exports.update_rfq_general_data = function(req, res){
 						res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": req.body.rfq_id});
 					}
 				});
-		}
 	});	
 };

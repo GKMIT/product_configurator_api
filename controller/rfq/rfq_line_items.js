@@ -113,7 +113,6 @@ exports.save_line_item = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			console.log(req.body.technical_specifications.length);
 			if(req.body.technical_specifications.length>0){
 				var rfq_lines_id=info.insertId;
 				var fields=["product_properties_id", "value", "remark"];
