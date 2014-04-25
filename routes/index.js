@@ -1,14 +1,16 @@
 var users = require('../controller/users');
 // validations
-var rfq_general_data_validation = require('../controller/validation/rfq_general_data.js');
-var rfq_product_validation = require('../controller/validation/general_product_data.js');
-var rfq_line_items_validation = require('../controller/validation/rfq_line_items.js');
+var rfq_general_data_validation = require('../controller/validation/rfq_general_data');
+var rfq_product_validation = require('../controller/validation/general_product_data');
+var rfq_line_items_validation = require('../controller/validation/rfq_line_items');
 var rfq_finalize_validation = require('../controller/validation/rfq_finalize');
+var rfq_bid_validation = require('../controller/validation/bid_no_bid');
 // calls
 var rfq = require('../controller/rfq/rfq_general_data');
 var rfq_product = require('../controller/rfq/general_product_data');
 var rfq_line_items = require('../controller/rfq/rfq_line_items');
 var rfq_finalize = require('../controller/rfq/rfq_finalize');
+var rfq_bid = require('../controller/rfq/bid_no_bid');
 module.exports = function(){
 	
 	app.post("/login", users.login);
@@ -53,5 +55,6 @@ module.exports = function(){
 
 	// bid no bid
 
+	app.get("/ready_rfq_bid/:user_id", rfq_bid_validation.ready_rfq_bid, rfq_bid.ready_rfq_bid);
 
 };

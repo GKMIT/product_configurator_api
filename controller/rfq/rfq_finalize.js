@@ -10,4 +10,3 @@ exports.rfq_partial_show = function(req, res){
 		}
 	});
 };
-
