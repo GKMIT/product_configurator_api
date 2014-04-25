@@ -14,7 +14,7 @@ exports.ready_rfq_bid_detail = function(req, res){
 	connection.query("SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq_lines`.`req_delivery_date` FROM `rfq` LEFT JOIN `rfq_lines` ON `rfq`.`id`=`rfq_lines`.`rfq_id` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			console.log(err);
-			res.json({"statusCode": 500, "success":"false", "message": "yoyyointernal error"});
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
 			connection.query("SELECT `id`, `question` FROM `rfq_questions`", function(err, rfq_questions) {
@@ -30,7 +30,6 @@ exports.ready_rfq_bid_detail = function(req, res){
 };
 
 exports.save_rfq_questions = function(req, res){
-	// if(req.body.questions.length>0){
 				var rfq_id=req.body.rfq_id;
 				var fields=["question_id", "value"];
 				var query="INSERT INTO `rfq_lines_questions`(`rfq_id`, `rfq_questions_id`, `question_value`) VALUES (";
@@ -56,5 +55,38 @@ exports.save_rfq_questions = function(req, res){
 						res.json({"statusCode":200, "success":"true", "message": "data insterted successfully"});
 					}					
 				});
-			// }
+};
+
+exports.full_rfq_detail = function(req, res){
+	connection.query("SELECT * FROM `rfq` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			connection.query("SELECT * FROM `rfq_lines` WHERE rfq_id='"+rfq[0].id+"'", function(err, rfq_lines) {
+				if(err){
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					var query="SELECT * FROM  `rfq_lines_technical_specs` WHERE ";
+					for (var i = 0; i < rfq_lines.length; i++) {
+						query=query+"rfq_lines_id='"+rfq_lines[i].id+"'";
+						if(i+1<rfq_lines.length){
+							query=query+" OR "
+						}
+					};
+					console.log(query);
+					connection.query(query, function(err, rfq_lines_technical_specs) {
+						if(err){
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+						}
+						else{
+							res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": rfq_lines_technical_specs});
+						}
+					});
+				}
+			});
+		}
+	});
 };
