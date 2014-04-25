@@ -32,7 +32,6 @@ exports.ready_rfq_bid = function(req, res, next){
 }
 
 
-var validator=require("validator");
 exports.ready_rfq_bid_detail = function(req, res, next){
 	
 	var checkValid=1;
@@ -63,13 +62,13 @@ exports.ready_rfq_bid_detail = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM rfq WHERE `id`="+req.params.rfq_id, function(err, rfq) {
+					connection.query("SELECT * FROM rfq WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
 						if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
 							if (rfq.length>0) {
-									next();				
+								next();
 							}
 							else{
 								res.json({"statusCode": 401, "success":"false", "message": "invalid access"});

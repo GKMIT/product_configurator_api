@@ -11,13 +11,20 @@ exports.ready_rfq_bid = function(req, res){
 	});
 };
 exports.ready_rfq_bid_detail = function(req, res){
-	connection.query(query, function(err, rfq) {
+	connection.query("SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq_lines`.`req_delivery_date` FROM `rfq` LEFT JOIN `rfq_lines` ON `rfq`.`id`=`rfq_lines`.`rfq_id` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			console.log(err);
-				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			res.json({"statusCode": 500, "success":"false", "message": "yoyyointernal error"});
 		}
 		else{
-			res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+			connection.query("SELECT `id`, `question` FROM `rfq_questions`", function(err, rfq_questions) {
+				if(err){
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_questions": rfq_questions});
+				}
+			});
 		}
 	});
 };
