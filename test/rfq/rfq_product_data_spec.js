@@ -285,6 +285,170 @@ describe('RFQ Product tendering teams Data', function () {
 
 
 
+// test cases for GET tendering teams Members data 
+describe('RFQ Product tendering teams Members Data', function () {
+	it('should return not ok parameter authentication_token not provide',
+			function (done) {
+  			var email="govindaraj.sethuraman@cgglobal.com"
+	     	var password="5e8ff9bf55ba3508199d22e984129be6";
+			login(email, password, function(user){
+				var token=user.authentication_token;
+				var user_id=user.data[0].id;
+				rfq_finalize(user_id, token, function(rfq){
+					var rfq_id=rfq.partial_rfq[0].id;
+					var url="/rfq_tendering_teams_members";
+					var parameter=user_id+"/"+rfq_id;
+					getcall("/rfq_new_line_item", parameter, token, 200, function(product){
+						var product_line_id=product.product_lines[0].id;
+						parameter=user_id+"/"+product_line_id;
+						getcall("/rfq_tendering_teams", parameter, token, 200, function(product){
+							var team_id = product.tendering_teams[0].id;
+							parameter=user_id+"/"+team_id;
+							getcallWithoutToken(url, parameter, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+	});
+
+	it('should return not ok parameter authentication_token provide but value not provide',
+			function (done) {
+  			var email="govindaraj.sethuraman@cgglobal.com"
+	     	var password="5e8ff9bf55ba3508199d22e984129be6";
+			login(email, password, function(user){
+				var token=user.authentication_token;
+				var user_id=user.data[0].id;
+				rfq_finalize(user_id, token, function(rfq){
+					var rfq_id=rfq.partial_rfq[0].id;
+					var url="/rfq_tendering_teams_members";
+					var parameter=user_id+"/"+rfq_id;
+					getcall("/rfq_new_line_item", parameter, token, 200, function(product){
+						var product_line_id=product.product_lines[0].id;
+						parameter=user_id+"/"+product_line_id;
+						getcall("/rfq_tendering_teams", parameter, token, 200, function(product){
+							var team_id = product.tendering_teams[0].id;
+							parameter=user_id+"/"+team_id;
+							token="";
+							getcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+	});
+
+	it('should return not ok parameter invalid authentication_token provide',
+			function (done) {
+  			var email="govindaraj.sethuraman@cgglobal.com"
+	     	var password="5e8ff9bf55ba3508199d22e984129be6";
+			login(email, password, function(user){
+				var token=user.authentication_token;
+				var user_id=user.data[0].id;
+				rfq_finalize(user_id, token, function(rfq){
+					var rfq_id=rfq.partial_rfq[0].id;
+					var url="/rfq_tendering_teams_members";
+					var parameter=user_id+"/"+rfq_id;
+					getcall("/rfq_new_line_item", parameter, token, 200, function(product){
+						var product_line_id=product.product_lines[0].id;
+						parameter=user_id+"/"+product_line_id;
+						getcall("/rfq_tendering_teams", parameter, token, 200, function(product){
+							var team_id = product.tendering_teams[0].id;
+							parameter=user_id+"/"+team_id;
+							token="invalid";
+							getcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+	});
+
+	it('should return not ok parameter invalid user_id provide',
+			function (done) {
+  			var email="govindaraj.sethuraman@cgglobal.com"
+	     	var password="5e8ff9bf55ba3508199d22e984129be6";
+			login(email, password, function(user){
+				var token=user.authentication_token;
+				var user_id=user.data[0].id;
+				rfq_finalize(user_id, token, function(rfq){
+					var rfq_id=rfq.partial_rfq[0].id;
+					var url="/rfq_tendering_teams_members";
+					var parameter=user_id+"/"+rfq_id;
+					getcall("/rfq_new_line_item", parameter, token, 200, function(product){
+						var product_line_id=product.product_lines[0].id;
+						parameter=user_id+"/"+product_line_id;
+						getcall("/rfq_tendering_teams", parameter, token, 200, function(product){
+							var team_id = product.tendering_teams[0].id;
+							user_id="invalid";
+							parameter=user_id+"/"+team_id;
+							getcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+	});
+
+	it('should return not ok parameter invalid tendering_teams_id provide',
+			function (done) {
+  			var email="govindaraj.sethuraman@cgglobal.com"
+	     	var password="5e8ff9bf55ba3508199d22e984129be6";
+			login(email, password, function(user){
+				var token=user.authentication_token;
+				var user_id=user.data[0].id;
+				rfq_finalize(user_id, token, function(rfq){
+					var rfq_id=rfq.partial_rfq[0].id;
+					var url="/rfq_tendering_teams_members";
+					var parameter=user_id+"/"+rfq_id;
+					getcall("/rfq_new_line_item", parameter, token, 200, function(product){
+						var product_line_id=product.product_lines[0].id;
+						parameter=user_id+"/"+product_line_id;
+						getcall("/rfq_tendering_teams", parameter, token, 200, function(product){
+							var team_id = product.tendering_teams[0].id;
+							team_id="invalid";
+							parameter=user_id+"/"+team_id;
+							getcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+	});
+
+	it('should return ok all parameter provide',function (done) {
+		var email="govindaraj.sethuraman@cgglobal.com"
+     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		login(email, password, function(user){
+			var token=user.authentication_token;
+			var user_id=user.data[0].id;
+			rfq_finalize(user_id, token, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var url="/rfq_tendering_teams_members";
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(product){
+					var product_line_id=product.product_lines[0].id;
+					parameter=user_id+"/"+product_line_id;
+					getcall("/rfq_tendering_teams", parameter, token, 200, function(product){
+						var team_id = product.tendering_teams[0].id;
+						parameter=user_id+"/"+team_id;
+						getcall(url, parameter, token, 200, function(obj){
+							done();
+						});
+					});
+				});
+			});
+		});
+	});
+});
+
+
+
 
 
 function login(email, password, callback){
