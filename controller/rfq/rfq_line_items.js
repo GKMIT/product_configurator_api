@@ -133,11 +133,11 @@ exports.save_line_item = function(req, res){
 					if(err){
 						res.json({"statusCode":500, "success": "false", "message": "internal error"});
 					}
-						res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
+						res.json({"statusCode":200, "success":"true", "message":"data insterted successfully"});
 					
 				});
 			}
-			res.json({"statusCode":200, "success":"true", "message":"data insterted successfully",});
+			res.json({"statusCode":200, "success":"true", "message":"data insterted successfully"});
 		}
 	});
 }
@@ -175,7 +175,7 @@ exports.update_line_item = function(req, res){
 							res.json({"statusCode":500, "success": "false", "message": "internal error"});
 						}
 						else{
-							res.json({"statusCode":200, "success":"true", "message":"data update successfully",});
+							res.json({"statusCode":200, "success":"true", "message":"data update successfully"});
 						}
 					});
 				}
@@ -195,7 +195,7 @@ exports.delete_line_item = function(req, res){
 					res.json({"statusCode":500, "success": "false", "message": "internal error"});
 				}
 				else{
-					res.json({"statusCode":200, "success":"true", "message":"data deleted successfully",});
+					res.json({"statusCode":200, "success":"true", "message":"data deleted successfully"});
 				}
 			});
 		}
@@ -208,7 +208,20 @@ exports.complete_rfq = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully",});
+			res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+		}
+	});
+}
+
+
+exports.fetch_property_detail = function(req, res, next){
+	connection.query("SELECT `id`, `property_name`, `product_lines_id`, `categories_id`, `unit_of_measurement` FROM `product_properties` WHERE `id`='"+req.params.property_id+"'", function(err, property){
+		if(err){
+			console.log(err);
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode":200, "success":"true", "message":"", "property": property});
 		}
 	});
 }

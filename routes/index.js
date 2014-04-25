@@ -37,6 +37,9 @@ module.exports = function(){
 	app.get("/fetch_product_plants_properties/:user_id/:product_lines_id", rfq_line_items_validation.fetch_product_plants_properties, rfq_line_items.fetch_product_plants_properties);
 	// app.get("/fetch_product_properties/:user_id/:product_lines_id", rfq_line_items_validation.fetch_production_plants, rfq_line_items.product_properties);
 
+	// call for get the property value
+	app.get("/fetch_property_detail/:user_id/:property_id", rfq_line_items_validation.fetch_property_detail, rfq_line_items.fetch_property_detail);
+
 	app.get("/fetch_rfq_line_items/:user_id/:rfq_id/:rfq_lines_id", rfq_line_items_validation.fetch_rfq_line_items, rfq_line_items.fetch_rfq_line_items);
 	
 	app.post("/save_line_item", rfq_line_items_validation.save_line_item, rfq_line_items.save_line_item);
@@ -47,5 +50,8 @@ module.exports = function(){
 
 	// rfq finalize
 	app.get("/rfq_finalize/:user_id",rfq_finalize_validation.rfq_partial_show, rfq_finalize.rfq_partial_show);
+
+	// bid no bid
+
 
 };
