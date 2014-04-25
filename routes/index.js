@@ -56,5 +56,8 @@ module.exports = function(){
 	// bid no bid
 
 	app.get("/ready_rfq_bid/:user_id", rfq_bid_validation.ready_rfq_bid, rfq_bid.ready_rfq_bid);
+	// app.get("/ready_rfq_bid_detail/:user_id/:rfq_id", rfq_bid_validation.ready_rfq_bid_detail, rfq_bid.ready_rfq_bid_detail);
+
+
 
 };
