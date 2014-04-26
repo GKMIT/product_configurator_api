@@ -113,3 +113,14 @@ exports.get_rejection_remarks = function(req, res){
 	});
 };
 
+
+exports.rfq_no_bid_submit = function(req, res){
+	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"', `rejection_remarks_id`='"+req.body.rejection_remarks_id+"', `estimated_sales_price`='"+req.body.estimated_sales_price+"' WHERE `id`='"+req.body.rfq_id+"' AND `created_by`='"+req.body.user_id+"'", function(err, info) {
+		if(err){
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "rfq rejected successfully"});
+		}
+	});
+};
