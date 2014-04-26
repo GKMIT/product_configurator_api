@@ -101,3 +101,15 @@ exports.rfq_bid_submit = function(req, res){
 		}
 	});
 };
+
+exports.get_rejection_remarks = function(req, res){
+	connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks) {
+		if(err){
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "", "rejection_remarks": rejection_remarks});
+		}
+	});
+};
+

@@ -60,6 +60,7 @@ module.exports = function(){
 	app.post("/save_rfq_questions", rfq_bid_validation.save_rfq_questions, rfq_bid.save_rfq_questions);
 	app.get("/full_rfq_detail/:user_id/:rfq_id", rfq_bid_validation.full_rfq_detail, rfq_bid.full_rfq_detail);
 	app.put("/rfq_bid_submit", rfq_bid_validation.rfq_bid_submit, rfq_bid.rfq_bid_submit);
-	
+	app.get("/get_rejection_remarks/:user_id", rfq_bid_validation.get_rejection_remarks, rfq_bid.get_rejection_remarks);
+
 
 };
