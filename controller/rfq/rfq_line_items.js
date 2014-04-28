@@ -144,11 +144,12 @@ exports.save_line_item = function(req, res){
 
 
 exports.update_line_item = function(req, res){
+	console.log(req.body.technical_specifications.length);
 	connection.query("UPDATE `rfq_lines` SET `product_lines_id` = '"+req.body.product_lines_id+"', `plants_id` = '"+req.body.plants_id+"', `rfq_id` = '"+req.body.rfq_id+"', `number_of_units` = '"+req.body.number_of_units+"', `req_delivery_date` = '"+req.body.req_delivery_date+"' WHERE `id`='"+req.body.rfq_lines_id+"'", function(err, info){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
-		else if(typeof req.body.technical_specifications=="object" && Array.isArray(req.body.technical_specifications && req.body.technical_specifications.length>0)){
+		else if(typeof req.body.technical_specifications=="object" && Array.isArray(req.body.technical_specifications) && req.body.technical_specifications.length>0){
 			connection.query("DELETE  FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
 				if(err){
 					res.json({"statusCode":500, "success": "false", "message": "internal error"});
