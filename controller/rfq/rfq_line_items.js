@@ -82,7 +82,7 @@ exports.fetch_rfq_line_items = function(req, res){
 		}
 		else{
 			if(rfq_lines.length>0){
-				connection.query("SELECT `product_properties_id`, `value`, `remark` FROM `rfq_lines_technical_specs` WHERE rfq_lines_id='"+req.params.rfq_lines_id+"'", function(err, technical_specifications) {
+				connection.query("SELECT `rlts`.`product_properties_id`, `rlts`.`value`, `rlts`.`remark`, `pp`.`unit_of_measurement` FROM `rfq_lines_technical_specs` `rlts` JOIN `product_properties` `pp` ON `rlts`.`product_properties_id`=`pp`.`id` WHERE rfq_lines_id='"+req.params.rfq_lines_id+"'", function(err, technical_specifications) {
 					if(err){
 						console.log(err);
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
