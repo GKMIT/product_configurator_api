@@ -148,7 +148,7 @@ exports.update_line_item = function(req, res){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
-		else{
+		else if(typeof req.body.technical_specifications=="object" && Array.isArray(req.body.technical_specifications)){
 			connection.query("DELETE  FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
 				if(err){
 					res.json({"statusCode":500, "success": "false", "message": "internal error"});
@@ -169,7 +169,6 @@ exports.update_line_item = function(req, res){
 							query=query+", (";
 						}
 					}
-					console.log(query);
 					connection.query(query, function(err, info_tech){
 						if(err){
 							res.json({"statusCode":500, "success": "false", "message": "internal error"});
@@ -181,11 +180,14 @@ exports.update_line_item = function(req, res){
 				}
 			});
 		}
+		else{
+			res.json({"statusCode":200, "success":"true", "message":"data update successfully"});
+		}
 	});
 }
 
 exports.delete_line_item = function(req, res){
-	connection.query("DELETE  FROM `rfq_lines` WHERE `rfq_id` = '"+req.body.rfq_id+"'", function(err, info_tech){
+	connection.query("DELETE  FROM `rfq_lines` WHERE `rfq_lines_id` = '"+req.body.rfq_lines_id+"'", function(err, info_tech){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
@@ -260,7 +262,7 @@ exports.fetch_property_detail = function(req, res, next){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"true", "message":"", "process.assert();perty": property});
+			res.json({"statusCode":200, "success":"true", "message":"", "properties": property});
 		}
 	});
 }

@@ -45,7 +45,7 @@ module.exports = function(){
 	app.get("/fetch_rfq_line_items/:user_id/:rfq_id/:rfq_lines_id", rfq_line_items_validation.fetch_rfq_line_items, rfq_line_items.fetch_rfq_line_items);
 	
 	app.post("/save_line_item", rfq_line_items_validation.save_line_item, rfq_line_items.save_line_item);
-	app.post("/update_line_item", rfq_line_items_validation.update_line_item, rfq_line_items.update_line_item);
+	app.put("/update_line_item", rfq_line_items_validation.update_line_item, rfq_line_items.update_line_item);
 	app.delete("/delete_line_item/:user_id/:rfq_lines_id", rfq_line_items_validation.delete_line_item, rfq_line_items.delete_line_item);
 	app.put("/complete_rfq", rfq_line_items_validation.complete_rfq, rfq_line_items.complete_rfq);
 
@@ -62,5 +62,8 @@ module.exports = function(){
 	app.put("/rfq_bid_submit", rfq_bid_validation.rfq_bid_submit, rfq_bid.rfq_bid_submit);
 	app.get("/get_rejection_remarks/:user_id", rfq_bid_validation.get_rejection_remarks, rfq_bid.get_rejection_remarks);
 	app.put("/rfq_no_bid_submit", rfq_bid_validation.rfq_no_bid_submit, rfq_bid.rfq_no_bid_submit);
+
+	// api for the tendering persons
+	// app.get("/");
 
 };

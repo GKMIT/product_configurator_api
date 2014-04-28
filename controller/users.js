@@ -82,7 +82,7 @@ function testUser(email, password, req, res){
 					});
 				}
 				
-			} 
+			}
 			else {
 				res.json({statusCode: 404, "success":"false","message":"user not found"});
 			}

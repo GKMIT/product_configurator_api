@@ -196,8 +196,6 @@ exports.save_line_item = function(req, res, next){
 
 exports.update_line_item = function(req, res, next){
 	var checkValid=1;
-	console.log("heleleliooo");
-	console.log(req.body);
 	var fields = ["user_id", "rfq_lines_id", "product_lines_id", "plants_id", "rfq_id", "number_of_units", "req_delivery_date"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
@@ -213,37 +211,17 @@ exports.update_line_item = function(req, res, next){
 		}
 	}
 	if(checkValid==1){
-		var subfields=["product_properties_id", "value", "remark"];
-			if(typeof req.body.techincal_specifications=="object" || !Array.isArray(req.body.technical_specifications)){
-				checkValid=0;
-				res.json({"statusCode": 404, "success":"false", "message": "technical_specifications not found !"});
-			}
-			else{
-			for(var i=0; i<req.body.technical_specifications.length; i++){
-				for(var j=0; j<subfields.length; j++){
-					if(typeof req.body.technical_specifications[i][subfields[j]]=="undefined" || req.body.technical_specifications[i][subfields[j]]==""){
-						checkValid=0;
-						res.json({"statusCode": 404, "success": "false", "message": subfields[j]+" not defined"});
-						break;
-					}
-				}
-			}
-		}
-		if(checkValid==1){
 			connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
 				if(err){
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					console.log(organization_users);
 					if (organization_users.length>0) {
-						console.log("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'");
 						connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
 							if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							console.log(rfq);
 							if(rfq.length>0){
 								next();
 							}
@@ -259,7 +237,6 @@ exports.update_line_item = function(req, res, next){
 				}
 			});
 		}
-	}
 }
 
 

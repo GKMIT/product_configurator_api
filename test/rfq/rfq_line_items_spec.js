@@ -400,7 +400,7 @@ describe('Fetch Product Plants And Properties', function () {
 
 });
 
-describe("fetch_property_value", function () {
+describe("fetch_property_detail", function () {
     // it('Should be pending')
     xit('Should be disabled, i.e not appear on the list')
 });
