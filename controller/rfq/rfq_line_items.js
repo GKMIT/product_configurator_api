@@ -148,7 +148,7 @@ exports.update_line_item = function(req, res){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
-		else if(typeof req.body.technical_specifications=="object" && Array.isArray(req.body.technical_specifications)){
+		else if(typeof req.body.technical_specifications=="object" && Array.isArray(req.body.technical_specifications && req.body.technical_specifications.length>0)){
 			connection.query("DELETE  FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
 				if(err){
 					res.json({"statusCode":500, "success": "false", "message": "internal error"});
