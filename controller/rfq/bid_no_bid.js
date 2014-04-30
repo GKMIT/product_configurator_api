@@ -58,7 +58,7 @@ exports.save_rfq_questions = function(req, res){
 };
 
 exports.full_rfq_detail = function(req, res){
-	connection.query("SELECT * FROM `rfq` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
+	connection.query("SELECT rfq.id, `rfq`.`document_no`, `rfq`.`version_no`, `sales_hubs`.`name` as `sales_hub`, `ou`.`user_name` as `sales_person`, `countries`.`name` as `customer_country`, `inst_country`.`name` as `installation_country`, `customers`.`name` as `customer_name`,  `type_of_quotes`.`description` as `quote_type`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `sales_segments`.`name` as `sales_segment`, `sales_agents`.`name` as `sales_agent_name`,  `rfq`.`product_lines_id`, `tendering_teams`.`name` as `tendering_team`, `organization_users`.user_name `tendering_team_members`, `rfq`.`requested_quotation_date`, `rfq`.`probability` FROM `rfq` JOIN `sales_hubs` ON `rfq`.`sales_hub_id`=`sales_hubs`.`id` JOIN `organization_users` `ou` ON `rfq`.`sales_person_id`=`ou`.`id` JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` JOIN `sales_segments` ON `rfq`.`sales_segments_id`=`sales_segments`.`id` JOIN `sales_agents` ON `rfq`.`sales_agents_id`=`sales_agents`.`id` JOIN `tendering_teams` ON `rfq`.`tendering_teams_id`=`tendering_teams`.`id` JOIN `organization_users` ON `rfq`.`tendering_teams_members_id`=`organization_users`.`id` JOIN `countries` ON `rfq`.`customer_country`=`countries`.`id` JOIN `countries` `inst_country` ON `rfq`.`installation_country`=`inst_country`.`id` JOIN `type_of_quotes` ON `rfq`.`type_of_quote_id`=`type_of_quotes`.id WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -69,6 +69,7 @@ exports.full_rfq_detail = function(req, res){
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
+					if(rfq_lines.length>0){
 					var query="SELECT * FROM  `rfq_lines_technical_specs` WHERE ";
 					for (var i = 0; i < rfq_lines.length; i++) {
 						query=query+"rfq_lines_id='"+rfq_lines[i].id+"'";
@@ -85,6 +86,10 @@ exports.full_rfq_detail = function(req, res){
 							res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": rfq_lines_technical_specs});
 						}
 					});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": []});
+					}
 				}
 			});
 		}

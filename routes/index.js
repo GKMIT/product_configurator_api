@@ -63,7 +63,11 @@ module.exports = function(){
 	app.get("/get_rejection_remarks/:user_id", rfq_bid_validation.get_rejection_remarks, rfq_bid.get_rejection_remarks);
 	app.put("/rfq_no_bid_submit", rfq_bid_validation.rfq_no_bid_submit, rfq_bid.rfq_no_bid_submit);
 
+
+
 	// api for the tendering person
-	// app.get("/");
+	var tendering_calls=require('../controller/tendering/quote');
+	var tendering_validation=require('../controller/validation/tendering/quote');	
+	app.get("/tendering_teams_quotes/:user_id", tendering_validation.tendering_teams_quotes, tendering_calls.tendering_teams_quotes);
 
 };
