@@ -176,7 +176,7 @@ function rfq_general_data_sales_personsValidation(req, res, callback){
 	callback(req, res, checkValid);
 }
 function get_rfq_general_data_sales_persons(req, res){
-	connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+req.params.sales_hubs_id+"'", function(err, sales_persons) {
+	connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+req.params.sales_hubs_id+"' AND user_status=1", function(err, sales_persons) {
 		if(err){
 			console.log(err);
 				res.json({"statusCode":500, "success":"false", "message": "internal error"});
