@@ -67,7 +67,7 @@ module.exports = function(){
 
 	// api for the tendering person
 	var tendering_calls=require('../controller/tendering/quote');
-	var tendering_validation=require('../controller/validation/tendering/quote');	
+	var tendering_validation=require('../controller/validation/tendering/quote');
 	app.get("/tendering_teams_quotes/:user_id", tendering_validation.tendering_teams_quotes, tendering_calls.tendering_teams_quotes);
 
 };
