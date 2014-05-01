@@ -146,11 +146,11 @@ exports.save_line_item = function(req, res, next){
 	}
 	if(checkValid==1){
 		var subfields=["product_properties_id", "value", "remark"];
-			if(typeof req.body.technical_specifications!="object" || !Array.isArray(req.body.technical_specifications)){
-				checkValid=0;
-				res.json({"statusCode": 404, "success":"false", "message": "technical_specifications not found !"});
-			}
-			else{
+		if(typeof req.body.technical_specifications!="object" || !Array.isArray(req.body.technical_specifications)){
+			checkValid=0;
+			res.json({"statusCode": 404, "success":"false", "message": "technical_specifications not found !"});
+		}
+		else{
 			for(var i=0; i<req.body.technical_specifications.length; i++){
 				// console.log(req.body.technical_specifications[i][subfields[i]]);
 				for(var j=0; j<subfields.length; j++){
