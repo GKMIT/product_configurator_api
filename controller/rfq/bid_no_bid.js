@@ -58,13 +58,13 @@ exports.save_rfq_questions = function(req, res){
 };
 
 exports.full_rfq_detail = function(req, res){
-	connection.query("SELECT rfq.id, `rfq`.`document_no`, `rfq`.`version_no`, `sales_hubs`.`name` as `sales_hub`, `ou`.`user_name` as `sales_person`, `countries`.`name` as `customer_country`, `inst_country`.`name` as `installation_country`, `customers`.`name` as `customer_name`,  `type_of_quotes`.`description` as `quote_type`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `sales_segments`.`name` as `sales_segment`, `sales_agents`.`name` as `sales_agent_name`,  `rfq`.`product_lines_id`, `tendering_teams`.`name` as `tendering_team`, `organization_users`.user_name `tendering_team_members`, `rfq`.`requested_quotation_date`, `rfq`.`probability` FROM `rfq` LEFT JOIN `sales_hubs` ON `rfq`.`sales_hub_id`=`sales_hubs`.`id` LEFT JOIN `organization_users` `ou` ON `rfq`.`sales_person_id`=`ou`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` LEFT JOIN `sales_segments` ON `rfq`.`sales_segments_id`=`sales_segments`.`id` LEFT JOIN `sales_agents` ON `rfq`.`sales_agents_id`=`sales_agents`.`id` LEFT JOIN `tendering_teams` ON `rfq`.`tendering_teams_id`=`tendering_teams`.`id` LEFT JOIN `organization_users` ON `rfq`.`tendering_teams_members_id`=`organization_users`.`id` LEFT JOIN `countries` ON `rfq`.`customer_country`=`countries`.`id` LEFT JOIN `countries` `inst_country` ON `rfq`.`installation_country`=`inst_country`.`id` LEFT JOIN `type_of_quotes` ON `rfq`.`type_of_quote_id`=`type_of_quotes`.id WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
+	connection.query("SELECT rfq.id, `rfq`.`document_no`, `rfq`.`version_no`, `sales_hubs`.`name` as `sales_hub`, `ou`.`user_name` as `sales_person`, `countries`.`name` as `customer_country`, `inst_country`.`name` as `installation_country`, `customers`.`name` as `customer_name`,  `type_of_quotes`.`description` as `quote_type`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `sales_segments`.`name` as `sales_segment`, `sales_agents`.`name` as `sales_agent_name`,  `product_lines`.`name` as `product_lines_name`, `tendering_teams`.`name` as `tendering_team`, `organization_users`.user_name `tendering_team_members`, `rfq`.`requested_quotation_date`, `rfq`.`probability`, `rfq`.`win` FROM `rfq` LEFT JOIN `sales_hubs` ON `rfq`.`sales_hub_id`=`sales_hubs`.`id` LEFT JOIN `organization_users` `ou` ON `rfq`.`sales_person_id`=`ou`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` LEFT JOIN `sales_segments` ON `rfq`.`sales_segments_id`=`sales_segments`.`id` LEFT JOIN `sales_agents` ON `rfq`.`sales_agents_id`=`sales_agents`.`id` LEFT JOIN `tendering_teams` ON `rfq`.`tendering_teams_id`=`tendering_teams`.`id` LEFT JOIN `organization_users` ON `rfq`.`tendering_teams_members_id`=`organization_users`.`id` LEFT JOIN `countries` ON `rfq`.`customer_country`=`countries`.`id` LEFT JOIN `countries` `inst_country` ON `rfq`.`installation_country`=`inst_country`.`id` LEFT JOIN `type_of_quotes` ON `rfq`.`type_of_quote_id`=`type_of_quotes`.id LEFT JOIN `product_lines` ON `rfq`.`product_lines_id`=`product_lines`.`id` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT * FROM `rfq_lines` WHERE rfq_id='"+rfq[0].id+"'", function(err, rfq_lines) {
+			connection.query("SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `rfq_lines`.`plants_id`, `rfq_lines`.`rfq_id`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, `rfq_lines`.`rfq_line_status`, `rfq_lines`.`material_code`, `rfq_lines`.`material_cost`, `rfq_lines`.`labour_cost`, `rfq_lines`.`no_of_labour_hours`, `rfq_lines`.`sales_price`, `rfq_lines`.`confirmed_delivery_date`, `rfq_lines`.`created_at`, `rfq_lines`.`updated_at`, `plants`.`name` as `plant_name` FROM `rfq_lines` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` WHERE rfq_id='"+rfq[0].id+"'", function(err, rfq_lines) {
 				if(err){
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
@@ -77,7 +77,7 @@ exports.full_rfq_detail = function(req, res){
 							query=query+" OR "
 						}
 					};
-					console.log(query);
+					// console.log(query);
 					connection.query(query, function(err, rfq_lines_technical_specs) {
 						if(err){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
