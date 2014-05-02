@@ -141,7 +141,8 @@ exports.save_line_item = function(req, res, next){
 			}
 		}
 	}
-	else if(typeof req.body.req_delivery_date=="undefined" || req.body.req_delivery_date==""){
+	if(typeof req.body.req_delivery_date=="undefined" || req.body.req_delivery_date==""){
+		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "requested_deliver_date not defined"});
 	}
 	if(checkValid==1){
@@ -196,17 +197,36 @@ exports.save_line_item = function(req, res, next){
 
 exports.update_line_item = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_lines_id", "product_lines_id", "plants_id", "rfq_id", "number_of_units", "req_delivery_date"];
+	var fields = ["user_id", "rfq_lines_id", "product_lines_id", "plants_id", "rfq_id", "number_of_units", "rfq_status_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]==""){
+			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
 				break;
+			}
+		}
+	}
+	if(checkValid==1){
+		var subfields=["product_properties_id", "value", "remark"];
+		if(typeof req.body.technical_specifications!="object" || !Array.isArray(req.body.technical_specifications)){
+			checkValid=0;
+			res.json({"statusCode": 404, "success":"false", "message": "technical_specifications not found !"});
+		}
+		else{
+			for(var i=0; i<req.body.technical_specifications.length; i++){
+				// console.log(req.body.technical_specifications[i][subfields[i]]);
+				for(var j=0; j<subfields.length; j++){
+					if(typeof req.body.technical_specifications[i][subfields[j]]=="undefined" || req.body.technical_specifications[i][subfields[j]]==""){
+						checkValid=0;
+						res.json({"statusCode": 404, "success": "false", "message": subfields[j]+" not defined"});
+						break;
+					}
+				}
 			}
 		}
 	}

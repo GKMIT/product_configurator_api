@@ -144,7 +144,7 @@ exports.save_line_item = function(req, res){
 
 
 exports.update_line_item = function(req, res){
-	console.log(req.body.technical_specifications.length);
+	// console.log(req.body.technical_specifications.length);
 	connection.query("UPDATE `rfq_lines` SET `product_lines_id` = '"+req.body.product_lines_id+"', `plants_id` = '"+req.body.plants_id+"', `rfq_id` = '"+req.body.rfq_id+"', `number_of_units` = '"+req.body.number_of_units+"', `req_delivery_date` = '"+req.body.req_delivery_date+"' WHERE `id`='"+req.body.rfq_lines_id+"'", function(err, info){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
