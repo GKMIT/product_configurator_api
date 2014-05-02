@@ -7,7 +7,7 @@ var should = require('should'),
 	var global=require('../global/global_spec');
 
 describe('RFQ Line Items API Calls', function () {
-		var email="govindaraj.sethuraman@cgglobal.com";
+		var email="nitin.naik@cgglobal.com";
 		var password="5e8ff9bf55ba3508199d22e984129be6";
 		var url="/rfq_new_line_item"
 
@@ -135,7 +135,7 @@ describe('RFQ Line Items API Calls', function () {
 
 
 describe('All RFQ Line Items', function () {
-	var email="govindaraj.sethuraman@cgglobal.com";
+	var email="nitin.naik@cgglobal.com";
 	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/all_rfq_line_items"
 
@@ -262,7 +262,7 @@ describe('All RFQ Line Items', function () {
 });
 
 describe('Fetch Product Plants And Properties', function () {
-	var email="govindaraj.sethuraman@cgglobal.com";
+	var email="nitin.naik@cgglobal.com";
 	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/fetch_product_plants_properties"
 
@@ -400,7 +400,7 @@ describe('Fetch Product Plants And Properties', function () {
 });
 
 describe("fetch_property_detail", function () {
-    var email="govindaraj.sethuraman@cgglobal.com";
+    var email="nitin.naik@cgglobal.com";
 	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/fetch_property_detail"
 
@@ -562,7 +562,7 @@ describe("fetch_property_detail", function () {
 
 
 describe("fetch_rfq_line_items", function () {
-    var email="govindaraj.sethuraman@cgglobal.com";
+    var email="nitin.naik@cgglobal.com";
 	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/fetch_rfq_line_items"
 	it("Should ok BCOZ All Correct Data", function (done) {
@@ -751,7 +751,7 @@ describe("fetch_rfq_line_items", function () {
 
 
 describe("save_line_item", function () {
-    var email="govindaraj.sethuraman@cgglobal.com";
+    var email="nitin.naik@cgglobal.com";
 	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/save_line_item"
 
@@ -1746,7 +1746,7 @@ describe("save_line_item", function () {
 });
 
 describe("update_line_item", function () {
-	var email="govindaraj.sethuraman@cgglobal.com";
+	var email="nitin.naik@cgglobal.com";
 	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/update_line_item"
 
@@ -2830,11 +2830,11 @@ describe("update_line_item", function () {
 
 
 describe("delete_line_item", function () {
-        var email="govindaraj.sethuraman@cgglobal.com";
+    var email="nitin.naik@cgglobal.com";
 	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/delete_line_item"
 
-	it("Should ok BCOZ All Correct Data blank technical_specifications array", function (done) {
+	it("Should ok BCOZ All the correct parameter provide", function (done) {
 		login(email, password, function(user){
 			var user_id=user.data[0].id;
 			var token=user.authentication_token;
@@ -2844,9 +2844,10 @@ describe("delete_line_item", function () {
 				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
 					var product_lines_id=line_item.product_lines[0].id;
 					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+product_lines_id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
 					parameter=user_id+"/"+rfq_line_items_id;
-					getcall(url, parameter, token, 200, function(obj){
+					deletecall(url, parameter, token, 200, function(obj){
 						// console.log(prop);
 						done();
 					});
@@ -2854,11 +2855,181 @@ describe("delete_line_item", function () {
 			});
 		});
 	});
+
+	it("Should NOT OK BCOZ authentication_token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
+					parameter=user_id+"/"+rfq_line_items_id;
+					deletecallWithoutToken(url, parameter, 404, function(obj){
+						// console.log(prop);
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ authentication_token provide but value not", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
+					parameter=user_id+"/"+rfq_line_items_id;
+					deletecall(url, parameter, "", 404, function(obj){
+						// console.log(prop);
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ authentication_token provide but invalid value", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
+					parameter=user_id+"/"+rfq_line_items_id;
+					deletecall(url, parameter, "invalid", 404, function(obj){
+						// console.log(prop);
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ user_id invalid provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
+					parameter="00000"+"/"+rfq_line_items_id;
+					deletecall(url, parameter, token, 404, function(obj){
+						// console.log(prop);
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ user_id provide value is nonNumeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
+					parameter="nonNumeric"+"/"+rfq_line_items_id;
+					deletecall(url, parameter, token, 404, function(obj){
+						// console.log(prop);
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ rfq_line_id invalid value provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
+					parameter=user_id+"/"+"00000";
+					deletecall(url, parameter, token, 401, function(obj){
+						// console.log(prop);
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ rfq_lines_id provide value is nonNumeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					var rfq_line_items_id=line_item.selected_rfq_lines_items[0].id;
+					// parameter=user_id+"/"+product_lines_id;
+					// console.log(rfq_line_items_id);
+					parameter=user_id+"/"+"nonNumeric";
+					deletecall(url, parameter, token, 404, function(obj){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+
 });
 
 describe("complete_rfq", function () {
-    // it('Should be pending')
-    xit('Should be disabled, i.e not appear on the list')
+	var email="nitin.naik@cgglobal.com";
+	var password="5e8ff9bf55ba3508199d22e984129be6";
+	var url="/complete_rfq"
+
+	it("Should ok BCOZ All the correct parameter provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
+				Putcall(url, parameter, token, 200, function(obj){
+					done();
+				});
+			});
+		});
+	});
 });
 
 
@@ -2955,4 +3126,27 @@ function PutcallWithoutToken(url, parameter, status, callback){
 			res.body.statusCode.should.equal(status);
 			callback(res.body);
 	});	
+}
+
+function deletecall(url, parameter, token, status, callback){
+	supertest(app)
+	.delete(url+"/"+parameter)
+	.set('authentication_token', token)
+	.expect(status)
+	.end(function (err, res) {
+		// console.log(err);
+		// console.log(res.body);
+		res.body.statusCode.should.equal(status);
+		callback(res.body);
+	});
+}
+
+function deletecallWithoutToken(url, parameter, status, callback){
+	supertest(app)
+		.delete(url+"/"+parameter)
+		.expect(status)
+		.end(function (err, res) {
+				res.body.statusCode.should.equal(status);
+			callback(res.body);
+		});
 }

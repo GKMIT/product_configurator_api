@@ -188,7 +188,7 @@ exports.update_line_item = function(req, res){
 }
 
 exports.delete_line_item = function(req, res){
-	connection.query("DELETE  FROM `rfq_lines` WHERE `rfq_lines_id` = '"+req.body.rfq_lines_id+"'", function(err, info_tech){
+	connection.query("DELETE  FROM `rfq_lines` WHERE `id` = '"+req.params.rfq_lines_id+"'", function(err, info_tech){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}

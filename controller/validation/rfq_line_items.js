@@ -266,11 +266,11 @@ exports.delete_line_item = function(req, res, next){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "authentication_token not found"});
 	}
-	else if(typeof req.params.user_id=="undefined" || req.params.user_id==""){
+	else if(typeof req.params.user_id=="undefined" || req.params.user_id=="" || !validator.isNumeric(req.params.user_id)){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "user_id not found"});
 	}
-	else if(typeof req.params.rfq_lines_id=="undefined" || req.params.rfq_lines_id==""){
+	else if(typeof req.params.rfq_lines_id=="undefined" || req.params.rfq_lines_id=="" || !validator.isNumeric(req.params.rfq_lines_id)){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "rfq_id not found"});
 	}
@@ -313,7 +313,7 @@ exports.complete_rfq = function(req, res, next){
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]==""){
+			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
 				break;
