@@ -22,7 +22,14 @@ exports.ready_rfq_bid_detail = function(req, res){
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_questions": rfq_questions});
+					connection.query("SELECT `rfq_id`, `rfq_questions_id`, `question_value` `question` FROM `rfq_lines_questions`", function(err, selected_rfq_questions) {
+						if(err){
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+						}
+						else{
+							res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_questions": rfq_questions, "selected_rfq_questions": selected_rfq_questions});
+						}
+					});
 				}
 			});
 		}
@@ -30,7 +37,13 @@ exports.ready_rfq_bid_detail = function(req, res){
 };
 
 exports.save_rfq_questions = function(req, res){
-				var rfq_id=req.body.rfq_id;
+	connection.query("DELETE FROM `rfq_lines_questions` WHERE `rfq_id`='"+req.body.rfq_id+"'", function(err, info){
+		if(err){
+			console.log(err);
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			var rfq_id=req.body.rfq_id;
 				var fields=["question_id", "value"];
 				var query="INSERT INTO `rfq_lines_questions`(`rfq_id`, `rfq_questions_id`, `question_value`) VALUES (";
 				for (var i = 0; i < req.body.questions.length; i++) {
@@ -45,7 +58,7 @@ exports.save_rfq_questions = function(req, res){
 						query=query+", (";
 					}
 				}
-				console.log(query);
+				// console.log(query);
 				connection.query(query, function(err, info){
 					if(err){
 						console.log(err);
@@ -55,6 +68,9 @@ exports.save_rfq_questions = function(req, res){
 						res.json({"statusCode":200, "success":"true", "message": "data insterted successfully"});
 					}					
 				});
+		}					
+	});
+				
 };
 
 exports.full_rfq_detail = function(req, res){

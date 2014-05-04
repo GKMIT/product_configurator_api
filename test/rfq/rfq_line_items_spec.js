@@ -2885,23 +2885,25 @@ describe("delete_line_item", function () {
 });
 
 describe("complete_rfq", function () {
-	var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
-	var url="/complete_rfq"
+	// var email="nitin.naik@cgglobal.com";
+	// var password="5e8ff9bf55ba3508199d22e984129be6";
+	// var url="/complete_rfq"
 
-	it("Should ok BCOZ All the correct parameter provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
-				Putcall(url, parameter, token, 200, function(obj){
-					done();
-				});
-			});
-		});
-	});
+	// it("Should ok BCOZ All the correct parameter provide", function (done) {
+	// 	login(email, password, function(user){
+	// 		var user_id=user.data[0].id;
+	// 		var token=user.authentication_token;
+	// 		getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+	// 			var rfq_id=rfq.partial_rfq[0].id;
+	// 			var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
+	// 			Putcall(url, parameter, token, 200, function(obj){
+	// 				console.log(obj);
+	// 				done();
+	// 			});
+	// 		});
+	// 	});
+	// });
+	it("complete the rfq");
 });
 
 
