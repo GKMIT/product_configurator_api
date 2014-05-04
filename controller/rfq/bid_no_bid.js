@@ -17,7 +17,7 @@ exports.ready_rfq_bid_detail = function(req, res){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT  `rfq_questions`.`id` ,  `rfq_questions`.`question`, `rfq_lines_questions`.`rfq_id`, `rfq_lines_questions`.`question_value` FROM  `rfq_questions` LEFT JOIN  `rfq_lines_questions` ON `rfq_lines_questions`. `rfq_id` =  '1' AND  `rfq_questions`.`id` =  `rfq_lines_questions`.`rfq_questions_id`", function(err, rfq_questions) {
+			connection.query("SELECT  `rfq_questions`.`id` ,  `rfq_questions`.`question`, `rfq_lines_questions`.`rfq_id`, `rfq_lines_questions`.`question_value` FROM  `rfq_questions` LEFT JOIN  `rfq_lines_questions` ON `rfq_lines_questions`. `rfq_id` =  '"+req.params.rfq_id+"' AND  `rfq_questions`.`id` =  `rfq_lines_questions`.`rfq_questions_id`", function(err, rfq_questions) {
 				if(err){
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}

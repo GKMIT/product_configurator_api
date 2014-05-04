@@ -70,4 +70,7 @@ module.exports = function(){
 	var tendering_validation=require('../controller/validation/tendering/quote');
 	app.get("/tendering_teams_quotes/:user_id", tendering_validation.tendering_teams_quotes, tendering_calls.tendering_teams_quotes);
 
+	app.get("/tendering_fetch_particular_quote/:user_id/:rfq_id", tendering_validation.tendering_teams_quotes, tendering_calls.tendering_teams_quotes);
+
 };
+// tendering_fetch_particular_quote
