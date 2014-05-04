@@ -97,3 +97,38 @@ exports.tendering_fetch_particular_quote = function(req, res){
 		}
 	});
 }
+
+exports.tendering_fetch_product_detail = function(req, res){
+	var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `plants`.`name` as `plants_name`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` LEFT JOIN `product_lines` ON `rfq_lines`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` WHERE `rfq_lines`.`id`='"+req.params.rfq_lines_id+"' AND `rfq_id`='"+req.params.rfq_id+"'";
+	connection.query(query, function(err, rfq_lines) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			var temp=rfq_lines[0].month/3;
+			var quarter;
+			if(temp<=1){
+				quarter=1;
+			}
+			else if(temp>1 && temp<=2){
+				quarter=2;
+			}
+			else if(temp>2 && temp<=3){
+				quarter=3;
+			}
+			else{
+				quarter=4;
+			}
+			connection.query("SELECT * FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.`id`=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`year`='"+rfq_lines[0].year+"' AND `product_designs_costs`.`quarter`='"+quarter+"'", function(err, product_designs) {
+				if(err){
+					console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					res.json({"statusCode": 200, "success":"true", "message": "", "rfq_lines":rfq_lines, "product_designs": product_designs});
+				}
+			});
+		}
+	});
+}
