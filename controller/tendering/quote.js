@@ -11,6 +11,7 @@ exports.tendering_teams_quotes = function(req, res){
 	});
 }
 
+
 exports.tendering_fetch_particular_quote = function(req, res){
 	var query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`rfq_status_id` FROM `rfq` WHERE `rfq_status_id`='4' AND `id`='"+req.params.rfq_id+"'";
 	// console.log(query);

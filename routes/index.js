@@ -82,5 +82,4 @@ module.exports = function(){
 	var rfq_quote_calls=require('../controller/rfq/rfq_quote_finalize.js');
 	var rfq_quote_validation=require('../controller/validation/rfq_quote_finalize.js');
 	app.get("/sales_quote_finalize_fetch_all/:user_id", rfq_quote_validation.sales_quote_finalize_fetch_all, rfq_quote_calls.sales_quote_finalize_fetch_all);
-
 };
