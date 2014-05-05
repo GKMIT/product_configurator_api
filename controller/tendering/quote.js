@@ -18,7 +18,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
-				res.json({"statusCode": 500, "success":"false", "message": "11internal error"});
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
 			 // `r_lines`.`material_cost`, `r_lines`.`labour_cost`, `r_lines`.`no_of_labour_hours`, 
@@ -26,7 +26,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
 					console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "22internal error"});
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
 					var merge = function() {
@@ -133,23 +133,51 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 	});
 }
 
-exports.tendering_submit_rfq_lines = function(req, res, next){
-		var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `rfq_line_status`='1' WHERE `id`='"+req.body.rfq_lines_id+"'";
+exports.tendering_submit_rfq_lines = function(req, res){
+	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `rfq_line_status`='1' WHERE `id`='"+req.body.rfq_lines_id+"'";
 	connection.query(query, function(err, info) {
 		if(err){
 			console.log(err);
-				res.json({"statusCode": 500, "success":"false", "message": "11internal error"});
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
 			connection.query("SELECT `id`, `design_number` FROM `product_designs` WHERE `id`='"+req.body.product_designs_id+"'", function(err, product_designs) {
 				if(err){
 					console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "22internal error"});
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					res.json({"statusCode": 200, "success":"true", "message": "Updated Successfully !", "product_designs": product_designs});
+					res.json({"statusCode": 200, "success":"true", "message": "rfq_line submitted successfully", "product_designs": product_designs});
 				}
 			});
 		}
 	});
 };
+
+exports.tendering_submit_rfq_to_sales = function(req, res){
+	var query="SELECT * FROM `rfq` INNER JOIN `rfq_lines` ON `rfq`.`id`=`rfq_lines`.`rfq_id` AND `rfq_lines`.`rfq_line_status`='0' WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
+	connection.query(query, function(err, rfq_lines) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			if(rfq_lines.length==0){
+				connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
+					if(err){
+						console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+					}
+				});
+			}
+			else{
+				res.json({"statusCode": 422, "success":"true", "message": "rfq_lines not complete"});
+			}
+		}
+	});
+};
+
+// tendering_submit_rfq_to_sales
