@@ -31,7 +31,7 @@ module.exports = function(){
 	app.get("/rfq_tendering_teams/:user_id/:product_lines_id", rfq_product.rfq_tendering_teams);
 	app.get("/rfq_tendering_teams_members/:user_id/:tendering_teams_id",rfq_product_validation.rfq_tendering_teams_members, rfq_product.rfq_tendering_teams_members);
 	app.put("/general_product_data_save", rfq_product_validation.general_product_data_saveValidation, rfq_product.general_product_data_save);
-	
+
 
 	// rfq line items API's
 	app.get("/rfq_new_line_item/:user_id/:rfq_id", rfq_line_items_validation.product_line, rfq_line_items.product_lines);
@@ -76,5 +76,9 @@ module.exports = function(){
 
 	app.put("/tendering_submit_rfq_lines", tendering_validation.tendering_submit_rfq_lines, tendering_calls.tendering_submit_rfq_lines);
 	app.put("/tendering_submit_rfq_to_sales", tendering_validation.tendering_submit_rfq_to_sales, tendering_calls.tendering_submit_rfq_to_sales);
+
+
+	// api for the sales_person for the quote finalize and follow up
+
 
 };

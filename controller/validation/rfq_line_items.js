@@ -146,7 +146,7 @@ exports.save_line_item = function(req, res, next){
 		res.json({"statusCode": 404, "success": "false", "message": "requested_deliver_date not defined"});
 	}
 	if(checkValid==1){
-		var subfields=["product_properties_id", "value", "remark"];
+		var subfields=["product_properties_id", "value"];
 		if(typeof req.body.technical_specifications!="object" || !Array.isArray(req.body.technical_specifications)){
 			checkValid=0;
 			res.json({"statusCode": 404, "success":"false", "message": "technical_specifications not found !"});
@@ -212,7 +212,7 @@ exports.update_line_item = function(req, res, next){
 		}
 	}
 	if(checkValid==1){
-		var subfields=["product_properties_id", "value", "remark"];
+		var subfields=["product_properties_id", "value"];
 		if(typeof req.body.technical_specifications!="object" || !Array.isArray(req.body.technical_specifications)){
 			checkValid=0;
 			res.json({"statusCode": 404, "success":"false", "message": "technical_specifications not found !"});

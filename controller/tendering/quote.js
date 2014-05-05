@@ -179,5 +179,3 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 		}
 	});
 };
-
-// tendering_submit_rfq_to_sales

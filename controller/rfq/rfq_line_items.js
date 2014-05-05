@@ -116,11 +116,17 @@ exports.save_line_item = function(req, res){
 			if(req.body.technical_specifications.length>0){
 				var rfq_lines_id=info.insertId;
 				var fields=["product_properties_id", "value", "remark"];
+				// console.log(req.body.technical_specifications);
 				var query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES (";
 				for (var i = 0; i < req.body.technical_specifications.length; i++) {
 					query=query+"'"+rfq_lines_id+"'";
 					for (var j = 0; j < fields.length; j++) {
-						query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+						if(typeof req.body.technical_specifications[i][fields[j]]=="undefined"){
+							query=query+", ''";
+						}
+						else{
+							query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+						}
 						if(j+1==fields.length){
 							query=query+")";
 						}
@@ -129,6 +135,7 @@ exports.save_line_item = function(req, res){
 						query=query+", (";
 					}
 				}
+				// console.log(query);
 				connection.query(query, function(err, info_tech){
 					if(err){
 						res.json({"statusCode":500, "success": "false", "message": "internal error"});
@@ -161,7 +168,12 @@ exports.update_line_item = function(req, res){
 					for (var i = 0; i < req.body.technical_specifications.length; i++) {
 						query=query+"'"+rfq_lines_id+"'";
 						for (var j = 0; j < fields.length; j++) {
-							query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+							if(typeof req.body.technical_specifications[i][fields[j]]=="undefined"){
+							query=query+", ''";
+							}
+							else{
+								query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+							}
 							if(j+1==fields.length){
 								query=query+")";
 							}
@@ -170,6 +182,7 @@ exports.update_line_item = function(req, res){
 							query=query+", (";
 						}
 					}
+					// console.log(query);
 					connection.query(query, function(err, info_tech){
 						if(err){
 							res.json({"statusCode":500, "success": "false", "message": "internal error"});
