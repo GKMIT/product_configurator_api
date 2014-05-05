@@ -163,7 +163,7 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 		}
 		else{
 			if(rfq_lines.length==0){
-				connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
+				connection.query("UPDATE `rfq` SET `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
 					if(err){
 						console.log(err);
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});

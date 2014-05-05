@@ -85,7 +85,9 @@ module.exports = function(){
 	app.get("/sales_quote_finalize_fetch_all/:user_id", rfq_quote_validation.sales_quote_finalize_fetch_all, rfq_quote_calls.sales_quote_finalize_fetch_all);
 
 	app.get("/sales_quote_finalize_fetch_one/:user_id/:rfq_id", rfq_quote_validation.sales_quote_finalize_fetch_one, rfq_quote_calls.sales_quote_finalize_fetch_one);
-
 	
+	app.put("/sales_quote_finalize_submit", rfq_quote_validation.sales_quote_finalize_submit, rfq_quote_calls.sales_quote_finalize_submit);
+
+
 
 };
