@@ -74,4 +74,6 @@ module.exports = function(){
 
 	app.get("/tendering_fetch_product_design_detail/:user_id/:rfq_id/:rfq_lines_id", tendering_validation.tendering_fetch_product_detail, tendering_calls.tendering_fetch_product_detail);
 
+	
+
 };
