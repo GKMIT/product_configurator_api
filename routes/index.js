@@ -72,8 +72,8 @@ module.exports = function(){
 
 	app.get("/tendering_fetch_particular_quote/:user_id/:rfq_id", tendering_validation.tendering_fetch_particular_quote, tendering_calls.tendering_fetch_particular_quote);
 
-	app.get("/tendering_fetch_product_design_detail/:user_id/:rfq_id/:rfq_lines_id", tendering_validation.tendering_fetch_product_detail, tendering_calls.tendering_fetch_product_detail);
+	app.get("/tendering_fetch_product_design_detail/:user_id/:rfq_id/:rfq_lines_id", tendering_validation.tendering_fetch_product_design_detail, tendering_calls.tendering_fetch_product_design_detail);
 
-	
+	app.put("/tendering_submit_rfq_lines", tendering_validation.tendering_submit_rfq_lines, tendering_calls.tendering_submit_rfq_lines);
 
 };

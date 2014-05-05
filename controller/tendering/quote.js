@@ -98,7 +98,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 	});
 }
 
-exports.tendering_fetch_product_detail = function(req, res){
+exports.tendering_fetch_product_design_detail = function(req, res){
 	var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `plants`.`name` as `plants_name`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` LEFT JOIN `product_lines` ON `rfq_lines`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` WHERE `rfq_lines`.`id`='"+req.params.rfq_lines_id+"' AND `rfq_id`='"+req.params.rfq_id+"'";
 	connection.query(query, function(err, rfq_lines) {
 		if(err){
@@ -132,3 +132,24 @@ exports.tendering_fetch_product_detail = function(req, res){
 		}
 	});
 }
+
+exports.tendering_submit_rfq_lines = function(req, res, next){
+		var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"' WHERE `id`='"+req.body.rfq_lines_id+"'";
+	connection.query(query, function(err, info) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "11internal error"});
+		}
+		else{
+			connection.query("SELECT `id`, `design_number` FROM `product_designs` WHERE `id`='"+req.body.product_designs_id+"'", function(err, product_designs) {
+				if(err){
+					console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "22internal error"});
+				}
+				else{
+					res.json({"statusCode": 200, "success":"true", "message": "Updated Successfully !", "product_designs": product_designs});
+				}
+			});
+		}
+	});
+};
