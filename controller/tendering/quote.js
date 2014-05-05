@@ -134,7 +134,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 }
 
 exports.tendering_submit_rfq_lines = function(req, res, next){
-		var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"' WHERE `id`='"+req.body.rfq_lines_id+"'";
+		var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `rfq_line_status`='1' WHERE `id`='"+req.body.rfq_lines_id+"'";
 	connection.query(query, function(err, info) {
 		if(err){
 			console.log(err);
