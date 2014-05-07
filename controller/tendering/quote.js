@@ -125,7 +125,8 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 			else{
 				quarter=4;
 			}
-			connection.query("SELECT * FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.`id`=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`year`='"+rfq_lines[0].year+"' AND `product_designs_costs`.`quarter`='"+quarter+"'", function(err, product_designs) {
+
+			connection.query("SELECT * FROM `product_designs` INNER JOIN `product_designs_costs` ON `product_designs`.`id`=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`year`='"+rfq_lines[0].year+"' AND `product_designs_costs`.`quarter`='"+quarter+"' INNER JOIN `product_designs_sales_prices` ON `product_designs_sales_prices`.`product_designs_id`=`product_designs`.`id`", function(err, product_designs) {
 				if(err){
 					console.log(err);
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -139,7 +140,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 }
 
 exports.tendering_submit_rfq_lines = function(req, res){
-	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `rfq_line_status`='1' WHERE `id`='"+req.body.rfq_lines_id+"'";
+	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='1' WHERE `id`='"+req.body.rfq_lines_id+"'";
 	connection.query(query, function(err, info) {
 		if(err){
 			console.log(err);
@@ -160,27 +161,59 @@ exports.tendering_submit_rfq_lines = function(req, res){
 };
 
 exports.tendering_submit_rfq_to_sales = function(req, res){
-	var query="SELECT * FROM `rfq` INNER JOIN `rfq_lines` ON `rfq`.`id`=`rfq_lines`.`rfq_id` AND `rfq_lines`.`rfq_line_status`='0' WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
+	var query="SELECT `rfq`.`id`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `rfq_lines`.`product_designs_id` FROM `rfq` INNER JOIN `rfq_lines` ON `rfq`.`id`=`rfq_lines`.`rfq_id` AND `rfq_lines`.`rfq_line_status`='1' WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, rfq_lines) {
 		if(err){
 			console.log(err);
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			if(rfq_lines.length==0){
-				connection.query("UPDATE `rfq` SET `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
-					if(err){
-						console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			connection.query("select * from rfq_lines where rfq_id='"+req.body.rfq_id+"'", function(err, all_rfq_lines) {
+				if(err){
+					console.log(err);
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					if(rfq_lines.length==all_rfq_lines.length){
+						// if(rfq_lines.length>0){
+							var estimated_sales_price=0;
+							var quarter=0;
+							var counter=0;
+							for (var i = 0; i < rfq_lines.length; i++) {
+								connection.query("SELECT `id`, `minimum_price` FROM `product_designs_sales_prices` WHERE `product_designs_id`='"+rfq_lines[i].product_designs_id+"' ORDER BY `updated_at` desc", function(err, sales_price) {
+								if(err){
+									console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									estimated_sales_price+=sales_price[0];
+									counter++;
+									if(counter==rfq_lines.length){
+										connection.query("UPDATE `rfq` SET `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
+											if(err){
+												console.log(err);
+												res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+											}
+											else{
+												res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+											}
+										});
+									}
+								}
+							});
+							};
+							
+						// }
+						// else{
+						// 	res.json({"statusCode": 422, "success":"true", "message": "rfq_lines not complete"});
+						// }
 					}
 					else{
-						res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+						res.json({"statusCode": 422, "success":"true", "message": "Please complete all rfq_line items"});
 					}
-				});
-			}
-			else{
-				res.json({"statusCode": 422, "success":"true", "message": "rfq_lines not complete"});
-			}
+				}
+			});
+			
 		}
 	});
 };

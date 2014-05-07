@@ -109,7 +109,7 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 
 exports.tendering_submit_rfq_lines = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id"];
+	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id", "sales_price"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});

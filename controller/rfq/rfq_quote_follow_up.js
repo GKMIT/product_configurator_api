@@ -23,3 +23,4 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 		}
 	});
 }
+
