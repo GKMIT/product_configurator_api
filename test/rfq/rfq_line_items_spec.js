@@ -136,8 +136,7 @@ describe('RFQ Line Items API Calls', function () {
 
 
 describe('All RFQ Line Items', function () {
-	var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
+	
 	var url="/all_rfq_line_items"
 
 	it("Should ok All Correct Data", function (done) {
@@ -263,8 +262,7 @@ describe('All RFQ Line Items', function () {
 });
 
 describe('Fetch Product Plants And Properties', function () {
-	var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
+	
 	var url="/fetch_product_plants_properties"
 
 	it("Should ok All Correct Data", function (done) {
@@ -401,8 +399,7 @@ describe('Fetch Product Plants And Properties', function () {
 });
 
 describe("fetch_property_detail", function () {
-    var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
+    
 	var url="/fetch_property_detail"
 
 	it("Should ok BCOZ All Correct Data", function (done) {
@@ -563,8 +560,7 @@ describe("fetch_property_detail", function () {
 
 
 describe("fetch_rfq_line_items", function () {
-    var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
+    
 	var url="/fetch_rfq_line_items"
 	it("Should ok BCOZ All Correct Data", function (done) {
 		login(email, password, function(user){
@@ -752,8 +748,7 @@ describe("fetch_rfq_line_items", function () {
 
 
 describe("save_line_item", function () {
-    var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
+    
 	var url="/save_line_item"
 
 	it("Should ok BCOZ All Correct Data blank technical_specifications array", function (done) {
@@ -1747,8 +1742,7 @@ describe("save_line_item", function () {
 });
 
 describe("update_line_item", function () {
-	var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
+	
 	var url="/update_line_item"
 
 	it("Should ok BCOZ All Correct Data blank technical_specifications array", function (done) {
@@ -2703,8 +2697,7 @@ describe("update_line_item", function () {
 
 
 describe("delete_line_item", function () {
-    var email="nitin.naik@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
+    
 	var url="/delete_line_item"
 
 	it("Should ok BCOZ All the correct parameter provide", function (done) {
