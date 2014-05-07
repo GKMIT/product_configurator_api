@@ -5,7 +5,8 @@ var should = require('should'),
 	supertest = require('supertest');
 
 	var global=require('../global/global_spec');
-
+	var email="nitin.naik@cgglobal.com";
+	var password="5e8ff9bf55ba3508199d22e984129be6";
 describe('RFQ Line Items API Calls', function () {
 		var email="nitin.naik@cgglobal.com";
 		var password="5e8ff9bf55ba3508199d22e984129be6";
@@ -2884,26 +2885,467 @@ describe("delete_line_item", function () {
 
 });
 
-describe("complete_rfq", function () {
-	// var email="nitin.naik@cgglobal.com";
-	// var password="5e8ff9bf55ba3508199d22e984129be6";
-	// var url="/complete_rfq"
 
-	// it("Should ok BCOZ All the correct parameter provide", function (done) {
-	// 	login(email, password, function(user){
-	// 		var user_id=user.data[0].id;
-	// 		var token=user.authentication_token;
-	// 		getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-	// 			var rfq_id=rfq.partial_rfq[0].id;
-	// 			var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
-	// 			Putcall(url, parameter, token, 200, function(obj){
-	// 				console.log(obj);
-	// 				done();
-	// 			});
-	// 		});
-	// 	});
-	// });
-	it("complete the rfq");
+describe("complete_rfq", function () {
+	var url="/complete_rfq"
+
+	it("Should ok BCOZ All the correct parameter provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
+							Putcall(url, parameter, token, 200, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok BCOZ All the correct parameter provide but token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
+							PutcallWithoutToken(url, parameter, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok BCOZ invalid token", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
+							Putcall(url, parameter, "token", 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok BCOZ invalid user_id", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":"10101010101","rfq_id":rfq_id, "rfq_status_id":2}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ user_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"rfq_id":rfq_id, "rfq_status_id":2}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ user_id proide but value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":"","rfq_id":rfq_id, "rfq_status_id":2}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok user_id is nonNumeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":"Nan","rfq_id":rfq_id, "rfq_status_id":2}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ rfq_id field not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id, "rfq_status_id":2}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+
+	it("Should Not ok BCOZ rfq_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":"", "rfq_status_id":2}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok BCOZ rfq_id non Numeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":"Nan", "rfq_status_id":2}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok BCOZ rfq_status_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":rfq_id}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok BCOZ rfq_status_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":""}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not ok BCOZ rfq_status_id is nonNumeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall("/save_line_item", parameter, token, 200, function(prop){
+							// console.log();
+							var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":"Nan"}
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+
 });
 
 
