@@ -88,6 +88,8 @@ module.exports = function(){
 	
 	app.put("/sales_quote_finalize_submit", rfq_quote_validation.sales_quote_finalize_submit, rfq_quote_calls.sales_quote_finalize_submit);
 
+	// api for the quote follow up
+
 
 
 };

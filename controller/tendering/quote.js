@@ -1,5 +1,10 @@
 exports.tendering_teams_quotes = function(req, res){
-	var query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.requested_quotation_date FROM `rfq`, `tendering_teams` WHERE `rfq_status_id`='4' AND `tendering_teams`.`id`=`rfq`.`tendering_teams_id` AND `tendering_teams`.`head_id`='"+req.params.user_id+"'  ORDER BY `rfq`.`updated_at` desc";
+	// discuss and decide who will see the quotes tendering_team head as and member
+	// var query="SELECT distinct `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.requested_quotation_date FROM `rfq`, `tendering_teams` WHERE `rfq`.`rfq_status_id`='4' AND `tendering_teams`.`id`=`rfq`.`tendering_teams_id` AND (`tendering_teams`.`head_id`='"+req.params.user_id+"' OR `rfq`.`tendering_teams_members_id`='"+req.params.user_id+"') ORDER BY `rfq`.`updated_at` desc";
+	// var query="SELECT distinct `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.requested_quotation_date FROM `rfq` WHERE `rfq`.`rfq_status_id`='4' AND `rfq`.`tendering_teams_members_id`='"+req.params.user_id+"' ORDER BY `rfq`.`updated_at` desc";
+	// console.log(query);
+	var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id` =  '4' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`updated_at` DESC";
+
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
@@ -14,21 +19,21 @@ exports.tendering_teams_quotes = function(req, res){
 
 exports.tendering_fetch_particular_quote = function(req, res){
 	var query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`rfq_status_id` FROM `rfq` WHERE `rfq_status_id`='4' AND `id`='"+req.params.rfq_id+"'";
-	// console.log(query);
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
+			console.log(rfq);
 			 // `r_lines`.`material_cost`, `r_lines`.`labour_cost`, `r_lines`.`no_of_labour_hours`, 
-
 			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
 					console.log(err);
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
+					console.log(rfq_lines);
 					var merge = function() {
 				    	var obj = {},
 				        i = 0,
