@@ -85,7 +85,7 @@ exports.sales_quote_finalize_submit = function(req, res, next){
 		}
 	}
 	if(checkValid==1){
-		if (req.body.quote_validity_date=="" || !validator.isDate(req.body.quote_validity_date)){
+		if (req.body.quote_validity_date=="" || req.body.quote_validity_date==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "quote_validity_date not found"});
 	}

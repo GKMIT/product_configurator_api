@@ -24,3 +24,16 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 	});
 }
 
+
+exports.sales_quote_followup_update = function(req, res){
+	var query="UPDATE `rfq` SET `quote_submission_date`='"+req.body.quote_submission_date+"', quote_validity_date='"+req.body.quote_validity_date+"', `probability`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.user_id+"'";
+	connection.query(query, function(err, quote) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "updated successfully"});
+		}
+	});
+}
