@@ -90,6 +90,13 @@ module.exports = function(){
 
 	// api for the quote follow up
 
+	var rfq_followup_calls=require('../controller/rfq/rfq_quote_follow_up.js');
+	var rfq_followup_validation=require('../controller/validation/rfq_quote_follow_up.js');
+	
+	app.get("/sales_quote_followup_fetch_all/:user_id", rfq_followup_validation.sales_quote_followup_fetch_all, rfq_followup_calls.sales_quote_followup_fetch_all);
+	
+	
+	
 
 
 };
