@@ -95,7 +95,8 @@ module.exports = function(){
 	
 	app.get("/sales_quote_followup_fetch_all/:user_id", rfq_followup_validation.sales_quote_followup_fetch_all, rfq_followup_calls.sales_quote_followup_fetch_all);
 	
-	
+	app.get("/sales_quote_followup_fetch_one/:user_id/:rfq_id", rfq_followup_validation.sales_quote_followup_fetch_one, rfq_followup_calls.sales_quote_followup_fetch_one);
+
 	
 
 
