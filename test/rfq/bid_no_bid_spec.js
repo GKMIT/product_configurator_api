@@ -70,21 +70,120 @@ describe('ready_rfq_bid API Calls', function () {
 //:user_id/:rfq_id
 
 describe('ready_rfq_bid_detail API Calls', function () {
-	var url="/ready_rfq_bid"
+	var url="/ready_rfq_bid_detail"
 	it("Should ok All Correct Data", function (done) {
 		login(email, password, function(user){
 			var user_id=user.data[0].id;
 			var token=user.authentication_token;
 			var parameter=user_id;
 			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
-				console.log(rfq);
-				 // parameter=user_id+"/"+;
-				getcall(url, parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, token, 200, function(rfq_detail){
 					done();
 				});
 			});
 		});
 	});
+
+	it("Should Not ok When token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcallWithoutToken(url, parameter, 404, function(rfq_detail){
+					done();
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When invalid token provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, "invalid", 404, function(rfq_detail){
+					done();
+				});
+			});
+		});
+	});
+
+	it("Should Not ok When token value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, "", 404, function(rfq_detail){
+					done();
+				});
+			});
+		});
+	});
+
+	it("Should Not ok When invalid user_id provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter="0000"+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, token, 404, function(rfq_detail){
+					done();
+				});
+			});
+		});
+	});
+
+
+	it("Should Not ok When user_id is NonNumeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter="Nan"+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, token, 404, function(rfq_detail){
+					done();
+				});
+			});
+		});
+	});
+
+	it("Should Not ok When rfq_id is NonNumeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+"Nan";
+				getcall(url, parameter, token, 404, function(rfq_detail){
+					done();
+				});
+			});
+		});
+	});
+
+	it("Should Not ok When rfq_id is invalid", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+"0000";
+				getcall(url, parameter, token, 401, function(rfq_detail){
+					done();
+				});
+			});
+		});
+	});
+
 });
 
 function login(email, password, callback){
