@@ -67,7 +67,25 @@ describe('ready_rfq_bid API Calls', function () {
 	});
 });
 
+//:user_id/:rfq_id
 
+describe('ready_rfq_bid_detail API Calls', function () {
+	var url="/ready_rfq_bid"
+	it("Should ok All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				console.log(rfq);
+				 // parameter=user_id+"/"+;
+				getcall(url, parameter, token, 200, function(rfq){
+					done();
+				});
+			});
+		});
+	});
+});
 
 function login(email, password, callback){
 	supertest(app)
