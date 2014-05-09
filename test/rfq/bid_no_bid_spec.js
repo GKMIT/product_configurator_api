@@ -742,6 +742,248 @@ describe('full_rfq_detail API Calls', function () {
 	});
 });
 
+describe('rfq_bid_submit API Call', function () {
+	var url="/rfq_bid_submit"
+	it("Should ok All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 4};
+							Putcall(url, parameter, token, 200, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When authentication_token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 4};
+							PutcallWithoutToken(url, parameter, 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When authentication_token value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 4};
+							Putcall(url, parameter, "", 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_id provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_status_id': 4};
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': '', 'rfq_status_id': 4};
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_id value NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': 'NaN', 'rfq_status_id': 4};
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id};
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': ''};
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id value NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 'NaN'};
+							Putcall(url, parameter, token, 404, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+});
+
+
+
 
 function login(email, password, callback){
 	supertest(app)
@@ -796,6 +1038,34 @@ function Postcall(url, parameter, token, status, callback){
 function PostcallWithoutToken(url, parameter, status, callback){
 	supertest(app)
 		.post(url)
+		.send(parameter)
+		// .set('authentication_token', token)
+		.expect(status)
+		.end(function (err, res) {
+			if(err){
+			}
+			res.body.statusCode.should.equal(status);
+			callback(res.body);
+	});	
+}
+
+function Putcall(url, parameter, token, status, callback){
+	supertest(app)
+		.put(url)
+		.send(parameter)
+		.set('authentication_token', token)
+		.expect(status)
+		.end(function (err, res) {
+			if(err){
+			}
+			res.body.statusCode.should.equal(status);
+			callback(res.body);
+	});	
+}
+
+function PutcallWithoutToken(url, parameter, status, callback){
+	supertest(app)
+		.put(url)
 		.send(parameter)
 		// .set('authentication_token', token)
 		.expect(status)
