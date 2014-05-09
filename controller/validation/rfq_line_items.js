@@ -143,7 +143,7 @@ exports.save_line_item = function(req, res, next){
 	}
 	if(typeof req.body.req_delivery_date=="undefined" || req.body.req_delivery_date==""){
 		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "requested_deliver_date not defined"});
+		res.json({"statusCode": 404, "success": "false", "message": "requested_delivery_date not defined"});
 	}
 	if(checkValid==1){
 		var subfields=["product_properties_id", "value"];
