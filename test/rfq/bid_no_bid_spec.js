@@ -744,33 +744,7 @@ describe('full_rfq_detail API Calls', function () {
 
 describe('rfq_bid_submit API Call', function () {
 	var url="/rfq_bid_submit"
-	it("Should ok All Correct Data", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
-				 parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
-					var questions = new Array();
-					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
-						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
-					
-					};
-						if(i==rfq_detail.rfq_questions.length){
-						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
-						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
-							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 4};
-							Putcall(url, parameter, token, 200, function(obj){
-								done();
-							});
-						});
-					}
-				});
-			});
-		});
-	});
-
+	
 	it("Should NOT OK When authentication_token not provide", function (done) {
 		login(email, password, function(user){
 			var user_id=user.data[0].id;
@@ -979,9 +953,675 @@ describe('rfq_bid_submit API Call', function () {
 			});
 		});
 	});
+	
+	it("Should ok All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 4};
+							Putcall(url, parameter, token, 200, function(obj){
+								done();
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
 
 });
 
+describe('get_rejection_remarks API Calls', function () {
+	var url="/get_rejection_remarks"
+	it("Should ok All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall(url, parameter, token, 200, function(rfq){
+				done();
+			});
+		});
+	});
+
+	it("Should NOT OK When token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcallWithoutToken(url, parameter, 404, function(rfq){
+				done();
+			});
+		});
+	});
+
+	it("Should NOT OK When invalid token pass", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall(url, parameter, "invalid_token", 404, function(rfq){
+				done();
+			});
+		});
+	});
+
+	it("Should NOT OK When user_id not invalid provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter="101";
+			getcall(url, parameter, token, 404, function(rfq){
+				done();
+			});
+		});
+	});
+
+	it("Should NOT OK When NonNumeric user_id provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter="NonNumeric";
+			getcall(url, parameter, token, 404, function(rfq){
+				done();
+			});
+		});
+	});
+});
+
+describe('rfq_no_bid_submit API Call', function () {
+	var url="/rfq_no_bid_submit"
+	
+	it("Should NOT OK When authentication_token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								PutcallWithoutToken(url, parameter, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When authentication_token value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, "", 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When authentication_token invalid provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id': user_id, 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, "invalid_token", 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When user_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When user_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id': '', 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When user_id value NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id': 'NaN', 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When user_id value invalid provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id': '0000', 'rfq_id': rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id': '', 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_id value NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id': 'NaN', 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': '', 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id value NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': 'NaN', 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+
+	it("Should NOT OK When rejection_remarks_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': 3, 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rejection_remarks_id value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': '', 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rejection_remarks_id value NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': 'NaN', 'estimated_sales_price':'4500'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When estimated_sales_price not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When estimated_sales_price value not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':''};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When estimated_sales_price value NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/ready_rfq_bid", parameter, token, 200, function(rfq){
+				 parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/ready_rfq_bid_detail", parameter, token, 200, function(rfq_detail){
+					var questions = new Array();
+					for (var i = 0; i < rfq_detail.rfq_questions.length; i++) {
+						questions[i]={'question_id': rfq_detail.rfq_questions[i].id, 'value': 1};
+					
+					};
+						if(i==rfq_detail.rfq_questions.length){
+						parameter={'user_id':user_id, 'rfq_id': rfq.rfq[0].id, 'questions':questions};
+						Postcall("/save_rfq_questions", parameter, token, 200, function(obj){
+							parameter=user_id;
+							getcall("/get_rejection_remarks", parameter, token, 200, function(rfq_remarks){
+								parameter={'user_id':user_id, 'rfq_id':rfq.rfq[0].id, 'rfq_status_id': 3, 'rejection_remarks_id': rfq_remarks.rejection_remarks[0].id, 'estimated_sales_price':'NaN'};
+								Putcall(url, parameter, token, 404, function(obj){
+									done();
+								});
+							});
+						});
+					}
+				});
+			});
+		});
+	});
+
+
+
+
+
+
+});
 
 
 
