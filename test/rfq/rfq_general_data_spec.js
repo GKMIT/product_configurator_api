@@ -6,11 +6,12 @@ var should = require('should'),
 
 	var general = require("../global/general");
 
+	var email="nitin.naik@cgglobal.com";
+	var password="5e8ff9bf55ba3508199d22e984129be6";
+
 // test cases for the general data of the rfq creation
 
 describe('RFQ General Data', function () {
-	var email="govindaraj.sethuraman@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/rfq_general_data";
 	var parameter="";
 	var token ="";
@@ -113,8 +114,6 @@ describe('RFQ General Data', function () {
 
 
 describe('RFQ General Data Sales Agent Get call', function () {
-	var email="govindaraj.sethuraman@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/rfq_general_data_sales_agents";
 	var parameter="";
 	var token ="";
@@ -229,8 +228,6 @@ describe('RFQ General Data Sales Agent Get call', function () {
 
 
 describe('RFQ General Data Sales persons Get call', function () {
-	var email="govindaraj.sethuraman@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/rfq_general_data_sales_persons";
 	var parameter="";
 	var token ="";
@@ -367,8 +364,6 @@ describe('RFQ General Data Sales persons Get call', function () {
 
 
 describe("Save RFQ General Data", function(){
-	var email="govindaraj.sethuraman@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/save_rfq_general_data";
 	var parameter="";
 	var token ="";
@@ -1988,7 +1983,7 @@ describe("Save RFQ General Data", function(){
 											"requested_quotation_date": rqd,
 											"probability": 30,
 											"rfq_status_id": "0",
-											"win": 1
+											"strategic_quote": 1
 											};
 								save_rfq_general_data(url, parameter, token, 200, function(obj){
 									done();
@@ -2034,7 +2029,7 @@ describe("Save RFQ General Data", function(){
 											"installation_country":general.countries[0].id,
 											"project_name":"testing project Name",
 											"sales_agents_id": agent.sales_agents[0].id,
-											"win": 1
+											"strategic_quote": 1
 											};
 								save_rfq_general_data(url, parameter, token, 200, function(obj){
 									done();
@@ -2054,8 +2049,6 @@ describe("Save RFQ General Data", function(){
 
 
 describe("Update RFQ General Data", function(){
-	var email="govindaraj.sethuraman@cgglobal.com";
-	var password="5e8ff9bf55ba3508199d22e984129be6";
 	var url="/update_rfq_general_data";
 	var parameter="";
 	var token ="";
@@ -3846,7 +3839,7 @@ describe("Update RFQ General Data", function(){
 											"requested_quotation_date": rqd,
 											"probability": 30,
 											"rfq_status_id": "0",
-											"win": 1
+											"strategic_quote": 1
 											};
 								update_rfq_general_data(url, parameter, token, 200, function(obj){
 									done();
@@ -3893,7 +3886,7 @@ describe("Update RFQ General Data", function(){
 											"installation_country":general.countries[1].id,
 											"project_name":"testing project Name Updated",
 											"sales_agents_id": agent.sales_agents[0].id,
-											"win": 1
+											"strategic_quote": 1
 											};
 								update_rfq_general_data(url, parameter, token, 200, function(obj){
 									done();

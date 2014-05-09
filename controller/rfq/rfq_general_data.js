@@ -32,27 +32,37 @@ exports.rfq_general_data = function(req, res){
 															res.json({"statusCode":500, "success":"false", "message": "internal error"});
 													}
 													else{
-														if(rfq.length<=0){
-															res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": ""});
-														}
-														else{
-															connection.query("SELECT `sa`.`id`,`sa`.`name` FROM `sales_agents` `sa`, `agent_country_allocation` `aca` WHERE sa.id=aca.sales_agents_id AND countries_id='"+rfq[0].customer_country+"'", function(err, sales_agents) {
-																if(err){
-																		res.json({"statusCode":500, "success":"false", "message": "internal error"});
+														connection.query("SELECT `id`, `name` FROM `channel_to_market`", function(err, channel_to_market) {
+															if(err){
+																console.log(err);
+																	res.json({"statusCode":500, "success":"false", "message": "internal error"});
+															}
+															else{
+																if(rfq.length<=0){
+																	res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": "", "channel_to_market": channel_to_market});
+																	// res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": ""});
 																}
 																else{
-																	connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+rfq[0].sales_hub_id+"'", function(err, sales_persons) {
+																	connection.query("SELECT `sa`.`id`,`sa`.`name` FROM `sales_agents` `sa`, `agent_country_allocation` `aca` WHERE sa.id=aca.sales_agents_id AND countries_id='"+rfq[0].customer_country+"'", function(err, sales_agents) {
 																		if(err){
-																			console.log(err);
 																				res.json({"statusCode":500, "success":"false", "message": "internal error"});
 																		}
 																		else{
-																			res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons});
+																			connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+rfq[0].sales_hub_id+"'", function(err, sales_persons) {
+																				if(err){
+																					console.log(err);
+																						res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																				}
+																				else{
+																					res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons, "channel_to_market": channel_to_market});
+																				}
+																			});																					
 																		}
-																	});																					
+																	});																			
 																}
-															});																			
-														}																		
+															}
+														});
+																																
 													}
 												});
 											}
@@ -282,9 +292,13 @@ exports.save_rfq_general_data = function(req, res){
 					param.push("sales_agents_id");
 					paramValue.push(req.body.sales_agents_id);
 				}
-				if(typeof req.body.win!=="undefined" && req.body.win!=="" && validator.isNumeric(req.body.win)){
-					param.push("win");
-					paramValue.push(req.body.win);
+				if(typeof req.body.strategic_quote!=="undefined" && req.body.strategic_quote!=="" && validator.isNumeric(req.body.strategic_quote)){
+					param.push("strategic_quote");
+					paramValue.push(req.body.strategic_quote);
+				}
+				if(typeof req.body.channel_to_market_id!=="undefined" && req.body.channel_to_market_id!=="" && validator.isNumeric(req.body.channel_to_market_id)){
+					param.push("channel_to_market_id");
+					paramValue.push(req.body.channel_to_market_id);
 				}
 					
 
@@ -421,9 +435,13 @@ exports.update_rfq_general_data = function(req, res){
 				param.push("installation_country");
 				paramValue.push(req.body.installation_country);
 			}
-			if(typeof req.body.win!=="undefined" && validator.isNumeric(req.body.win)){
-				param.push("win");
-				paramValue.push(req.body.win);
+			if(typeof req.body.strategic_quote!=="undefined" && validator.isNumeric(req.body.strategic_quote)){
+				param.push("strategic_quote");
+				paramValue.push(req.body.strategic_quote);
+			}
+			if(typeof req.body.channel_to_market_id!=="undefined" && req.body.channel_to_market_id!=="" && validator.isNumeric(req.body.channel_to_market_id)){
+				param.push("channel_to_market_id");
+				paramValue.push(req.body.channel_to_market_id);
 			}
 
 				var query="UPDATE rfq ";
