@@ -570,6 +570,7 @@ describe("fetch_rfq_line_items", function () {
 				var rfq_id=rfq.partial_rfq[0].id;
 				var parameter=user_id+"/"+rfq_id;
 				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					
 					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
 					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
 					getcall(url, parameter, token, 200, function(line_items){
@@ -2900,13 +2901,13 @@ describe("complete_rfq", function () {
 									"plants_id":plants_id,
 									"rfq_id":rfq_id,
 									"number_of_units":"12",
-									"rfq_status_id":"3",
+									"rfq_status_id":"2",
 									"req_delivery_date":"2014-10-10 12:00:00",
 									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
-							var parameter={"user_id":user_id,"rfq_id":rfq_id, "rfq_status_id":2}
+							var parameter={"user_id":user_id, "rfq_id":rfq_id, "rfq_status_id":2}
 							Putcall(url, parameter, token, 200, function(obj){
 								done();
 							});

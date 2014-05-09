@@ -3,13 +3,12 @@ var testConnection = require('../../helper/connection');
 
 var should = require('should'),
 	supertest = require('supertest');
-
+	var email="nitin.naik@cgglobal.com";
+	var password="5e8ff9bf55ba3508199d22e984129be6";
 // test cases for the product data
 describe('RFQ Product Data', function () {
 	it('should return not ok parameter authentication_token not provide',
 			function (done) {
-	      	var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -26,8 +25,6 @@ describe('RFQ Product Data', function () {
 
 	it('should return not ok parameter authentication_token provide but value not provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -45,8 +42,6 @@ describe('RFQ Product Data', function () {
 
 	it('should return not ok parameter invalid authentication_token provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -64,8 +59,6 @@ describe('RFQ Product Data', function () {
 
 	it('should return not ok parameter invalid user_id provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -84,8 +77,6 @@ describe('RFQ Product Data', function () {
 
 	it('should return not ok parameter invalid rfq_id provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -104,8 +95,6 @@ describe('RFQ Product Data', function () {
 
 	it('should return not ok parameter rfq_id is not created_by this user_id',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -124,8 +113,6 @@ describe('RFQ Product Data', function () {
 
 	it('should return ok all parameter provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -148,8 +135,6 @@ describe('RFQ Product Data', function () {
 describe('RFQ Product tendering teams Data', function () {
 	it('should return not ok parameter authentication_token not provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -170,8 +155,6 @@ describe('RFQ Product tendering teams Data', function () {
 
 	it('should return not ok parameter authentication_token provide but value not provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -193,8 +176,6 @@ describe('RFQ Product tendering teams Data', function () {
 
 	it('should return not ok parameter invalid authentication_token provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -216,8 +197,6 @@ describe('RFQ Product tendering teams Data', function () {
 
 	it('should return not ok parameter invalid user_id provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -239,8 +218,6 @@ describe('RFQ Product tendering teams Data', function () {
 
 	it('should return not ok parameter invalid product_lines_id provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -261,8 +238,6 @@ describe('RFQ Product tendering teams Data', function () {
 
 	it('should return ok all parameter provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -289,8 +264,6 @@ describe('RFQ Product tendering teams Data', function () {
 describe('RFQ Product tendering teams Members Data', function () {
 	it('should return not ok parameter authentication_token not provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -315,8 +288,6 @@ describe('RFQ Product tendering teams Members Data', function () {
 
 	it('should return not ok parameter authentication_token provide but value not provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -342,8 +313,6 @@ describe('RFQ Product tendering teams Members Data', function () {
 
 	it('should return not ok parameter invalid authentication_token provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -369,8 +338,6 @@ describe('RFQ Product tendering teams Members Data', function () {
 
 	it('should return not ok parameter invalid user_id provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -396,8 +363,6 @@ describe('RFQ Product tendering teams Members Data', function () {
 
 	it('should return not ok parameter invalid tendering_teams_id provide',
 			function (done) {
-  			var email="govindaraj.sethuraman@cgglobal.com"
-	     	var password="5e8ff9bf55ba3508199d22e984129be6";
 			login(email, password, function(user){
 				var token=user.authentication_token;
 				var user_id=user.data[0].id;
@@ -422,8 +387,7 @@ describe('RFQ Product tendering teams Members Data', function () {
 	});
 
 	it('should return ok all parameter provide',function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -450,8 +414,6 @@ describe('RFQ Product tendering teams Members Data', function () {
 
 describe('General Product Data Save', function () {
 	it('should return not ok parameter authentication_token not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -465,7 +427,10 @@ describe('General Product Data Save', function () {
 						var team_id = product.tendering_teams[0].id;
 						parameter={"user_id":user_id,
 									"rfq_id": rfq_id,
-									"rfq_status_id":1
+									"rfq_status_id":1,
+									"product_lines_id":1,
+									"tendering_teams_id":1,
+									"tendering_teams_members_id":1
 									};
 						PutcallWithoutToken("/general_product_data_save", parameter, 404, function(obj){
 							done();
@@ -478,8 +443,7 @@ describe('General Product Data Save', function () {
 
 
 	it('should return not ok parameter authentication_token provide but value not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -493,7 +457,10 @@ describe('General Product Data Save', function () {
 						var team_id = product.tendering_teams[0].id;
 						parameter={"user_id":user_id,
 									"rfq_id": rfq_id,
-									"rfq_status_id":1
+									"rfq_status_id":1,
+									"product_lines_id":1,
+									"tendering_teams_id":1,
+									"tendering_teams_members_id":1
 									};
 									token="";
 						Putcall("/general_product_data_save", parameter, token, 404, function(obj){
@@ -506,8 +473,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter authentication_token provide but value not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -521,7 +487,10 @@ describe('General Product Data Save', function () {
 						var team_id = product.tendering_teams[0].id;
 						parameter={"user_id":user_id,
 									"rfq_id": rfq_id,
-									"rfq_status_id":1
+									"rfq_status_id":1,
+									"product_lines_id":1,
+									"tendering_teams_id":1,
+									"tendering_teams_members_id":1
 									};
 									token="";
 						Putcall("/general_product_data_save", parameter, token, 404, function(obj){
@@ -534,8 +503,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter authentication_token provide but invalid', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -570,8 +538,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter user_id not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -606,8 +573,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter user_id provide but value not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -641,8 +607,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter user_id provide but invalid', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -676,8 +641,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter rfq_id not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -711,8 +675,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter rfq_id provide but value not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -747,8 +710,7 @@ describe('General Product Data Save', function () {
 
 
 	it('should return not ok parameter rfq_id provide but invalid', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -782,8 +744,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter rfq_status_id not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -816,8 +777,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter rfq_status_id not provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -851,8 +811,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return not ok parameter rfq_status_id  invalid', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -886,8 +845,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return ok all parameter provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -906,9 +864,9 @@ describe('General Product Data Save', function () {
 							parameter={"user_id":user_id,
 										"rfq_id": rfq_id,
 										"rfq_status_id":1,
-										"product_lines_id":product_line_id,
-										"tendering_teams_id":team_id,
-										"tendering_teams_members_id":team_member_id
+										// "product_lines_id":product_line_id,
+										// "tendering_teams_id":team_id,
+										// "tendering_teams_members_id":team_member_id
 										};
 							Putcall("/general_product_data_save", parameter, token, 200, function(obj){
 								done();
@@ -921,8 +879,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return ok manditory parameter provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -953,8 +910,7 @@ describe('General Product Data Save', function () {
 	});
 
 	it('should return ok all manditory parameter AND some optional parameter provide', function (done) {
-		var email="govindaraj.sethuraman@cgglobal.com"
-     	var password="5e8ff9bf55ba3508199d22e984129be6";
+		
 		login(email, password, function(user){
 			var token=user.authentication_token;
 			var user_id=user.data[0].id;
@@ -974,7 +930,8 @@ describe('General Product Data Save', function () {
 										"rfq_id": rfq_id,
 										"rfq_status_id":1,
 										"product_lines_id":product_line_id,
-										"tendering_teams_id":team_id
+										"tendering_teams_id":team_id,
+										"tendering_teams_members_id":team_member_id
 										};
 							Putcall("/general_product_data_save", parameter, token, 200, function(obj){
 								done();
