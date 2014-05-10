@@ -165,7 +165,7 @@ exports.save_line_item = function(req, res){
 				});
 			}
 			else{
-				res.json({"statusCode":422, "success":"false", "message":"Data not sufficient !"});
+				res.json({"statusCode":422, "success":"false", "message":"Please fill mandatory fields !"});
 			}
 		}
 			
