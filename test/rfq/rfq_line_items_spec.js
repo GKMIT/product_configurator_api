@@ -752,7 +752,7 @@ describe("save_line_item", function () {
     
 	var url="/save_line_item"
 
-	it("Should ok BCOZ All Correct Data blank technical_specifications array", function (done) {
+	it("Should ok BCOZ All Correct Data with mandatory technical_specifications array", function (done) {
 		login(email, password, function(user){
 			var user_id=user.data[0].id;
 			var token=user.authentication_token;
@@ -772,7 +772,7 @@ describe("save_line_item", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall(url, parameter, token, 200, function(prop){
 							// console.log(prop);
@@ -784,7 +784,40 @@ describe("save_line_item", function () {
 		});
 	});
 	
-	it("Should ok BCOZ All Correct Data with technical_specifications", function (done) {
+	it("Should ok BCOZ All Correct Data with mandatory and some more technical_specifications", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				// console.log(rfq_id);
+				getcall("/rfq_new_line_item", parameter, token, 200, function(line_item){
+					var product_lines_id=line_item.product_lines[0].id;
+					parameter=user_id+"/"+product_lines_id;
+					getcall("/fetch_product_plants_properties", parameter, token, 200, function(prop){
+						var plants_id=prop.production_plants[0].id;
+						// parameter=user_id+"/"+plant_id;
+						parameter={"user_id":user_id,
+									"product_lines_id":product_lines_id,
+									"plants_id":plants_id,
+									"rfq_id":rfq_id,
+									"number_of_units":"12",
+									"rfq_status_id":"3",
+									"req_delivery_date":"2014-10-10 12:00:00",
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":3, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									};
+						Postcall(url, parameter, token, 200, function(prop){
+							// console.log(prop);
+							done();
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it("Should Not Ok BCOZ All Correct Data but mandatory more technical_specifications", function (done) {
 		login(email, password, function(user){
 			var user_id=user.data[0].id;
 			var token=user.authentication_token;
@@ -807,7 +840,7 @@ describe("save_line_item", function () {
 									"req_delivery_date":"2014-10-10 12:00:00",
 									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
-						Postcall(url, parameter, token, 200, function(prop){
+						Postcall(url, parameter, token, 422, function(prop){
 							// console.log(prop);
 							done();
 						});
@@ -2903,7 +2936,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"2",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -2938,7 +2971,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -2973,7 +3006,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3008,7 +3041,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3043,7 +3076,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3078,7 +3111,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3113,7 +3146,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3148,7 +3181,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3184,7 +3217,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3219,7 +3252,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3254,7 +3287,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3289,7 +3322,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
@@ -3324,7 +3357,7 @@ describe("complete_rfq", function () {
 									"number_of_units":"12",
 									"rfq_status_id":"3",
 									"req_delivery_date":"2014-10-10 12:00:00",
-									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
+									"technical_specifications":[{"product_properties_id":1, "value":"value are what ever !", "remark":"remakrs are bla bla.."},{"product_properties_id":2, "value":"value are what ever !", "remark":"remakrs are bla bla.."}]
 									};
 						Postcall("/save_line_item", parameter, token, 200, function(prop){
 							// console.log();
