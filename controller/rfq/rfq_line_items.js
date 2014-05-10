@@ -180,41 +180,64 @@ exports.update_line_item = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else if(typeof req.body.technical_specifications=="object" && Array.isArray(req.body.technical_specifications) && req.body.technical_specifications.length>0){
-			connection.query("DELETE  FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
+			connection.query("SELECT `mandatory_properties` FROM `product_lines` WHERE `id`='"+req.body.product_lines_id+"'", function(err, mandatory){
 				if(err){
+					console.log(err);
 					res.json({"statusCode":500, "success": "false", "message": "internal error"});
 				}
 				else{
-					var rfq_lines_id=req.body.rfq_lines_id;
-					var fields=["product_properties_id", "value", "remark"];
-					var query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES (";
-					for (var i = 0; i < req.body.technical_specifications.length; i++) {
-						query=query+"'"+rfq_lines_id+"'";
-						for (var j = 0; j < fields.length; j++) {
-							if(typeof req.body.technical_specifications[i][fields[j]]=="undefined"){
-							query=query+", ''";
+					var testIds=mandatory[0].mandatory_properties.split(",");
+					var counter=0;
+					for (var i = 0; i < testIds.length; i++) {
+						for (var j = 0; j < req.body.technical_specifications.length; j++) {
+							if(testIds[i]==req.body.technical_specifications[j].product_properties_id){
+								counter++;
+							}
+						};
+					};
+					if(counter>=testIds.length){
+						connection.query("DELETE  FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
+							if(err){
+								res.json({"statusCode":500, "success": "false", "message": "internal error"});
 							}
 							else{
-								query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+								var rfq_lines_id=req.body.rfq_lines_id;
+								var fields=["product_properties_id", "value", "remark"];
+								var query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES (";
+								for (var i = 0; i < req.body.technical_specifications.length; i++) {
+									query=query+"'"+rfq_lines_id+"'";
+									for (var j = 0; j < fields.length; j++) {
+										if(typeof req.body.technical_specifications[i][fields[j]]=="undefined"){
+										query=query+", ''";
+										}
+										else{
+											query=query+", '"+req.body.technical_specifications[i][fields[j]]+"'";
+										}
+										if(j+1==fields.length){
+											query=query+")";
+										}
+									}
+									if(i+1<req.body.technical_specifications.length){
+										query=query+", (";
+									}
+								}
+								// console.log(query);
+								connection.query(query, function(err, info_tech){
+									if(err){
+										res.json({"statusCode":500, "success": "false", "message": "internal error"});
+									}
+									else{
+										res.json({"statusCode":200, "success":"true", "message":"data update successfully"});
+									}
+								});
 							}
-							if(j+1==fields.length){
-								query=query+")";
-							}
-						}
-						if(i+1<req.body.technical_specifications.length){
-							query=query+", (";
-						}
+						});
 					}
-					// console.log(query);
-					connection.query(query, function(err, info_tech){
-						if(err){
-							res.json({"statusCode":500, "success": "false", "message": "internal error"});
-						}
-						else{
-							res.json({"statusCode":200, "success":"true", "message":"data update successfully"});
-						}
-					});
+					else{
+						res.json({"statusCode":422, "success":"false", "message":"Please fill mandatory fields !"});
+					}
 				}
+					
 			});
 		}
 		else{
