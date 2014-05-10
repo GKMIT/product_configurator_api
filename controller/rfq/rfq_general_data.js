@@ -54,7 +54,15 @@ exports.rfq_general_data = function(req, res){
 																						res.json({"statusCode":500, "success":"false", "message": "internal error"});
 																				}
 																				else{
-																					res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons, "channel_to_market": channel_to_market});
+																					connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks) {
+																						if(err){
+																							console.log(err);
+																								res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																						}
+																						else{
+																							res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons, "channel_to_market": channel_to_market, "rejection_remarks":rejection_remarks});
+																						}
+																					});
 																				}
 																			});																					
 																		}
