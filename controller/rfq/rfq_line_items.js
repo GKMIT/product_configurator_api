@@ -48,13 +48,21 @@ exports.fetch_product_plants_properties = function(req, res){
 			res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `product_properties`.`id`, `product_properties`.`property_name`, `product_lines`.`mandatory_properties` FROM `product_properties`, `product_lines` WHERE `product_lines`.id='"+req.params.product_lines_id+"' AND  product_lines_id='"+req.params.product_lines_id+"'", function(err, product_properties) {
+			connection.query("SELECT `product_properties`.`id`, `product_properties`.`property_name` FROM `product_properties` WHERE  product_lines_id='"+req.params.product_lines_id+"'", function(err, product_properties) {
 				if(err){
 					console.log(err);
 						res.json({"statusCode":500, "success":"false", "message": "internal error"});
 				}
 				else{
-					res.json({"statusCode":200, "success":"true", "massage":"", "production_plants":production_plants, "product_properties":product_properties, "product_properties":product_properties});
+					connection.query("SELECT `product_lines`.`id`, `product_lines`.`name`, `product_lines`.`mandatory_properties` FROM `product_lines` WHERE id='"+req.params.product_lines_id+"'", function(err, mandatory_properties) {
+						if(err){
+							console.log(err);
+								res.json({"statusCode":500, "success":"false", "message": "internal error"});
+						}
+						else{
+							res.json({"statusCode":200, "success":"true", "massage":"", "production_plants":production_plants, "product_properties":product_properties, "mandatory_properties":mandatory_properties});
+						}
+					});
 				}
 			});
 		}
