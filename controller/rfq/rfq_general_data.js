@@ -345,7 +345,7 @@ exports.save_rfq_general_data = function(req, res){
 					query=query+queryparam+")"+queryValue+")";
 					connection.query(query, function(err, info) {
 						if(err){
-								res.json({"statusCode":500, "success":"false", "message": "internal error"});
+								res.json({"statusCode":500, "success":"false", "message": "22222internal error"});
 						}
 						else{
 							res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": info.insertId});
@@ -384,6 +384,16 @@ function update_rfq_general_dataValidation(req, res, callback){
 		}
 	}
 	if(checkValid==1){
+		if(typeof req.body.is_bid=="undefined" || !validator.isNumeric(req.body.is_bid) || req.body.is_bid==""){
+			checkValid=0;
+			res.json({"statusCode": 404, "success": "false", "message": "is_bid not defined"});
+		}
+		else if(req.body.is_bid==0){
+			if(typeof req.body.sales_rejection_remarks_id=="undefined" || !validator.isNumeric(req.body.sales_rejection_remarks_id) || req.body.sales_rejection_remarks_id==""){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": "sales_rejection_remarks_id not defined"});
+			}
+		}
 		var param = ["date_rfq_in", "requested_quotation_date"];
 		var parameterValue=JSON.parse(JSON.stringify(req.body));
 			for(var i=0; i<param.length; i++){
@@ -467,6 +477,12 @@ exports.update_rfq_general_data = function(req, res){
 				param.push("channel_to_market_id");
 				paramValue.push(req.body.channel_to_market_id);
 			}
+			if(typeof req.body.sales_rejection_remarks_id!=="undefined" && req.body.sales_rejection_remarks_id!=="" && validator.isNumeric(req.body.sales_rejection_remarks_id)){
+				param.push("sales_rejection_remarks_id");
+				paramValue.push(req.body.sales_rejection_remarks_id);
+			}
+			param.push("is_bid");
+			paramValue.push(req.body.is_bid);
 
 				var query="UPDATE rfq ";
 				var queryparam=" SET `sales_hub_id`='"+req.body.sales_hub_id+"', `sales_person_id`='"+req.body.sales_person_id +"', `customers_id`='"+req.body.customers_id+"', `customer_country`='"+req.body.customer_country+"', `type_of_quote_id`='"+req.body.type_of_quote_id+"', `date_rfq_in`='"+req.body.date_rfq_in+"', `sales_segments_id`='"+req.body.sales_segments_id+"', `requested_quotation_date`='"+req.body.requested_quotation_date+"', `created_by`='"+req.body.user_id+"', `probability`='"+req.body.probability+"'";
