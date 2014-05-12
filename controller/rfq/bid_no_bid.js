@@ -11,7 +11,8 @@ exports.ready_rfq_bid = function(req, res){
 	});
 };
 exports.ready_rfq_bid_detail = function(req, res){
-	connection.query("SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`requested_quotation_date` FROM `rfq` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
+	console.log("SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`requested_quotation_date`, `rfq`.`is_bid`, `rejection_remarks`.`description` as `rejection_remarks_name` FROM `rfq` LEFT JOIN `rejection_remarks` ON `rejection_remarks`.`id`=`rfq`.`sales_rejection_remarks_id` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'");
+	connection.query("SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`requested_quotation_date`, `rfq`.`is_bid`, `rejection_remarks`.`description` as `rejection_remarks_name` FROM `rfq` LEFT JOIN `rejection_remarks` ON `rejection_remarks`.`id`=`rfq`.`sales_rejection_remarks_id` WHERE `rfq`.`rfq_status_id`='2' AND `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});

@@ -574,6 +574,7 @@ describe("fetch_rfq_line_items", function () {
 					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
 					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
 					getcall(url, parameter, token, 200, function(line_items){
+						// console.log(line_items);
 						done();
 					});
 				});
