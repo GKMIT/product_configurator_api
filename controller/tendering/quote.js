@@ -103,8 +103,6 @@ exports.tendering_fetch_particular_quote = function(req, res){
 	});
 }
 
-
-
 exports.tendering_fetch_product_design_detail = function(req, res){
 	var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `plants`.`name` as `plants_name`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` LEFT JOIN `product_lines` ON `rfq_lines`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` WHERE `rfq_lines`.`id`='"+req.params.rfq_lines_id+"' AND `rfq_id`='"+req.params.rfq_id+"'";
 	connection.query(query, function(err, rfq_lines) {
@@ -128,7 +126,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 				quarter=4;
 			}
 
-			connection.query("SELECT * FROM `product_designs` INNER JOIN `product_designs_costs` ON `product_designs`.`id`=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`year`='"+rfq_lines[0].year+"' AND `product_designs_costs`.`quarter`='"+quarter+"' INNER JOIN `product_designs_sales_prices` ON `product_designs_sales_prices`.`product_designs_id`=`product_designs`.`id`", function(err, product_designs) {
+			connection.query("SELECT `pd`.`id` ,  `pd`.`product_lines_id` ,  `pd`.`plants_id` ,  `pd`.`standard_for_country` ,  `pd`.`standard_for_customer` , `pd`.`material_code` ,  `pd`.`design_number` ,  `pd`.`design_variant` ,  `pdc`.`id` AS  `product_design_costs_id` , `pdc`.`material_pricelist_reference` ,  `pdc`.`year` ,  `pdc`.`quarter` ,  `pdc`.`currency` ,  `pdc`.`labor_cost` ,  `pdc`.`labor_hours` , `pdc`.`material_cost`, `pdsp`.`minimum_price`, `pdsp`.`id` as `product_designs_sales_prices_id`, `pdsp`.`minimum_price`, `pdsp`.`minimum_price_for_country_id`, `pdsp`.`validity_date_from`, `pdsp`.`validity_date_to` FROM `product_designs` `pd`        INNER JOIN `product_designs_costs` `pdc` ON `pd`.`id`=`pdc`.`product_design_id` AND `pdc`.`year`='"+rfq_lines[0].year+"' AND `pdc`.`quarter`='"+quarter+"' INNER JOIN `product_designs_sales_prices` `pdsp` ON `pdsp`.`product_designs_id`=`pd`.`id`", function(err, product_designs) {
 				if(err){
 					console.log(err);
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -137,6 +135,18 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq_lines":rfq_lines, "product_designs": product_designs});
 				}
 			});
+		}
+	});
+}
+
+exports.tendering_fetch_particular_design = function(){
+	connection.query("SELECT * FROM `product_designs` WHERE `product_designs`.`id`='"+req.params.product_designs_id+"'", function(err, design) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "", "design":designs});
 		}
 	});
 }
