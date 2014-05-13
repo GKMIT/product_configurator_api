@@ -68,7 +68,97 @@ describe('tendering_teams_quotes API Calls', function () {
 	});
 });
 
+describe('tendering_fetch_particular_quote API Calls', function () {
 
+	var url="/tendering_fetch_particular_quote"
+	it("Should ok All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+			parameter=user_id+"/"+rfq.rfq[0].id;
+			// console.log(parameter);
+				getcall(url, parameter, token, 200, function(rfq){
+					// console.log(rfq);
+					done();
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcallWithoutToken(url, parameter, 404, function(rfq){
+					done();
+				});
+			});			
+		});
+	});
+
+	it("Should NOT OK When invalid token provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, "invalid", 404, function(rfq){
+					done();
+				});
+			});			
+		});
+	});
+
+	it("Should NOT OK When invalid user_id provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+			parameter="0000"+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, token, 404, function(rfq){
+					done();
+				});
+			});			
+		});
+	});
+
+	it("Should NOT OK When user_id NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+			parameter="NaN"+"/"+rfq.rfq[0].id;
+				getcall(url, parameter, token, 404, function(rfq){
+					done();
+				});
+			});			
+		});
+	});
+
+	it("Should NOT OK When rfq_id NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+			parameter=user_id+"/"+"NaN";
+				getcall(url, parameter, token, 404, function(rfq){
+					done();
+				});
+			});			
+		});
+	});
+
+
+});
 
 function login(email, password, callback){
 	supertest(app)
