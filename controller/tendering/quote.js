@@ -146,7 +146,15 @@ exports.tendering_fetch_particular_design = function(req, res){
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode": 200, "success":"true", "message": "", "design":design});
+			connection.query("SELECT * FROM `product_designs_technical_details` WHERE `product_design_id`='"+req.params.product_designs_id+"'", function(err, design_technical_detail){
+				if(err){
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					res.json({"statusCode": 200, "success":"true", "message": "", "design":design, "product_designs_technical_details": design_technical_detail});
+				}
+			});
+			// res.json({"statusCode": 200, "success":"true", "message": "", "design":design});
 		}
 	});
 }
