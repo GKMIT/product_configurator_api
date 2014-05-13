@@ -139,14 +139,14 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 	});
 }
 
-exports.tendering_fetch_particular_design = function(){
-	connection.query("SELECT * FROM `product_designs` WHERE `product_designs`.`id`='"+req.params.product_designs_id+"'", function(err, design) {
+exports.tendering_fetch_particular_design = function(req, res){
+	connection.query("SELECT `pd`.`id`, `pd`.`product_lines_id`, `pd`.`plants_id`, `pd`.`standard_for_country`, `pd`.`standard_for_customer`, `pd`.`material_code`, `pd`.`design_number`,  `pd`.`design_variant`, `pdc`.`id` AS  `product_design_costs_id`, `pdc`.`material_pricelist_reference`, `pdc`.`year`, `pdc`.`quarter`, `pdc`.`currency`, `pdc`.`labor_cost` ,  `pdc`.`labor_hours`, `pdc`.`material_cost`, `pdsp`.`minimum_price`, `pdsp`.`id` as `product_designs_sales_prices_id`, `pdsp`.`minimum_price`, `pdsp`.`minimum_price_for_country_id`, `pdsp`.`validity_date_from`, `pdsp`.`validity_date_to` FROM `product_designs` `pd` LEFT JOIN `product_designs_costs` `pdc` ON `pd`.`id`=`pdc`.`product_design_id` AND `pdc`.`id`='"+req.params.product_designs_costs_id+"' LEFT JOIN `product_designs_sales_prices` `pdsp` ON `pdsp`.`product_designs_id`='"+req.params.product_designs_id+"' WHERE `pd`.`id`='"+req.params.product_designs_id+"'", function(err, design) {
 		if(err){
 			console.log(err);
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode": 200, "success":"true", "message": "", "design":designs});
+			res.json({"statusCode": 200, "success":"true", "message": "", "design":design});
 		}
 	});
 }
