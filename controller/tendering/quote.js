@@ -25,15 +25,15 @@ exports.tendering_fetch_particular_quote = function(req, res){
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			console.log(rfq);
+			// console.log(rfq);
 			 // `r_lines`.`material_cost`, `r_lines`.`labour_cost`, `r_lines`.`no_of_labour_hours`, 
-			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
+			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
 					console.log(err);
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					console.log(rfq_lines);
+					// console.log(rfq_lines);
 					var merge = function() {
 				    	var obj = {},
 				        i = 0,
@@ -73,16 +73,16 @@ exports.tendering_fetch_particular_quote = function(req, res){
 								else{
 									quarter=4;
 								}
-								console.log(counter1);
+								// console.log(counter1);
 								// console.log(rfq_lines[counter].product_designs_id);
-								console.log("counter is : "+counter);
+								// console.log("counter is : "+counter);
 								connection.query("SELECT * FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.id=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`quarter`='"+quarter+"' AND `product_designs_costs`.`year`='"+rfq_lines[counter1].year+"' WHERE `product_designs`.id='"+rfq_lines[counter1].product_designs_id+"'", function(err, product_design_detail) {
 									if(err){
 										console.log(err);
 											res.json({"statusCode": 500, "success":"false", "message": "44internal error"});
 									}
 									else{
-										console.log("counter is ===>  "+counter);
+										// console.log("counter is ===>  "+counter);
 										complete_rfq_lines[counter]["rfq_lines_technical_specs"]=rfq_lines_technical_specs;
 										complete_rfq_lines[counter]["product_design_detail"]=product_design_detail;
 										counter++;
@@ -102,6 +102,8 @@ exports.tendering_fetch_particular_quote = function(req, res){
 		}
 	});
 }
+
+
 
 exports.tendering_fetch_product_design_detail = function(req, res){
 	var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `plants`.`name` as `plants_name`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` LEFT JOIN `product_lines` ON `rfq_lines`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` WHERE `rfq_lines`.`id`='"+req.params.rfq_lines_id+"' AND `rfq_id`='"+req.params.rfq_id+"'";
