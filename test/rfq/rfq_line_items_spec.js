@@ -559,195 +559,6 @@ describe("fetch_property_detail", function () {
 });
 
 
-describe("fetch_rfq_line_items", function () {
-    
-	var url="/fetch_rfq_line_items"
-	it("Should ok BCOZ All Correct Data", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
-					getcall(url, parameter, token, 200, function(line_items){
-						// console.log(line_items);
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ authentication_token not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
-					getcallWithoutToken(url, parameter, 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ authentication_token provide but value not", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
-					getcall(url, parameter, "", 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ invalid authentication_token provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
-					getcall(url, parameter, "invalid", 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ user_id is nonNemeric", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter="nonNumeric"+"/"+rfq_id+"/"+rfq_lines_id;
-					getcall(url, parameter, token, 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ invalid user_id", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter="000000"+"/"+rfq_id+"/"+rfq_lines_id;
-					getcall(url, parameter, token, 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-
-	it("Should NOT OK BCOZ rfq_id is nonNemeric", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+"nonNumeric"+"/"+rfq_lines_id;
-					getcall(url, parameter, token, 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ invalid rfq_id", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+"000000"+"/"+rfq_lines_id;
-					getcall(url, parameter, token, 401, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ rfq_lines_id is nonNemeric", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+rfq_id+"/"+"nonNumeric";
-					getcall(url, parameter, token, 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK BCOZ invalid rfq_lines_id", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
-				var rfq_id=rfq.partial_rfq[0].id;
-				var parameter=user_id+"/"+rfq_id;
-				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
-					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
-					parameter=user_id+"/"+rfq_id+"/"+"00000";
-					getcall(url, parameter, token, 404, function(line_items){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-});
-
-
 
 describe("save_line_item", function () {
     
@@ -1775,6 +1586,195 @@ describe("save_line_item", function () {
 	});
 
 });
+
+describe("fetch_rfq_line_items", function () {
+    
+	var url="/fetch_rfq_line_items"
+	it("Should ok BCOZ All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
+					getcall(url, parameter, token, 200, function(line_items){
+						// console.log(line_items);
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ authentication_token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
+					getcallWithoutToken(url, parameter, 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ authentication_token provide but value not", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
+					getcall(url, parameter, "", 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ invalid authentication_token provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+rfq_id+"/"+rfq_lines_id;
+					getcall(url, parameter, "invalid", 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ user_id is nonNemeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter="nonNumeric"+"/"+rfq_id+"/"+rfq_lines_id;
+					getcall(url, parameter, token, 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ invalid user_id", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter="000000"+"/"+rfq_id+"/"+rfq_lines_id;
+					getcall(url, parameter, token, 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+
+	it("Should NOT OK BCOZ rfq_id is nonNemeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+"nonNumeric"+"/"+rfq_lines_id;
+					getcall(url, parameter, token, 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ invalid rfq_id", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+"000000"+"/"+rfq_lines_id;
+					getcall(url, parameter, token, 401, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ rfq_lines_id is nonNemeric", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+rfq_id+"/"+"nonNumeric";
+					getcall(url, parameter, token, 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK BCOZ invalid rfq_lines_id", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			getcall("/rfq_finalize", user_id, token, 200, function(rfq){
+				var rfq_id=rfq.partial_rfq[0].id;
+				var parameter=user_id+"/"+rfq_id;
+				getcall("/all_rfq_line_items", parameter, token, 200, function(rfq_lines){
+					var rfq_lines_id=rfq_lines.selected_rfq_lines_items[0].id;
+					parameter=user_id+"/"+rfq_id+"/"+"00000";
+					getcall(url, parameter, token, 404, function(line_items){
+						done();
+					});
+				});
+			});
+		});
+	});
+
+});
+
 
 describe("update_line_item", function () {
 	

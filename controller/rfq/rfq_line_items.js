@@ -131,7 +131,7 @@ exports.save_line_item = function(req, res){
 					}
 				};
 			};
-			console.log(counter);
+			// console.log(counter);
 			if(counter>=testIds.length){
 				connection.query("INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`) VALUES('"+req.body.product_lines_id+"', '"+req.body.plants_id+"', '"+req.body.rfq_id+"', '"+req.body.number_of_units+"', '"+req.body.req_delivery_date+"')", function(err, info){
 					if(err){
@@ -273,58 +273,70 @@ exports.delete_line_item = function(req, res){
 }
 
 exports.complete_rfq = function(req, res){
-	if(req.body.rfq_status_id==2){
-		connection.query("SELECT r.id, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
-			if(err){
-				res.json({"statusCode":500, "success": "false", "message": "internal error"});
-			}
-			else{
-				if(rfq_detail.length>0){
-					// TODO : code this will optimize after some discussion
-					var document_no="";
-					var version_no="1.0";
-					var country=rfq_detail[0].iso_code;
-					var year=""+rfq_detail[0].year;
-					year=year.toString();
-					year=year[2]+year[3];
-					var number=rfq_detail[0].id;
-					var product_line=rfq_detail[0].product_lines_id;
-					var product_line_name="";
-					var rfq_id=rfq_detail[0].id;
-					if(product_line==1){
-						product_line_name="D";
-					}
-					if(product_line==2){
-						product_line_name="P";
-					}
-					document_no=country+year+product_line_name+number+"/"+version_no;
-
-					connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+	connection.query("SELECT * FROM `rfq_lines` WHERE rfq_id='"+req.body.rfq_id+"'", function(err, check_line_item){
+		if(err){
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			if(check_line_item.length>0){
+				if(req.body.rfq_status_id==2){
+					connection.query("SELECT r.id, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
 						if(err){
 							res.json({"statusCode":500, "success": "false", "message": "internal error"});
 						}
 						else{
-							res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+							if(rfq_detail.length>0){
+								// TODO : code this will optimize after some discussion
+								var document_no="";
+								var version_no="1.0";
+								var country=rfq_detail[0].iso_code;
+								var year=""+rfq_detail[0].year;
+								year=year.toString();
+								year=year[2]+year[3];
+								var number=rfq_detail[0].id;
+								var product_line=rfq_detail[0].product_lines_id;
+								var product_line_name="";
+								var rfq_id=rfq_detail[0].id;
+								if(product_line==1){
+									product_line_name="D";
+								}
+								if(product_line==2){
+									product_line_name="P";
+								}
+								document_no=country+year+product_line_name+number+"/"+version_no;
+
+								connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+									if(err){
+										res.json({"statusCode":500, "success": "false", "message": "internal error"});
+									}
+									else{
+										res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+									}
+								});
+							}
+							else{
+								res.json({"statusCode":206, "success":"true", "message":"rfq detail not completed"});
+							}
 						}
 					});
 				}
-				else{
-					res.json({"statusCode":206, "success":"true", "message":"rfq detail not completed"});
+				else
+				{
+					// connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+					// 	if(err){
+					// 		res.json({"statusCode":500, "success": "false", "message": "internal error"});
+					// 	}
+					// 	else{
+							res.json({"statusCode":422, "success":"true", "message":"rfq_status_id  unprocessable"});
+					// 	}
+					// });
 				}
 			}
-		});
-	}
-	else
-	{
-		connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
-			if(err){
-				res.json({"statusCode":500, "success": "false", "message": "internal error"});
-			}
 			else{
-				res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+				res.json({"statusCode":422, "success": "false", "message": "RFQ Line Items Does not exist"});
 			}
-		});
-	}
+		}
+	});
 }
 
 
