@@ -76,20 +76,20 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "authentication_token not found"});
 	}
-	else if (req.params.user_id=="" || !validator.isNumeric(req.params.user_id)){
+	else if (req.body.user_id=="" || !validator.isNumeric(req.body.user_id)){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "user_id not found"});
 	}
-	else if (req.params.rfq_id=="" || !validator.isNumeric(req.params.rfq_id)){
+	else if (req.body.rfq_id=="" || !validator.isNumeric(req.body.rfq_id)){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "user_id not found"});
 	}
-	else if (req.params.rfq_lines_id=="" || !validator.isNumeric(req.params.rfq_lines_id)){
+	else if (req.body.rfq_lines_id=="" || !validator.isNumeric(req.body.rfq_lines_id)){
 		checkValid=0;
 		res.json({"statusCode": 404, "success":"false", "message": "user_id not found"});
 	}
 	else if(checkValid==1){
-		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.params.user_id, function(err, organization_users) {
+		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
 			if(err){
 				console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
