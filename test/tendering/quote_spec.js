@@ -69,7 +69,6 @@ describe('tendering_teams_quotes API Calls', function () {
 });
 
 describe('tendering_fetch_particular_quote API Calls', function () {
-
 	var url="/tendering_fetch_particular_quote"
 	it("Should ok All Correct Data", function (done) {
 		login(email, password, function(user){
@@ -156,8 +155,52 @@ describe('tendering_fetch_particular_quote API Calls', function () {
 			});			
 		});
 	});
+});
 
+describe('tendering_fetch_product_design_detail API Calls', function () {
+	var url="/tendering_fetch_product_design_detail"
+	it("Should ok All Correct Data", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				// console.log(rfq);
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+			// console.log(parameter);
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					// console.log(rfq.rfq[0].id);
+					var equalfilter=new Array();
+					var rangefilter=new Array();
+					for (var i = 0; i < rfq.rfq_lines[0].rfq_lines_technical_specs.length; i++) {
+						equalfilter.push({"id" :rfq.rfq_lines[0].rfq_lines_technical_specs[i].product_properties_id, "value": 20+i});
+					};
 
+					equalfilter.push({"id" :3, "value": "0"});
+					// equalfilter.push({"id" :3, "value": "5"});
+					// equalfilter.push({"id" :6, "value": 5});
+					// equalfilter.push({"id" :6, "value": 5});
+
+					// rangefilter.push({"id" :18, "value": "20"});
+					rangefilter.push({"id" :19, "value": 830});
+
+					parameter={"user_id": user_id, "rfq_id": rfq_id,
+					 "rfq_lines_id": rfq.rfq_lines[i].id,
+					 "equalfilter":equalfilter,
+					 "rangefilter":rangefilter
+					};
+					console.log(parameter);
+
+					Postcall(url, parameter, token, 200, function(design_data){
+						// console.log("yoyoyoyo");
+						console.log(design_data);
+						done();
+					});
+				});
+			});
+		});
+	});
 });
 
 function login(email, password, callback){
@@ -194,4 +237,33 @@ function getcallWithoutToken(url, parameter, status, callback){
 				res.body.statusCode.should.equal(status);
 			callback(res.body);
 		});
+}
+
+
+function Postcall(url, parameter, token, status, callback){
+	supertest(app)
+		.post(url)
+		.send(parameter)
+		.set('authentication_token', token)
+		.expect(status)
+		.end(function (err, res) {
+			if(err){
+			}
+			res.body.statusCode.should.equal(status);
+			callback(res.body);
+	});	
+}
+
+function PostcallWithoutToken(url, parameter, status, callback){
+	supertest(app)
+		.post(url)
+		.send(parameter)
+		// .set('authentication_token', token)
+		.expect(status)
+		.end(function (err, res) {
+			if(err){
+			}
+			res.body.statusCode.should.equal(status);
+			callback(res.body);
+	});	
 }
