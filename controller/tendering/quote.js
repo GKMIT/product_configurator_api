@@ -25,8 +25,6 @@ exports.tendering_fetch_particular_quote = function(req, res){
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			// console.log(rfq);
-			 // `r_lines`.`material_cost`, `r_lines`.`labour_cost`, `r_lines`.`no_of_labour_hours`, 
 			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
 					console.log(err);
@@ -36,21 +34,6 @@ exports.tendering_fetch_particular_quote = function(req, res){
 					if(rfq_lines.length==0){
 						res.json({"statusCode": 404, "success":"false", "message": "rfq line items not exist"});
 					}
-					// console.log(rfq_lines);
-					// var merge = function() {
-				 //    	var obj = {},
-				 //        i = 0,
-				 //        il = arguments.length,
-				 //        key;
-					//     for (; i < il; i++) {
-					//         for (key in arguments[i]) {
-					//             if (arguments[i].hasOwnProperty(key)) {
-					//                 obj[key] = arguments[i][key];
-					//             }
-					//         }
-					//     }
-					//     return obj;
-					// };
 					var complete_rfq_lines=rfq_lines;
 					var counter=0;
 					var counter1=0;
@@ -61,7 +44,6 @@ exports.tendering_fetch_particular_quote = function(req, res){
 									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
 							else{
-								// console.log(i);
 								var temp=rfq_lines[counter].month/3;
 								var quarter;
 								if(temp<=1){
@@ -76,16 +58,12 @@ exports.tendering_fetch_particular_quote = function(req, res){
 								else{
 									quarter=4;
 								}
-								// console.log(counter1);
-								// console.log(rfq_lines[counter].product_designs_id);
-								// console.log("counter is : "+counter);
-								connection.query("SELECT `product_designs`.`id` as `product_design_id`, `product_designs`.`product_lines_id`, `product_designs`.`material_code`, `product_designs`.`design_number`, `product_designs`.`design_variant`, `product_designs`.`design_version`, `product_designs_costs`.`id` as `product_designs_costs_id`, `product_designs_costs`.`year`, `product_designs_costs`.`quarter`, `product_designs_costs`.`currency`, `product_designs_costs`.`labor_cost`, `product_designs_costs`.`labor_hours`, `product_designs_costs`.`material_cost` FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.id=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`quarter`='"+quarter+"' AND `product_designs_costs`.`year`='"+rfq_lines[counter1].year+"' WHERE `product_designs`.id='"+rfq_lines[counter1].product_designs_id+"'", function(err, product_design_detail) {
+								connection.query("SELECT `product_designs`.`id` as `product_design_id`, `product_designs`.`product_lines_id`, `product_designs`.`material_code`, `product_designs`.`design_number`, `product_designs`.`design_variant`, `product_designs`.`design_version`, `product_designs_costs`.`id` as `product_designs_costs_id`, `product_designs_costs`.`year`, `product_designs_costs`.`quarter`, `product_designs_costs`.`currency`, `product_designs_costs`.`labor_cost`, `product_designs_costs`.`labor_hours`, `product_designs_costs`.`material_cost` FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.id=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`quarter`='"+quarter+"' AND `product_designs_costs`.`year`='"+rfq_lines[counter1].year+"' WHERE `product_designs`.id='"+rfq_lines[counter1].product_designs_id+"' LIMIT 1", function(err, product_design_detail) {
 									if(err){
 										console.log(err);
-											res.json({"statusCode": 500, "success":"false", "message": "44internal error"});
+											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 									}
 									else{
-										// console.log("counter is ===>  "+counter);
 										complete_rfq_lines[counter]["rfq_lines_technical_specs"]=rfq_lines_technical_specs;
 										complete_rfq_lines[counter]["product_design_detail"]=product_design_detail;
 										counter++;
@@ -98,8 +76,6 @@ exports.tendering_fetch_particular_quote = function(req, res){
 							}
 						});
 					};
-					
-					
 				}
 			});
 		}
