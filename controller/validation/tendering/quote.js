@@ -93,33 +93,17 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 	}
 	if(checkValid==1){
 		var subfields=["id", "value"];
-		if(typeof req.body.equalfilter!="object" || !Array.isArray(req.body.equalfilter)){
+		if(typeof req.body.properties!="object" || !Array.isArray(req.body.properties)){
 			checkValid=0;
 			res.json({"statusCode": 404, "success":"false", "message": "equalfilter not found !"});
 		}
 		else{
-			for(var i=0; i<req.body.equalfilter.length; i++){
+			for(var i=0; i<req.body.properties.length; i++){
 				// console.log(req.body.equalfilter[i][subfields[i]]);
 				for(var j=0; j<subfields.length; j++){
-					if(typeof req.body.equalfilter[i][subfields[j]]=="undefined" || req.body.equalfilter[i][subfields[j]]==""){
+					if(typeof req.body.properties[i][subfields[j]]=="undefined" || req.body.properties[i][subfields[j]]==""){
 						checkValid=0;
-						res.json({"statusCode": 404, "success": "false", "message": "equalfilter "+subfields[j]+" not defined"});
-						break;
-					}
-				}
-			}
-		}
-		if(typeof req.body.rangefilter!="object" || !Array.isArray(req.body.rangefilter)){
-			checkValid=0;
-			res.json({"statusCode": 404, "success":"false", "message": "rangefilter not found !"});
-		}
-		else{
-			for(var i=0; i<req.body.rangefilter.length; i++){
-				// console.log(req.body.rangefilter[i][subfields[i]]);
-				for(var j=0; j<subfields.length; j++){
-					if(typeof req.body.rangefilter[i][subfields[j]]=="undefined" || req.body.rangefilter[i][subfields[j]]==""){
-						checkValid=0;
-						res.json({"statusCode": 404, "success": "false", "message": "rangefilter "+subfields[j]+" not defined"});
+						res.json({"statusCode": 404, "success": "false", "message": "properties "+subfields[j]+" not defined"});
 						break;
 					}
 				}

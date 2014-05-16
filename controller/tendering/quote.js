@@ -122,13 +122,35 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					var range_tech_detail=new Array();
 					var equalfilterids="";
 					var rangefilterids="";
-					for (var i = 0; i < req.body.equalfilter.length; i++) {
-						equalfilterids+=req.body.equalfilter[i].id;
-						if(i<req.body.equalfilter.length-1){
+					// new array declare for the create equalfilter AND rangefilter id, value array
+					var equalfilter=new Array();
+					var rangefilter=new Array();
+					var equal_prop_arr=equal_prop.split(",");
+					var range_prop_arr=range_prop.split(",");
+					for (var i = 0; i < req.body.properties.length; i++) {
+						for (var j = 0; j < equal_prop_arr.length; j++) {
+							if(req.body.properties[i].id==equal_prop_arr[j]){
+								equalfilter.push(req.body.properties[i]);
+							}
+						};
+					};
+					for (var i = 0; i < req.body.properties.length; i++) {
+						for (var j = 0; j < range_prop_arr.length; j++) {
+							if(req.body.properties[i].id==range_prop_arr[j]){
+								rangefilter.push(req.body.properties[i]);
+							}
+						};
+					};
+					// console.log(equalfilter);
+					// console.log(rangefilter);
+					for (var i = 0; i < equalfilter.length; i++) {
+						equalfilterids+=equalfilter[i].id;
+						if(i<equalfilter.length-1){
 							equalfilterids+=",";
 						}
 					};
-					connection.query("SELECT * FROM `product_designs_technical_details` WHERE `product_properties_id` IN ("+equal_prop+") AND `product_properties_id` IN ("+equalfilterids+")", function(err, info){
+					// console.log(equalfilterids);
+					connection.query("SELECT * FROM `product_designs_technical_details` WHERE  `product_properties_id` IN ("+equalfilterids+")", function(err, info){
 							if(err){
 								console.log(err);
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -139,23 +161,23 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 								}
 								else{
 									for (var i = 0; i < info.length; i++) {
-										for (var j = 0; j < req.body.equalfilter.length; j++) {
-											if(info[i].product_properties_id==req.body.equalfilter[j].id){
-												if((info[i].plus_tolerance+req.body.equalfilter[j].value)<info[i].maximum_value && (req.body.equalfilter[j].value-info[i].minus_tolerance)>info[i].minimum_value){
+										for (var j = 0; j < equalfilter.length; j++) {
+											if(info[i].product_properties_id==equalfilter[j].id){
+												if((info[i].plus_tolerance+equalfilter[j].value)<info[i].maximum_value && (equalfilter[j].value-info[i].minus_tolerance)>info[i].minimum_value){
 													equal_tech_detail.push(info[i]);
 												}
 											}
 										}
 
 									};
-									for (var i = 0; i < req.body.rangefilter.length; i++) {
-										rangefilterids+=req.body.rangefilter[i].id;
-										if(i<req.body.rangefilter.length-1){
+									for (var i = 0; i < rangefilter.length; i++) {
+										rangefilterids+=rangefilter[i].id;
+										if(i<rangefilter.length-1){
 											rangefilterids+=",";
 										}
 										// console.log(equalfilterids);
 									};
-									connection.query("SELECT * FROM `product_designs_technical_details` WHERE `product_properties_id` IN ("+range_prop+") AND `product_properties_id` IN ("+rangefilterids+")", function(err, info){
+									connection.query("SELECT * FROM `product_designs_technical_details` WHERE `product_properties_id` IN ("+rangefilterids+")", function(err, info){
 										if(err){
 											console.log(err);
 											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -168,10 +190,9 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 												// about this id -> value need to discuss what will effect of value which receive in array
 												for (var i = 0; i < info.length; i++) {
 													// if(info[i])
-													for (var j = 0; j < req.body.rangefilter.length; j++) {
-														if(info[i].product_properties_id==req.body.rangefilter[j].id){
-															if(req.body.rangefilter[j].value==info[i].spec_value){
-																console.log("oksoksoks");
+													for (var j = 0; j < rangefilter.length; j++) {
+														if(info[i].product_properties_id==rangefilter[j].id){
+															if(rangefilter[j].value==info[i].spec_value){
 																range_tech_detail.push(info[i]);
 															}
 														}
@@ -189,7 +210,6 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 												if(i==range_tech_detail.length){
 													flag=0;
 													var counter=0
-													// console.log("yoyoyyo"+equal_tech_detail);
 													for (var i = 0; i < equal_tech_detail.length; i++) {
 														flag=0;
 														for (var j = i; j < equal_tech_detail.length; j++) {
