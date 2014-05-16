@@ -16,7 +16,6 @@ exports.tendering_teams_quotes = function(req, res){
 	});
 }
 
-
 exports.tendering_fetch_particular_quote = function(req, res){
 	var query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`rfq_status_id` FROM `rfq` WHERE `rfq_status_id`='4' AND `id`='"+req.params.rfq_id+"' LIMIT 1";
 	connection.query(query, function(err, rfq) {
@@ -44,20 +43,22 @@ exports.tendering_fetch_particular_quote = function(req, res){
 									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
 							else{
-								var temp=rfq_lines[counter].month/3;
+								// var temp=rfq_lines[counter].month/3;
 								var quarter;
-								if(temp<=1){
-									quarter=1;
-								}
-								else if(temp>1 && temp<=2){
-									quarter=2;
-								}
-								else if(temp>2 && temp<=3){
-									quarter=3;
-								}
-								else{
-									quarter=4;
-								}
+								// if(temp<=1){
+								// 	quarter=1;
+								// }
+								// else if(temp>1 && temp<=2){
+								// 	quarter=2;
+								// }
+								// else if(temp>2 && temp<=3){
+								// 	quarter=3;
+								// }
+								// else{
+								// 	quarter=4;
+								// }
+								quarter=Math.ceil(rfq_lines[counter].month/3);
+								// console.log(quarter);
 								connection.query("SELECT `product_designs`.`id` as `product_design_id`, `product_designs`.`product_lines_id`, `product_designs`.`material_code`, `product_designs`.`design_number`, `product_designs`.`design_variant`, `product_designs`.`design_version`, `product_designs_costs`.`id` as `product_designs_costs_id`, `product_designs_costs`.`year`, `product_designs_costs`.`quarter`, `product_designs_costs`.`currency`, `product_designs_costs`.`labor_cost`, `product_designs_costs`.`labor_hours`, `product_designs_costs`.`material_cost` FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.id=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`quarter`='"+quarter+"' AND `product_designs_costs`.`year`='"+rfq_lines[counter1].year+"' WHERE `product_designs`.id='"+rfq_lines[counter1].product_designs_id+"' LIMIT 1", function(err, product_design_detail) {
 									if(err){
 										console.log(err);
@@ -92,19 +93,19 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 		}
 		else{
 			var temp=rfq_lines[0].month/3;
-			var quarter;
-			if(temp<=1){
-				quarter=1;
-			}
-			else if(temp>1 && temp<=2){
-				quarter=2;
-			}
-			else if(temp>2 && temp<=3){
-				quarter=3;
-			}
-			else{
-				quarter=4;
-			}
+			var quarter=Math.ceil(rfq_lines[0].month/3);
+			// if(temp<=1){
+			// 	quarter=1;
+			// }
+			// else if(temp>1 && temp<=2){
+			// 	quarter=2;
+			// }
+			// else if(temp>2 && temp<=3){
+			// 	quarter=3;
+			// }
+			// else{
+			// 	quarter=4;
+			// }
 			var equal_prop="";
 			var range_prop="";
 			connection.query("SELECT `product_lines`.`id`, `product_lines`.`equal_properties`, `product_lines`.`range_properties` FROM `product_lines` INNER JOIN `rfq_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"'", function(err, product_lines){
@@ -282,28 +283,33 @@ exports.tendering_fetch_particular_design = function(req, res){
 }
 
 exports.tendering_submit_rfq_lines = function(req, res){
-	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='1' WHERE `id`='"+req.body.rfq_lines_id+"'";
+	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='2' WHERE `id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, info) {
 		if(err){
 			console.log(err);
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `id`, `design_number` FROM `product_designs` WHERE `id`='"+req.body.product_designs_id+"'", function(err, product_designs) {
-				if(err){
-					console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-				}
-				else{
-					res.json({"statusCode": 200, "success":"true", "message": "rfq_line submitted successfully", "product_designs": product_designs});
-				}
-			});
+			if(info.affectedRows>0){
+				connection.query("SELECT `id`, `design_number` FROM `product_designs` WHERE `id`='"+req.body.product_designs_id+"'", function(err, product_designs) {
+					if(err){
+						console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "rfq_line submitted successfully", "product_designs": product_designs});
+					}
+				});
+			}
+			else{
+				res.json({"statusCode": 404, "success":"true", "message": "rfq_line not submitted"});
+			}
 		}
 	});
 };
 
 exports.tendering_submit_rfq_to_sales = function(req, res){
-	var query="SELECT `rfq`.`id`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `rfq_lines`.`product_designs_id` FROM `rfq` INNER JOIN `rfq_lines` ON `rfq`.`id`=`rfq_lines`.`rfq_id` AND `rfq_lines`.`rfq_line_status`='1' WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
+	var query="SELECT `rfq`.`id`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `rfq_lines`.`product_designs_id` FROM `rfq` INNER JOIN `rfq_lines` ON `rfq`.`id`=`rfq_lines`.`rfq_id` AND `rfq_lines`.`rfq_line_status`='2' WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, rfq_lines) {
 		if(err){
 			console.log(err);
@@ -317,38 +323,26 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 				}
 				else{
 					if(rfq_lines.length==all_rfq_lines.length){
-						// if(rfq_lines.length>0){
 							var estimated_sales_price=0;
 							var quarter=0;
 							var counter=0;
-							for (var i = 0; i < rfq_lines.length; i++) {
-								connection.query("SELECT `id`, `minimum_price` FROM `product_designs_sales_prices` WHERE `product_designs_id`='"+rfq_lines[i].product_designs_id+"' ORDER BY `updated_at` desc", function(err, sales_price) {
+								connection.query("select SUM(`sales_price`) as `sales_price` from rfq_lines where rfq_id='"+req.body.rfq_id+"'", function(err, estimated_sales_price) {
 								if(err){
 									console.log(err);
 									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 								}
 								else{
-									estimated_sales_price+=sales_price[0];
-									counter++;
-									if(counter==rfq_lines.length){
-										connection.query("UPDATE `rfq` SET `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
-											if(err){
-												console.log(err);
-												res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-											}
-											else{
-												res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
-											}
-										});
-									}
+									connection.query("UPDATE `rfq` SET `estimated_sales_price`='"+estimated_sales_price[0].sales_price+"', `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
+										if(err){
+											console.log(err);
+											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+										}
+										else{
+											res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+										}
+									});
 								}
 							});
-							};
-							
-						// }
-						// else{
-						// 	res.json({"statusCode": 422, "success":"true", "message": "rfq_lines not complete"});
-						// }
 					}
 					else{
 						res.json({"statusCode": 422, "success":"true", "message": "Please complete all rfq_line items"});
