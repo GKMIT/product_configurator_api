@@ -65,6 +65,8 @@ exports.tendering_fetch_particular_quote = function(req, res){
 }
 
 exports.tendering_fetch_product_design_detail = function(req, res){
+	// console.log(req.body);
+	console.log(new Date().getMilliseconds());
 	// var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `plants`.`name` as `plants_name`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` LEFT JOIN `product_lines` ON `rfq_lines`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
 	// connection.query(query, function(err, rfq_lines) {
 	// 	if(err){
@@ -81,6 +83,11 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
+						if(product_lines.length==0){
+							res.json({"statusCode":404, "success":"false", "message":"product_lines not found"});
+						}
+						else{
+							console.log(product_lines.length);
 						// var quarter=Math.ceil(rfq_lines[0].month/3);
 						equal_prop=product_lines[0].equal_properties;
 						range_prop=product_lines[0].range_properties;
@@ -126,77 +133,91 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
 							else{
-								console.log(product_designs);
-								var design_ids="";
-								for (var i = 0; i < product_designs.length; i++) {
-									design_ids+=product_designs[i].id;
-									if(i<product_designs.length-1){
-										design_ids+=",";
-									}
-								};
-								console.log(design_ids);
-								// query for the equalsfilter prop
-								console.log("SELECT * FROM `product_designs_technical_details` WHERE product_design_id IN ("+design_ids+")");
-								connection.query("SELECT * FROM `product_designs_technical_details` WHERE product_design_id IN ("+design_ids+")", function(err, info){
-									if(err){
-										console.log(err);
-										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-									}
-									else{
-										console.log(info.length);
-										// console.log("info : "+JSON.stringify(info));
-										var designIdsarr=new Array();
-										var step=0;
-										var pushFlag=0;
-										for (var i = 0; i < info.length; i++) {
-											pushFlag=0;
-											for (var j = 0; j < equalfilter.length; j++) {
-												if(info[i].spec_value==equalfilter[j].value){
-													for (var l = 0; l < rangefilter.length; l++) {
-														for (var k = 0; k < info.length; k++){
-															if(rangefilter[l].value>info[k].minimum_value && rangefilter[l].value<info[k].maximum_value){
-																pushFlag++;
-															}
-														}
-													};
-												}
-											};
-											if(pushFlag>0){
-												designIdsarr.push(info[i].product_design_id);
-											}
-											step++;
-										};
-										console.log(designIdsarr);
-										var finalDesignIds="";
-										if(step==info.length){
-											if(designIdsarr.length>0){
-												for (var i = 0; i < designIdsarr.length; i++) {
-													finalDesignIds+=designIdsarr[i];
-													if(i<product_designs.length-1){
-														finalDesignIds+=",";
-													}
-												};
-											// query to give data from 
-											// success json
-											connection.query("SELECT `id`, `plants_id`, `material_code`, `design_number`, `design_version` FROM `product_designs` WHERE id IN ("+finalDesignIds+")", function(err, finalDesigns){
-												if(err){
-													console.log(err);
-													res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-												}
-												else{
-													res.json({"statusCode": 200, "success":"true", "message": "", "product_designs": finalDesigns});
-												}
-											});
+								if(product_designs.length==0){
+									res.json({"statusCode":404, "success":"false", "message":"product designs not found"});
+								}
+								else{
+									var design_ids="";
+									for (var i = 0; i < product_designs.length; i++) {
+										design_ids+=product_designs[i].id;
+										if(i<product_designs.length-1){
+											design_ids+=",";
+										}
+									};
+									// console.log(design_ids);
+									// query for the equalsfilter prop
+									// console.log("SELECT * FROM `product_designs_technical_details` WHERE product_design_id IN ("+design_ids+")");
+									connection.query("SELECT * FROM `product_designs_technical_details` WHERE product_design_id IN ("+design_ids+")", function(err, info){
+										if(err){
+											console.log(err);
+											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+										}
+										else{
+											if(info.length==0){
+												res.json({"statusCode":404, "success":"false", "message":"product design not found in product technical detail"});
 											}
 											else{
-												// fail json
-												res.json({"statusCode": 404, "success":"false", "message": "product designs not found"});
+												// console.log("info : "+JSON.stringify(info));
+												var designIdsarr=new Array();
+												var step=0;
+												var pushFlag=0;
+												for (var i = 0; i < info.length; i++) {
+													pushFlag=0;
+													for (var j = 0; j < equalfilter.length; j++) {
+														if(info[i].spec_value==equalfilter[j].value){
+															for (var l = 0; l < rangefilter.length; l++) {
+																for (var k = 0; k < info.length; k++){
+																	if(rangefilter[l].value>info[k].minimum_value && rangefilter[l].value<info[k].maximum_value){
+																		pushFlag++;
+																	}
+																}
+															};
+														}
+													};
+													if(pushFlag>0){
+														designIdsarr.push(info[i].product_design_id);
+													}
+													step++;
+												};
+												// console.log(designIdsarr);
+												var finalDesignIds="";
+												if(step==info.length){
+													if(designIdsarr.length>0){
+														for (var i = 0; i < designIdsarr.length; i++) {
+															finalDesignIds+=designIdsarr[i];
+															if(i<product_designs.length-1){
+																finalDesignIds+=",";
+															}
+														};
+													// query to give data from 
+													// success json
+													connection.query("SELECT `id`, `plants_id`, `material_code`, `design_number`, `design_version` FROM `product_designs` WHERE id IN ("+finalDesignIds+")", function(err, finalDesigns){
+														if(err){
+															console.log(err);
+															res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+														}
+														else{
+															console.log(new Date().getMilliseconds());
+															console.log("========");
+															res.json({"statusCode": 200, "success":"true", "message": "", "product_designs": finalDesigns});
+														}
+													});
+													}
+													else{
+														// fail json
+														res.json({"statusCode": 404, "success":"false", "message": "product designs not found"});
+													}
+												}
 											}
+											
 										}
-									}
-								});
+									});
+								}
+								
 							}
 						});
+						}
+						
 					}
 				});
 		// }
