@@ -31,8 +31,6 @@ exports.tendering_teams_quotes = function(req, res, next){
 	}
 };
 
-
-
 exports.tendering_fetch_particular_quote = function(req, res, next){
 	var checkValid=1;
 	if(req.header("authentication_token")=="" || typeof req.header("authentication_token")=="undefined"){
@@ -130,23 +128,26 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 
 exports.tendering_fetch_particular_design = function(req, res, next){
 	var checkValid=1;
-	if(req.header("authentication_token")=="" || typeof req.header("authentication_token")=="undefined"){
+	var fields = ["user_id", "rfq_lines_id", "product_designs_id"];
+	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
-		res.json({"statusCode": 404, "success":"false", "message": "authentication_token not found"});
-	}
-	else if (req.params.user_id=="" || !validator.isNumeric(req.params.user_id)){
-		checkValid=0;
-		res.json({"statusCode": 404, "success":"false", "message": "user_id not found"});
-	}
-	else if (req.params.product_designs_id=="" || !validator.isNumeric(req.params.product_designs_id)){
-		checkValid=0;
-		res.json({"statusCode": 404, "success":"false", "message": "user_id not found"});
-	}
-	else if (req.params.product_designs_costs_id=="" || !validator.isNumeric(req.params.product_designs_costs_id)){
-		checkValid=0;
-		res.json({"statusCode": 404, "success":"false", "message": "user_id not found"});
+		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
+		for(var i=0; i<fields.length; i++){
+			if(typeof req.params[fields[i]]=="undefined"){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
+				break;
+			}
+			if(req.params[fields[i]]==""  || !validator.isNumeric(req.params[fields[i]])){
+				checkValid=0;
+				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" value not found"});
+				break;
+			}
+		}
+	}
+	if(checkValid==1){
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.params.user_id, function(err, organization_users) {
 			if(err){
 				console.log(err);

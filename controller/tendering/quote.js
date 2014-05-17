@@ -65,131 +65,133 @@ exports.tendering_fetch_particular_quote = function(req, res){
 }
 
 exports.tendering_fetch_product_design_detail = function(req, res){
-	// console.log(req.body);
-	console.log(new Date().getMilliseconds());
-	// var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `plants`.`name` as `plants_name`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` LEFT JOIN `product_lines` ON `rfq_lines`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
-	// connection.query(query, function(err, rfq_lines) {
-	// 	if(err){
-	// 		console.log(err);
-	// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-	// 	}
-	// 	else{
-	// 		if(rfq_lines.length==0){
-	// 			res.json({"statusCode": 404, "success":"false", "message": "rfq line items not found"});
-	// 		}
-			connection.query("SELECT `product_lines`.`id`, `product_lines`.`equal_properties`, `product_lines`.`range_properties` FROM `product_lines` INNER JOIN `rfq_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"'", function(err, product_lines){
-					if(err){
-						console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-					}
-					else{
-						if(product_lines.length==0){
-							res.json({"statusCode":200, "success":"false", "message":"product_lines not found"});
-						}
-						else{
-							console.log(product_lines.length);
-						// var quarter=Math.ceil(rfq_lines[0].month/3);
-						equal_prop=product_lines[0].equal_properties;
-						range_prop=product_lines[0].range_properties;
-						var counter=0;
-						var equal_tech_detail=new Array();
-						var range_tech_detail=new Array();
-						var equalfilterids="";
-						var rangefilterids="";
-						equal_query="";
-						range_query="";
-
-						// new array declare for the create equalfilter AND rangefilter id, value array
-						var equalfilter=new Array();
-						var rangefilter=new Array();
-						var equal_prop_arr=equal_prop.split(",");
-						var range_prop_arr=range_prop.split(",");
-						for (var i = 0; i < req.body.properties.length; i++) {
-							for (var j = 0; j < equal_prop_arr.length; j++) {
-								if(req.body.properties[i].id==equal_prop_arr[j]){
-									equalfilter.push(req.body.properties[i]);
-									equalfilterids+=req.body.properties[i].id+",";
-									equal_query="product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"' AND";
-								}
-							};
-						};
-						for (var i = 0; i < req.body.properties.length; i++) {
-							for (var j = 0; j < range_prop_arr.length; j++) {
-								if(req.body.properties[i].id==range_prop_arr[j]){
-									rangefilter.push(req.body.properties[i]);
-									rangefilterids+=req.body.properties[i].id+",";
-									range_query="product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"' AND";
-								}
-							};
-						};
-						equalfilterids=equalfilterids.substring("", equalfilterids.length-1);
-						rangefilterids=rangefilterids.substring("", rangefilterids.length-1);
-						equal_query=equal_query.substring("", equal_query.length-3);
-						range_query=range_query.substring("", range_query.length-3);
-						console.log(equal_query);
-						console.log(range_query);
-						var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
-						var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
-						
-						var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_2+") AND "+range_query;
-						
-						var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
-						connection.query(final_query, function(err, product_designs){
-							if(err){
-								console.log(err);
-								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-							}
-							else{
-								if(product_designs.length==0){
-									res.json({"statusCode":200, "success":"true", "message":"product designs not found", "product_designs":[]});
-								}
-								else{
-									final_design_ids="";
-									for (var i = 0; i < product_designs.length; i++) {
-										final_design_ids+=product_designs[i].id+",";
-									};
-									final_design_ids=final_design_ids.substring("", final_design_ids.length-1);
-									connection.query("SELECT `id`, `plants_id`, `material_code`, `design_version`, `design_variant` FROM `product_designs` WHERE `id` IN ("+final_design_ids+")", function(err, result){
-										if(err){
-											console.log(err);
-											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-										}
-										else{
-											if(result.length==0){
-
-											}
-											else{
-												res.json({"statusCode": 200, "success":"true", "message": "", "product_designs": result});
-											}
-										}
-									});
-								}
-								
-							}
-						});
-						}
-						
-					}
-				});
-		// }
-	// });
-};
-
-exports.tendering_fetch_particular_design = function(req, res){
-	connection.query("SELECT `pd`.`id`, `pd`.`product_lines_id`, `pd`.`plants_id`, `pd`.`standard_for_country`, `pd`.`standard_for_customer`, `pd`.`material_code`, `pd`.`design_number`,  `pd`.`design_variant`, `pdc`.`id` AS  `product_design_costs_id`, `pdc`.`material_pricelist_reference`, `pdc`.`year`, `pdc`.`quarter`, `pdc`.`currency`, `pdc`.`labor_cost` ,  `pdc`.`labor_hours`, `pdc`.`material_cost`, `pdsp`.`minimum_price`, `pdsp`.`id` as `product_designs_sales_prices_id`, `pdsp`.`minimum_price`, `pdsp`.`minimum_price_for_country_id`, `pdsp`.`validity_date_from`, `pdsp`.`validity_date_to` FROM `product_designs` `pd` LEFT JOIN `product_designs_costs` `pdc` ON `pd`.`id`=`pdc`.`product_design_id` AND `pdc`.`id`='"+req.params.product_designs_costs_id+"' LEFT JOIN `product_designs_sales_prices` `pdsp` ON `pdsp`.`product_designs_id`='"+req.params.product_designs_id+"' WHERE `pd`.`id`='"+req.params.product_designs_id+"'", function(err, design) {
+	connection.query("SELECT `product_lines`.`id`, `product_lines`.`equal_properties`, `product_lines`.`range_properties` FROM `product_lines` INNER JOIN `rfq_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"'", function(err, product_lines){
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `id`, `product_design_id`, `product_properties_id`, `spec_value`, `calculated_value`, `measured_value` FROM `product_designs_technical_details` WHERE `product_design_id`='"+req.params.product_designs_id+"'", function(err, design_technical_detail){
+			if(product_lines.length==0){
+				res.json({"statusCode":200, "success":"false", "message":"product_lines not found"});
+			}
+			else{
+				console.log(product_lines.length);
+			// var quarter=Math.ceil(rfq_lines[0].month/3);
+			equal_prop=product_lines[0].equal_properties;
+			range_prop=product_lines[0].range_properties;
+			var counter=0;
+			var equal_tech_detail=new Array();
+			var range_tech_detail=new Array();
+			var equalfilterids="";
+			var rangefilterids="";
+			equal_query="";
+			range_query="";
+
+			// new array declare for the create equalfilter AND rangefilter id, value array
+			var equalfilter=new Array();
+			var rangefilter=new Array();
+			var equal_prop_arr=equal_prop.split(",");
+			var range_prop_arr=range_prop.split(",");
+			for (var i = 0; i < req.body.properties.length; i++) {
+				for (var j = 0; j < equal_prop_arr.length; j++) {
+					if(req.body.properties[i].id==equal_prop_arr[j]){
+						equalfilter.push(req.body.properties[i]);
+						equalfilterids+=req.body.properties[i].id+",";
+						equal_query="product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"' AND";
+					}
+				};
+			};
+			for (var i = 0; i < req.body.properties.length; i++) {
+				for (var j = 0; j < range_prop_arr.length; j++) {
+					if(req.body.properties[i].id==range_prop_arr[j]){
+						rangefilter.push(req.body.properties[i]);
+						rangefilterids+=req.body.properties[i].id+",";
+						range_query="product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"' AND";
+					}
+				};
+			};
+			equalfilterids=equalfilterids.substring("", equalfilterids.length-1);
+			rangefilterids=rangefilterids.substring("", rangefilterids.length-1);
+			equal_query=equal_query.substring("", equal_query.length-3);
+			range_query=range_query.substring("", range_query.length-3);
+			console.log(equal_query);
+			console.log(range_query);
+			var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
+			var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
+			
+			var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_2+") AND "+range_query;
+			
+			var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
+			connection.query(final_query, function(err, product_designs){
 				if(err){
+					console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					res.json({"statusCode": 200, "success":"true", "message": "", "design":design, "product_designs_technical_details": design_technical_detail});
+					if(product_designs.length==0){
+						res.json({"statusCode":200, "success":"true", "message":"product designs not found", "product_designs":[]});
+					}
+					else{
+						final_design_ids="";
+						for (var i = 0; i < product_designs.length; i++) {
+							final_design_ids+=product_designs[i].id+",";
+						};
+						final_design_ids=final_design_ids.substring("", final_design_ids.length-1);
+						connection.query("SELECT `id`, `plants_id`, `material_code`, `design_version`, `design_variant` FROM `product_designs` WHERE `id` IN ("+final_design_ids+")", function(err, result){
+							if(err){
+								console.log(err);
+								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							}
+							else{
+								if(result.length==0){
+
+								}
+								else{
+									res.json({"statusCode": 200, "success":"true", "message": "", "product_designs": result});
+								}
+							}
+						});
+					}
+					
 				}
 			});
+			}
+			
+		}
+	});
+};
+
+exports.tendering_fetch_particular_design = function(req, res){
+	var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` WHERE `rfq_lines`.`id`='"+req.params.rfq_lines_id+"' LIMIT 1";
+	connection.query(query, function(err, rfq_lines){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			if(rfq_lines.length==0){
+				res.json({"statusCode": 200, "success":"false", "message": "rfq_lines item not found"});
+			}
+			else{
+				var year=rfq_lines[0].year;
+				var quarter=Math.ceil(rfq_lines[0].month/3);
+				connection.query("SELECT `pd`.`id`, `pd`.`product_lines_id`, `pd`.`plants_id`, `pd`.`standard_for_country`, `pd`.`standard_for_customer`, `pd`.`material_code`, `pd`.`design_number`,  `pd`.`design_variant`, `pdc`.`id` AS  `product_design_costs_id`, `pdc`.`material_pricelist_reference`, `pdc`.`year`, `pdc`.`quarter`, `pdc`.`currency`, `pdc`.`labor_cost` ,  `pdc`.`labor_hours`, `pdc`.`material_cost`, `pdsp`.`minimum_price`, `pdsp`.`id` as `product_designs_sales_prices_id`, `pdsp`.`minimum_price`, `pdsp`.`minimum_price_for_country_id`, `pdsp`.`validity_date_from`, `pdsp`.`validity_date_to` FROM `product_designs` `pd` LEFT JOIN `product_designs_costs` `pdc` ON `pd`.`id`=`pdc`.`product_design_id` AND `pdc`.`year`='"+year+"' AND `pdc`.`quarter`='"+quarter+"' LEFT JOIN `product_designs_sales_prices` `pdsp` ON `pdsp`.`product_designs_id`='"+req.params.product_designs_id+"' WHERE `pd`.`id`='"+req.params.product_designs_id+"'", function(err, design) {
+					if(err){
+						console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						connection.query("SELECT `id`, `product_design_id`, `product_properties_id`, `spec_value`, `calculated_value`, `measured_value` FROM `product_designs_technical_details` WHERE `product_design_id`='"+req.params.product_designs_id+"'", function(err, design_technical_detail){
+							if(err){
+								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							}
+							else{
+								res.json({"statusCode": 200, "success":"true", "message": "", "design":design, "product_designs_technical_details": design_technical_detail});
+							}
+						});
+					}
+				});
+			}
 		}
 	});
 }
