@@ -173,7 +173,7 @@ exports.tendering_submit_rfq_lines = function(req, res, next){
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])){
+			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || req.body[fields[i]]==0 || !validator.isNumeric(req.body[fields[i]])){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not found"});
 				break;

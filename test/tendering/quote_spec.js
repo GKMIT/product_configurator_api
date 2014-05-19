@@ -2161,7 +2161,6 @@ describe('tendering_submit_rfq_lines API Calls', function () {
 					properties.push({"id":"14","value":"100"});
 					properties.push({"id":"15","value":"100"});
 					properties.push({"id":"17","value":"300"});
-
 					
 					var counter_1=0;
 					var counter_2=0;

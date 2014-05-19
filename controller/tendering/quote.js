@@ -116,7 +116,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					if(req.body.properties[i].id==equal_prop_arr[j]){
 						equalfilter.push(req.body.properties[i]);
 						equalfilterids+=req.body.properties[i].id+",";
-						equal_query="product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"' AND";
+						equal_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"') AND";
 					}
 				};
 			};
@@ -125,7 +125,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					if(req.body.properties[i].id==range_prop_arr[j]){
 						rangefilter.push(req.body.properties[i]);
 						rangefilterids+=req.body.properties[i].id+",";
-						range_query="product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"' AND";
+						range_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"') AND";
 					}
 				};
 			};
@@ -137,12 +137,13 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 			// console.log(range_query);
 			var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
 			var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
-			
+			// console.log(query_2);
 			var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_2+") AND "+range_query;
 			var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_2+")";
 			if(rangefilter.length>0){
 				final_query="SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
 			}
+			// console.log(final_query);
 			
 			connection.query(final_query, function(err, product_designs){
 				if(err){
