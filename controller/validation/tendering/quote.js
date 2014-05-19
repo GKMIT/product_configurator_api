@@ -67,7 +67,6 @@ exports.tendering_fetch_particular_quote = function(req, res, next){
 	}
 };
 
-
 exports.tendering_fetch_product_design_detail = function(req, res, next){
 	var checkValid=1;
 	var fields = ["user_id", "rfq_id", "rfq_lines_id"];
@@ -91,9 +90,9 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 	}
 	if(checkValid==1){
 		var subfields=["id", "value"];
-		if(typeof req.body.properties!="object" || !Array.isArray(req.body.properties)){
+		if(typeof req.body.properties!="object" || !Array.isArray(req.body.properties) || req.body.properties.length==0){
 			checkValid=0;
-			res.json({"statusCode": 404, "success":"false", "message": "equalfilter not found !"});
+			res.json({"statusCode": 404, "success":"false", "message": "properties not found !"});
 		}
 		else{
 			for(var i=0; i<req.body.properties.length; i++){
@@ -116,7 +115,7 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-						next();				
+					next();				
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
@@ -164,7 +163,6 @@ exports.tendering_fetch_particular_design = function(req, res, next){
 		});
 	}
 };
-
 
 exports.tendering_submit_rfq_lines = function(req, res, next){
 	var checkValid=1;

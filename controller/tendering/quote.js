@@ -65,20 +65,21 @@ exports.tendering_fetch_particular_quote = function(req, res){
 }
 
 exports.tendering_fetch_product_design_detail = function(req, res){
-	connection.query("SELECT `product_lines`.`id`, `product_lines`.`equal_properties`, `product_lines`.`range_properties` FROM `product_lines` INNER JOIN `rfq_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"'", function(err, product_lines){
+	connection.query("SELECT `product_lines`.`id`, `product_lines`.`mandatory_properties`, `product_lines`.`equal_properties`, `product_lines`.`range_properties` FROM `product_lines` INNER JOIN `rfq_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"'", function(err, product_lines){
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
 			if(product_lines.length==0){
-				res.json({"statusCode":200, "success":"false", "message":"product_lines not found"});
+				res.json({"statusCode":200, "success":"true", "message":"product_lines not found"});
 			}
 			else{
-				console.log(product_lines.length);
+				// console.log(product_lines.length);
 			// var quarter=Math.ceil(rfq_lines[0].month/3);
 			equal_prop=product_lines[0].equal_properties;
 			range_prop=product_lines[0].range_properties;
+			var mandatory_prop=product_lines[0].mandatory_properties;
 			var counter=0;
 			var equal_tech_detail=new Array();
 			var range_tech_detail=new Array();
@@ -86,6 +87,24 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 			var rangefilterids="";
 			equal_query="";
 			range_query="";
+
+			var mandatoryfilter=new Array();
+			var mandatory_prop_arr=mandatory_prop.split(",");
+			for (var i = 0; i < req.body.properties.length; i++) {
+				for (var j = 0; j < mandatory_prop_arr.length; j++) {
+					if(req.body.properties[i].id==mandatory_prop_arr[j]){
+						mandatoryfilter.push(req.body.properties[i].id);
+					}
+				};
+				// counter++;
+			};
+			// if(counter==req.body.properties.length){
+				// console.log(mandatoryfilter.length);
+				// console.log(mandatory_prop_arr.length);
+				if(mandatoryfilter.length!=mandatory_prop_arr.length)
+				res.json({"statusCode":422, "success":"false", "message":"mandatory properties not incomplete"});
+			// }
+
 
 			// new array declare for the create equalfilter AND rangefilter id, value array
 			var equalfilter=new Array();
@@ -114,8 +133,8 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 			rangefilterids=rangefilterids.substring("", rangefilterids.length-1);
 			equal_query=equal_query.substring("", equal_query.length-3);
 			range_query=range_query.substring("", range_query.length-3);
-			console.log(equal_query);
-			console.log(range_query);
+			// console.log(equal_query);
+			// console.log(range_query);
 			var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
 			var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
 			
@@ -137,14 +156,14 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 							final_design_ids+=product_designs[i].id+",";
 						};
 						final_design_ids=final_design_ids.substring("", final_design_ids.length-1);
-						connection.query("SELECT `id`, `plants_id`, `material_code`, `design_version`, `design_variant` FROM `product_designs` WHERE `id` IN ("+final_design_ids+")", function(err, result){
+						connection.query("SELECT `product_designs`.`id`, `product_designs`.`plants_id`, `plants`.`name` as `plant_name`, `product_designs`.`material_code`, `product_designs`.`design_version`, `product_designs`.`design_variant` FROM `product_designs` LEFT JOIN `plants` ON `product_designs`.`plants_id`=`plants`.`id` WHERE `product_designs`.`id` IN ("+final_design_ids+")", function(err, result){
 							if(err){
 								console.log(err);
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
 							else{
 								if(result.length==0){
-
+									res.json({"statusCode": 200, "success":"true", "message": "result not found", "product_designs": "[]"});
 								}
 								else{
 									res.json({"statusCode": 200, "success":"true", "message": "", "product_designs": result});
