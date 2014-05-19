@@ -139,8 +139,11 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 			var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
 			
 			var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_2+") AND "+range_query;
+			var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_2+")";
+			if(rangefilter.length>0){
+				final_query="SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
+			}
 			
-			var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
 			connection.query(final_query, function(err, product_designs){
 				if(err){
 					console.log(err);

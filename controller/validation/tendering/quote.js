@@ -139,7 +139,7 @@ exports.tendering_fetch_particular_design = function(req, res, next){
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
 				break;
 			}
-			if(req.params[fields[i]]==""  || !validator.isNumeric(req.params[fields[i]])){
+			if(req.params[fields[i]]==""  || !validator.isNumeric(req.params[fields[i]]) || req.params[fields[i]]==0){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" value not found"});
 				break;
@@ -166,26 +166,26 @@ exports.tendering_fetch_particular_design = function(req, res, next){
 
 exports.tendering_submit_rfq_lines = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id", "sales_price"];
+	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id", "sales_price", "confirmed_delivery_date"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])){
+			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || req.body[fields[i]]==0 || !validator.isNumeric(req.body[fields[i]])){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not found"});
 				break;
 			}
 		}
 	}
-	if(checkValid==1){
-		if(typeof req.body.confirmed_delivery_date=="undefined" || req.body.confirmed_delivery_date==""){
-			checkValid=0;
-			res.json({"statusCode": 404, "success": "false", "message": "confirmed_delivery_date not found"});
-		}
-	}
+	// if(checkValid==1){
+	// 	if(typeof req.body.confirmed_delivery_date=="undefined" || req.body.confirmed_delivery_date==""){
+	// 		checkValid=0;
+	// 		res.json({"statusCode": 404, "success": "false", "message": "confirmed_delivery_date not found"});
+	// 	}
+	// }
 	if(checkValid==1){
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
 			if(err){
