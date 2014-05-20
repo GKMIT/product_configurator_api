@@ -204,7 +204,7 @@ exports.tendering_fetch_particular_design = function(req, res){
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
-						connection.query("SELECT `id`, `product_design_id`, `product_properties_id`, `spec_value`, `calculated_value`, `measured_value` FROM `product_designs_technical_details` WHERE `product_design_id`='"+req.params.product_designs_id+"'", function(err, design_technical_detail){
+						connection.query("SELECT `pdtd`.`id`, `pdtd`.`product_design_id`, `pdtd`.`product_properties_id`, `product_properties`.`property_name`, `product_properties`.`unit_of_measurement`, `pdtd`.`spec_value`, `pdtd`.`calculated_value`, `pdtd`.`measured_value` FROM `product_designs_technical_details` `pdtd` LEFT JOIN `product_properties` ON `pdtd`.`product_properties_id`=`product_properties`.`id` WHERE `pdtd`.`product_design_id`='"+req.params.product_designs_id+"'", function(err, design_technical_detail){
 							if(err){
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
