@@ -159,6 +159,7 @@ var should = require('should'),
 
 // describe('tendering_fetch_product_design_detail API Calls', function () {
 // 	var url="/tendering_fetch_product_design_detail";
+// 	this.timeout(15000);
 // 	it("Should ok All Correct Data", function (done) {
 // 		login(email, password, function(user){
 // 			var user_id=user.data[0].id;
@@ -2143,6 +2144,7 @@ var should = require('should'),
 
 describe('tendering_submit_rfq_lines API Calls', function () {
 	var url="/tendering_submit_rfq_lines";
+	// this.timeout(15000);
 	it("Should ok All Correct Data", function (done) {
 		login(email, password, function(user){
 			var user_id=user.data[0].id;
@@ -2162,33 +2164,20 @@ describe('tendering_submit_rfq_lines API Calls', function () {
 					properties.push({"id":"15","value":"100"});
 					properties.push({"id":"17","value":"300"});
 					
-					var counter_1=0;
-					var counter_2=0;
-					var counter_3=0;
-					var i=0;
-					for (i = 0; i < rfq.rfq_lines.length; i++) {
-						parameter={"user_id": user_id, "rfq_id": rfq_id,
-							"rfq_lines_id": rfq.rfq_lines[i].id,
-							"properties":properties
-						};
-						// (function(callback){callback();})(function(){});
-						Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
-							console.log(counter_1);
-							console.log(rfq.rfq_lines[counter_1].id);
-							parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[counter_1].id;
-							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
-								parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": design_data.product_designs[0].id, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
-								Putcall(url, parameter, token, 200, function(info){
-									if(i==rfq.rfq_lines.length){
-										console.log("Yoyoyoy");
-									}
-									// counter_3++;
-								});
-								counter_2++;
+					parameter={"user_id": user_id, "rfq_id": rfq_id,
+					 "rfq_lines_id": rfq.rfq_lines[0].id,
+					 "properties":properties
+					};
+
+					Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
+						parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
+						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+							parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[0].id, "product_designs_id": design_data.product_designs[0].id, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+							Putcall(url, parameter, token, 200, function(info){
+								done();
 							});
-							counter_1++;
 						});
-					};					
+					});
 				});
 			});
 		});
