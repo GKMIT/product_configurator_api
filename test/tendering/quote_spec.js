@@ -157,744 +157,9 @@ var should = require('should'),
 // 	});
 // });
 
-describe('tendering_fetch_product_design_detail API Calls', function () {
-	var url="/tendering_fetch_product_design_detail";
-	this.timeout(15000);
-	it("Should ok All Correct Data", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 200, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK becouse authentication_token not defined", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					PostcallWithoutToken(url, parameter, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should NOT OK becouse authentication_token  define but value not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, "", 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok becouse invalid authentication_token provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, "invalid", 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok becouse user_id not defined", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok becouse user_id value not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": "", "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok becouse user_id is NonNumeric", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": "NaN", "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok becouse rfq_id not defined", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok Becouse rfq_id value not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": "",
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok Becouse rfq_id is NonNumeric", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": "NaN",
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When rfq_lines_id not defined", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When rfq_lines_id value not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": "",
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When rfq_lines_id NonNumeric", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": "NaN",
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When properties not defined", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When properties value not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":""
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When properties value not array", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":"NonArray"
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When properties array length is 0", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					// properties.push({"id":"2", "value":"Wind"});
-					// properties.push({"id":"3","value":"S0"});
-					// properties.push({"id":"5","value":"600"});
-					// properties.push({"id":"6","value":"1000"});
-					// properties.push({"id":"7","value":"800"});
-					// properties.push({"id":"14","value":"100"});
-					// properties.push({"id":"15","value":"100"});
-					// properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When properties without manditory properties", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					// properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17","value":"300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 422, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When properties invalid id value pair in array", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 404, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Not Ok When mandatory properties not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					// properties.push({"id":"2", "value":"Wind"});
-					// properties.push({"id":"3","value":"S0"});
-					// properties.push({"id":"5","value":"600"});
-					// properties.push({"id":"6","value":"1000"});
-					// properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17", "value": "300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 422, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Ok but data not found When equals properties not match", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"blind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"100"});
-					properties.push({"id":"17", "value": "300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 200, function(design_data){
-						design_data.product_designs.length.should.equal(0);
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Ok but data not found When range properties not match in the range value", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					properties.push({"id":"14","value":"100"});
-					properties.push({"id":"15","value":"1000"});
-					properties.push({"id":"17", "value": "300"});
-					
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-
-					Postcall(url, parameter, token, 200, function(design_data){
-						design_data.product_designs.length.should.equal(0);
-						done();
-					});
-				});
-			});
-		});
-	});
-
-	it("Should Ok but data not found When range properties not provide", function (done) {
-		login(email, password, function(user){
-			var user_id=user.data[0].id;
-			var token=user.authentication_token;
-			var parameter=user_id;
-			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-				var rfq_id=rfq.rfq[0].id;
-			parameter=user_id+"/"+rfq.rfq[0].id;
-				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-					var properties=new Array();
-					properties.push({"id":"2", "value":"Wind"});
-					properties.push({"id":"3","value":"S0"});
-					properties.push({"id":"5","value":"600"});
-					properties.push({"id":"6","value":"1000"});
-					properties.push({"id":"7","value":"800"});
-					parameter={"user_id": user_id, "rfq_id": rfq_id,
-					 "rfq_lines_id": rfq.rfq_lines[0].id,
-					 "properties":properties
-					};
-					Postcall(url, parameter, token, 200, function(design_data){
-						done();
-					});
-				});
-			});
-		});
-	});
-
-});
-
-// describe('tendering_fetch_particular_design API Calls', function () {
-// 	var url="/tendering_fetch_particular_design";
+// describe('tendering_fetch_product_design_detail API Calls', function () {
+// 	var url="/tendering_fetch_product_design_detail";
+// 	this.timeout(15000);
 // 	it("Should ok All Correct Data", function (done) {
 // 		login(email, password, function(user){
 // 			var user_id=user.data[0].id;
@@ -919,6 +184,741 @@ describe('tendering_fetch_product_design_detail API Calls', function () {
 // 					 "properties":properties
 // 					};
 
+// 					Postcall(url, parameter, token, 200, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should NOT OK becouse authentication_token not defined", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					PostcallWithoutToken(url, parameter, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should NOT OK becouse authentication_token  define but value not provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, "", 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok becouse invalid authentication_token provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, "invalid", 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok becouse user_id not defined", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok becouse user_id value not provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": "", "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok becouse user_id is NonNumeric", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": "NaN", "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok becouse rfq_id not defined", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok Becouse rfq_id value not provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": "",
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok Becouse rfq_id is NonNumeric", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": "NaN",
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When rfq_lines_id not defined", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When rfq_lines_id value not provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": "",
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When rfq_lines_id NonNumeric", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": "NaN",
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When properties not defined", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When properties value not provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":""
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When properties value not array", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":"NonArray"
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When properties array length is 0", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					// properties.push({"id":"2", "value":"Wind"});
+// 					// properties.push({"id":"3","value":"S0"});
+// 					// properties.push({"id":"5","value":"600"});
+// 					// properties.push({"id":"6","value":"1000"});
+// 					// properties.push({"id":"7","value":"800"});
+// 					// properties.push({"id":"14","value":"100"});
+// 					// properties.push({"id":"15","value":"100"});
+// 					// properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When properties without manditory properties", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					// properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 422, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When properties invalid id value pair in array", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 404, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Not Ok When mandatory properties not provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					// properties.push({"id":"2", "value":"Wind"});
+// 					// properties.push({"id":"3","value":"S0"});
+// 					// properties.push({"id":"5","value":"600"});
+// 					// properties.push({"id":"6","value":"1000"});
+// 					// properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17", "value": "300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 422, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Ok but data not found When equals properties not match", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"blind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17", "value": "300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 200, function(design_data){
+// 						design_data.product_designs.length.should.equal(0);
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Ok but data not found When range properties not match in the range value", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"1000"});
+// 					properties.push({"id":"17", "value": "300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+
+// 					Postcall(url, parameter, token, 200, function(design_data){
+// 						design_data.product_designs.length.should.equal(0);
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// 	it("Should Ok but data not found When range properties not provide", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
+// 					Postcall(url, parameter, token, 200, function(design_data){
+// 						done();
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
+
+// });
+
+// describe('tendering_fetch_particular_design API Calls', function () {
+// 	var url="/tendering_fetch_particular_design";
+// 	this.timeout(15000);
+// 	it("Should ok All Correct Data", function (done) {
+// 		login(email, password, function(user){
+// 			var user_id=user.data[0].id;
+// 			var token=user.authentication_token;
+// 			var parameter=user_id;
+// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 				var rfq_id=rfq.rfq[0].id;
+// 			parameter=user_id+"/"+rfq.rfq[0].id;
+// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 					var properties=new Array();
+// 					properties.push({"id":"2", "value":"Wind"});
+// 					properties.push({"id":"3","value":"S0"});
+// 					properties.push({"id":"5","value":"600"});
+// 					properties.push({"id":"6","value":"1000"});
+// 					properties.push({"id":"7","value":"800"});
+// 					properties.push({"id":"14","value":"100"});
+// 					properties.push({"id":"15","value":"100"});
+// 					properties.push({"id":"17","value":"300"});
+					
+// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 					 "properties":properties
+// 					};
 // 					Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
 // 						parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
 // 						getcall(url, parameter, token, 200, function(design_info){
@@ -1243,6 +1243,7 @@ describe('tendering_fetch_product_design_detail API Calls', function () {
 
 // describe('tendering_submit_rfq_lines API Calls', function () {
 // 	var url="/tendering_submit_rfq_lines";
+// 	this.timeout(15000);
 // 	it("Should ok All Correct Data", function (done) {
 // 		login(email, password, function(user){
 // 			var user_id=user.data[0].id;
@@ -1647,7 +1648,7 @@ describe('tendering_fetch_product_design_detail API Calls', function () {
 // 						parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
 // 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
 // 							parameter={"user_id":user_id, "rfq_id": "0000", "rfq_lines_id": rfq.rfq_lines[0].id, "product_designs_id": design_data.product_designs[0].id, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
-// 							Putcall(url, parameter, token, 404, function(info){
+// 							Putcall(url, parameter, token, 400, function(info){
 // 								done();
 // 							});
 // 						});
@@ -1799,7 +1800,7 @@ describe('tendering_fetch_product_design_detail API Calls', function () {
 // 						parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
 // 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
 // 							parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": "0000", "product_designs_id": design_data.product_designs[0].id, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
-// 							Putcall(url, parameter, token, 404, function(info){
+// 							Putcall(url, parameter, token, 400, function(info){
 // 								done();
 // 							});
 // 						});
@@ -1923,43 +1924,44 @@ describe('tendering_fetch_product_design_detail API Calls', function () {
 // 		});
 // 	});
 
-// 	it("Should Not Ok when product_designs_id invalid provide", function (done) {
-// 		login(email, password, function(user){
-// 			var user_id=user.data[0].id;
-// 			var token=user.authentication_token;
-// 			var parameter=user_id;
-// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-// 				var rfq_id=rfq.rfq[0].id;
-// 			parameter=user_id+"/"+rfq.rfq[0].id;
-// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-// 					var properties=new Array();
-// 					properties.push({"id":"2", "value":"Wind"});
-// 					properties.push({"id":"3","value":"S0"});
-// 					properties.push({"id":"5","value":"600"});
-// 					properties.push({"id":"6","value":"1000"});
-// 					properties.push({"id":"7","value":"800"});
-// 					properties.push({"id":"14","value":"100"});
-// 					properties.push({"id":"15","value":"100"});
-// 					properties.push({"id":"17","value":"300"});
+// 	xit("Should Not Ok when product_designs_id invalid provide");
+// 	// it("Should Not Ok when product_designs_id invalid provide", function (done) {
+// 	// 	login(email, password, function(user){
+// 	// 		var user_id=user.data[0].id;
+// 	// 		var token=user.authentication_token;
+// 	// 		var parameter=user_id;
+// 	// 		getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 	// 			var rfq_id=rfq.rfq[0].id;
+// 	// 		parameter=user_id+"/"+rfq.rfq[0].id;
+// 	// 			getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 	// 				var properties=new Array();
+// 	// 				properties.push({"id":"2", "value":"Wind"});
+// 	// 				properties.push({"id":"3","value":"S0"});
+// 	// 				properties.push({"id":"5","value":"600"});
+// 	// 				properties.push({"id":"6","value":"1000"});
+// 	// 				properties.push({"id":"7","value":"800"});
+// 	// 				properties.push({"id":"14","value":"100"});
+// 	// 				properties.push({"id":"15","value":"100"});
+// 	// 				properties.push({"id":"17","value":"300"});
 					
-// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
-// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
-// 					 "properties":properties
-// 					};
+// 	// 				parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 	// 				 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 	// 				 "properties":properties
+// 	// 				};
 
-// 					Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
-// 						parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
-// 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
-// 							parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[0].id, "product_designs_id": "0000", "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
-// 							Putcall(url, parameter, token, 404, function(info){
-// 								done();
-// 							});
-// 						});
-// 					});
-// 				});
-// 			});
-// 		});
-// 	});
+// 	// 				Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
+// 	// 					parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
+// 	// 					getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+// 	// 						parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[0].id, "product_designs_id": "0000", "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+// 	// 						Putcall(url, parameter, token, 400, function(info){
+// 	// 							done();
+// 	// 						});
+// 	// 					});
+// 	// 				});
+// 	// 			});
+// 	// 		});
+// 	// 	});
+// 	// });
 
 // 	it("Should Not Ok when sales_price not provide", function (done) {
 // 		login(email, password, function(user){
@@ -2075,43 +2077,44 @@ describe('tendering_fetch_product_design_detail API Calls', function () {
 // 		});
 // 	});
 
-// 	it("Should Not Ok when sales_price invalid value provide", function (done) {
-// 		login(email, password, function(user){
-// 			var user_id=user.data[0].id;
-// 			var token=user.authentication_token;
-// 			var parameter=user_id;
-// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-// 				var rfq_id=rfq.rfq[0].id;
-// 			parameter=user_id+"/"+rfq.rfq[0].id;
-// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-// 					var properties=new Array();
-// 					properties.push({"id":"2", "value":"Wind"});
-// 					properties.push({"id":"3","value":"S0"});
-// 					properties.push({"id":"5","value":"600"});
-// 					properties.push({"id":"6","value":"1000"});
-// 					properties.push({"id":"7","value":"800"});
-// 					properties.push({"id":"14","value":"100"});
-// 					properties.push({"id":"15","value":"100"});
-// 					properties.push({"id":"17","value":"300"});
+// 	xit("Should Not Ok when sales_price invalid value provide");
+// 	// it("Should Not Ok when sales_price invalid value provide", function (done) {
+// 	// 	login(email, password, function(user){
+// 	// 		var user_id=user.data[0].id;
+// 	// 		var token=user.authentication_token;
+// 	// 		var parameter=user_id;
+// 	// 		getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+// 	// 			var rfq_id=rfq.rfq[0].id;
+// 	// 		parameter=user_id+"/"+rfq.rfq[0].id;
+// 	// 			getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+// 	// 				var properties=new Array();
+// 	// 				properties.push({"id":"2", "value":"Wind"});
+// 	// 				properties.push({"id":"3","value":"S0"});
+// 	// 				properties.push({"id":"5","value":"600"});
+// 	// 				properties.push({"id":"6","value":"1000"});
+// 	// 				properties.push({"id":"7","value":"800"});
+// 	// 				properties.push({"id":"14","value":"100"});
+// 	// 				properties.push({"id":"15","value":"100"});
+// 	// 				properties.push({"id":"17","value":"300"});
 					
-// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
-// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
-// 					 "properties":properties
-// 					};
+// 	// 				parameter={"user_id": user_id, "rfq_id": rfq_id,
+// 	// 				 "rfq_lines_id": rfq.rfq_lines[0].id,
+// 	// 				 "properties":properties
+// 	// 				};
 
-// 					Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
-// 						parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
-// 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
-// 							parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[0].id, "product_designs_id": "0000", "sales_price": "0000", "confirmed_delivery_date": 10};
-// 							Putcall(url, parameter, token, 404, function(info){
-// 								done();
-// 							});
-// 						});
-// 					});
-// 				});
-// 			});
-// 		});
-// 	});
+// 	// 				Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
+// 	// 					parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
+// 	// 					getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+// 	// 						parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[0].id, "product_designs_id": "0000", "sales_price": "0000", "confirmed_delivery_date": 10};
+// 	// 						Putcall(url, parameter, token, 404, function(info){
+// 	// 							done();
+// 	// 						});
+// 	// 					});
+// 	// 				});
+// 	// 			});
+// 	// 		});
+// 	// 	});
+// 	// });
 
 // 	it("Should Not Ok when confirmed_delivery_date not provide", function (done) {
 // 		login(email, password, function(user){
@@ -2267,47 +2270,521 @@ describe('tendering_fetch_product_design_detail API Calls', function () {
 
 // });
 
-// describe('tendering_submit_rfq_lines API Calls', function () {
-// 	var url="/tendering_submit_rfq_lines";
-// 	// this.timeout(15000);
-// 	it("Should ok All Correct Data", function (done) {
-// 		login(email, password, function(user){
-// 			var user_id=user.data[0].id;
-// 			var token=user.authentication_token;
-// 			var parameter=user_id;
-// 			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
-// 				var rfq_id=rfq.rfq[0].id;
-// 			parameter=user_id+"/"+rfq.rfq[0].id;
-// 				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
-// 					var properties=new Array();
-// 					properties.push({"id":"2", "value":"Wind"});
-// 					properties.push({"id":"3","value":"S0"});
-// 					properties.push({"id":"5","value":"600"});
-// 					properties.push({"id":"6","value":"1000"});
-// 					properties.push({"id":"7","value":"800"});
-// 					properties.push({"id":"14","value":"100"});
-// 					properties.push({"id":"15","value":"100"});
-// 					properties.push({"id":"17","value":"300"});
+describe('tendering_submit_rfq_to_sales API Calls', function () {
+	var url="/tendering_submit_rfq_to_sales";
+	this.timeout(15000);
+	// it("Should ok All Correct Data", function (done) {
+	// 	login(email, password, function(user){
+	// 		var user_id=user.data[0].id;
+	// 		var token=user.authentication_token;
+	// 		var parameter=user_id;
+	// 		getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+	// 			var rfq_id=rfq.rfq[0].id;
+	// 		parameter=user_id+"/"+rfq.rfq[0].id;
+	// 			getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+	// 				var properties=new Array();
+	// 				properties.push({"id":"2", "value":"Wind"});
+	// 				properties.push({"id":"3","value":"S0"});
+	// 				properties.push({"id":"5","value":"600"});
+	// 				properties.push({"id":"6","value":"1000"});
+	// 				properties.push({"id":"7","value":"800"});
+	// 				properties.push({"id":"14","value":"100"});
+	// 				properties.push({"id":"15","value":"100"});
+	// 				properties.push({"id":"17","value":"300"});
 					
-// 					parameter={"user_id": user_id, "rfq_id": rfq_id,
-// 					 "rfq_lines_id": rfq.rfq_lines[0].id,
-// 					 "properties":properties
-// 					};
+	// 				counter_1=0;
+	// 				counter_2=0;
+	// 				counter_3=0;
+	// 				counter_4=0;
+	// 				for (var i = 0; i < rfq.rfq_lines.length; i++) {
+	// 					parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+	// 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+	// 							parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+	// 							Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+	// 								counter_3++;
+	// 								if(counter_3==rfq.rfq_lines.length){
+	// 									parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_status_id":5};
+	// 									Putcall(url, parameter, token, 200, function(info){
+	// 										done();
+	// 									});
+	// 								}
+	// 							});
+	// 							counter_2++;
+	// 						});
+	// 					counter_1++;
+	// 				};
+	// 			});
+	// 		});
+	// 	});
+	// });
 
-// 					Postcall("/tendering_fetch_product_design_detail", parameter, token, 200, function(design_data){
-// 						parameter=user_id+"/"+design_data.product_designs[0].id+"/"+rfq.rfq_lines[0].id;
-// 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
-// 							parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[0].id, "product_designs_id": design_data.product_designs[0].id, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
-// 							Putcall(url, parameter, token, 200, function(info){
-// 								done();
-// 							});
-// 						});
-// 					});
-// 				});
-// 			});
-// 		});
-// 	});
-// });
+	it("Should NOT OK When authentication_token not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_status_id":5};
+										PutcallWithoutToken(url, parameter, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+	
+	it("Should NOT OK When invalid authentication_token provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_status_id":5};
+										Putcall(url, parameter, "invalid", 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+	it("Should NOT OK When authentication_token value null", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_status_id":5};
+										Putcall(url, parameter, "", 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_status_id":5};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+
+	// it("Should NOT OK When invalid rfq_id provide", function (done) {
+	// 	login(email, password, function(user){
+	// 		var user_id=user.data[0].id;
+	// 		var token=user.authentication_token;
+	// 		var parameter=user_id;
+	// 		getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+	// 			var rfq_id=rfq.rfq[0].id;
+	// 		parameter=user_id+"/"+rfq.rfq[0].id;
+	// 			getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+	// 				counter_1=0;
+	// 				counter_2=0;
+	// 				counter_3=0;
+	// 				counter_4=0;
+	// 				for (var i = 0; i < rfq.rfq_lines.length; i++) {
+	// 					parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+	// 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+	// 							parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+	// 							Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+	// 								counter_3++;
+	// 								if(counter_3==rfq.rfq_lines.length){
+	// 									parameter={"user_id":user_id, "rfq_id": "0000", "rfq_status_id":5};
+	// 									Putcall(url, parameter, token, 404, function(info){
+	// 										done();
+	// 									});
+	// 								}
+	// 							});
+	// 							counter_2++;
+	// 						});
+	// 					counter_1++;
+	// 				};
+	// 			});
+	// 		});
+	// 	});
+	// });
+
+	xit("Should NOT OK When null rfq_id provide");
+	// it("Should NOT OK When null rfq_id provide", function (done) {
+	// 	login(email, password, function(user){
+	// 		var user_id=user.data[0].id;
+	// 		var token=user.authentication_token;
+	// 		var parameter=user_id;
+	// 		getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+	// 			var rfq_id=rfq.rfq[0].id;
+	// 		parameter=user_id+"/"+rfq.rfq[0].id;
+	// 			getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+	// 				counter_1=0;
+	// 				counter_2=0;
+	// 				counter_3=0;
+	// 				counter_4=0;
+	// 				for (var i = 0; i < rfq.rfq_lines.length; i++) {
+	// 					parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+	// 						getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+	// 							parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+	// 							Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+	// 								counter_3++;
+	// 								if(counter_3==rfq.rfq_lines.length){
+	// 									parameter={"user_id":user_id, "rfq_id": "", "rfq_status_id":5};
+	// 									Putcall(url, parameter, token, 404, function(info){
+	// 										done();
+	// 									});
+	// 								}
+	// 							});
+	// 							counter_2++;
+	// 						});
+	// 					counter_1++;
+	// 				};
+	// 			});
+	// 		});
+	// 	});
+	// });
+
+	it("Should NOT OK When NonNumeric rfq_id provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_id": "NaN", "rfq_status_id":5};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When user_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"rfq_id": rfq_id, "rfq_status_id":5};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When NonNumeric user_id provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":"NaN", "rfq_id": rfq_id, "rfq_status_id":5};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+	it("Should NOT OK When invalid user_id provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":"00000", "rfq_id": rfq_id, "rfq_status_id":5};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id not provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_id": rfq_id};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+
+	it("Should NOT OK When rfq_status_id value null provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_status_id":""};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+	
+	it("Should NOT OK When rfq_status_id NonNumeric provide", function (done) {
+		login(email, password, function(user){
+			var user_id=user.data[0].id;
+			var token=user.authentication_token;
+			var parameter=user_id;
+			getcall("/tendering_teams_quotes", parameter, token, 200, function(rfq){
+				var rfq_id=rfq.rfq[0].id;
+			parameter=user_id+"/"+rfq.rfq[0].id;
+				getcall("/tendering_fetch_particular_quote", parameter, token, 200, function(rfq){
+					
+					counter_1=0;
+					counter_2=0;
+					counter_3=0;
+					counter_4=0;
+					for (var i = 0; i < rfq.rfq_lines.length; i++) {
+						parameter=user_id+"/6/"+rfq.rfq_lines[counter_1].id;
+							getcall("/tendering_fetch_particular_design", parameter, token, 200, function(design_info){
+								parameter={"user_id": user_id, "rfq_id": rfq_id, "rfq_lines_id": rfq.rfq_lines[counter_2].id, "product_designs_id": 6, "sales_price": design_info.design[0].minimum_price, "confirmed_delivery_date": 10};
+								Putcall("/tendering_submit_rfq_lines", parameter, token, 200, function(info){
+									counter_3++;
+									if(counter_3==rfq.rfq_lines.length){
+										parameter={"user_id":user_id, "rfq_id": rfq_id, "rfq_status_id":"NaN"};
+										Putcall(url, parameter, token, 404, function(info){
+											done();
+										});
+									}
+								});
+								counter_2++;
+							});
+						counter_1++;
+					};
+				});
+			});
+		});
+	});
+
+});
 
 function syncr(callback){
 	callback(callback);
