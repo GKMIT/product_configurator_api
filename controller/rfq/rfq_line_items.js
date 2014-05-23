@@ -60,7 +60,22 @@ exports.fetch_product_plants_properties = function(req, res){
 								res.json({"statusCode":500, "success":"false", "message": "internal error"});
 						}
 						else{
-							res.json({"statusCode":200, "success":"true", "massage":"", "production_plants":production_plants, "product_properties":product_properties, "mandatory_properties":mandatory_properties});
+							connection.query("SELECT `id`, `name` FROM `product_types`", function(err, product_types) {
+									if(err){
+										res.json({"statusCode":500, "success":"false", "message": "internal error"});
+									}
+									else{
+										connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities) {
+											if(err){
+												res.json({"statusCode":500, "success":"false", "message": "internal error"});
+											}
+											else{
+												res.json({"statusCode":200, "success":"true", "massage":"", "production_plants":production_plants, "product_properties":product_properties, "mandatory_properties":mandatory_properties, "complexity": complexities, "product_types":product_types});
+											}
+										});
+									}
+								});
+							// res.json({"statusCode":200, "success":"true", "massage":"", "production_plants":production_plants, "product_properties":product_properties, "mandatory_properties":mandatory_properties});
 						}
 					});
 				}
@@ -101,7 +116,22 @@ exports.fetch_rfq_line_items = function(req, res){
 								res.json({"statusCode":500, "success":"false", "message": "internal error"});
 							}
 							else{
-								res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "product_lines": product_lines, "technical_specifications":technical_specifications});
+								// connection.query("SELECT `id`, `name` FROM `product_types`", function(err, product_types) {
+								// 	if(err){
+								// 		res.json({"statusCode":500, "success":"false", "message": "internal error"});
+								// 	}
+								// 	else{
+								// 		connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities) {
+								// 			if(err){
+								// 				res.json({"statusCode":500, "success":"false", "message": "internal error"});
+								// 			}
+								// 			else{
+								// 				res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "product_lines": product_lines, "technical_specifications":technical_specifications, "complexity": complexities, "product_types":product_types});
+								// 			}
+								// 		});
+								// 	}
+								// });
+									res.json({"statusCode":200, "success":"true", "massage":"", "rfq_lines":rfq_lines, "product_lines": product_lines, "technical_specifications":technical_specifications});
 							}
 						});
 					}
