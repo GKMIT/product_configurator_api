@@ -76,6 +76,8 @@ module.exports = function(){
 	
 	app.get("/tendering_fetch_particular_design/:user_id/:product_designs_id/:rfq_lines_id",tendering_validation.tendering_fetch_particular_design,  tendering_calls.tendering_fetch_particular_design);
 
+	app.get("/tendering_calculate_sales_price/:user_id/:rfq_lines_id/:plants_id/:complexities_id", tendering_validation.tendering_calculate_sales_price, tendering_calls.tendering_calculate_sales_price);
+
 	app.put("/tendering_submit_rfq_lines", tendering_validation.tendering_submit_rfq_lines, tendering_calls.tendering_submit_rfq_lines);
 	app.put("/tendering_submit_rfq_to_sales", tendering_validation.tendering_submit_rfq_to_sales, tendering_calls.tendering_submit_rfq_to_sales);
 

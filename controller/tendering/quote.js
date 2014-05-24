@@ -256,7 +256,7 @@ exports.tendering_fetch_particular_design = function(req, res){
 }
 
 exports.tendering_submit_rfq_lines = function(req, res){
-	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='2' WHERE `id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
+	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='2', `material_cost`='"+req.body.material_cost+"', `labour_cost`='"+req.body.labor_cost+"', `no_of_labour_hours`='"+req.body.no_of_labor_hours+"' WHERE `id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, info) {
 		if(err){
 			console.log(err);
@@ -317,6 +317,39 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 					else{
 						res.json({"statusCode": 422, "success":"true", "message": "Please complete all rfq_line items"});
 					}
+				}
+			});
+		}
+	});
+};
+
+
+exports.tendering_calculate_sales_price = function(req, res){
+	var query_1="SELECT `material_cost`, `labour_cost`, `no_of_labour_hours` FROM `rfq_lines` WHERE `id`='"+req.params['rfq_lines_id']+"' LIMIT 1";
+	connection.query(query_1, function(err, rfq_lines_data){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			var query_1="SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+req.params['plants_id']+"'";
+			connection.query(query_1, function(err, overheads){
+				if(err){
+					console.log(err);
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+req.params['plants_id']+"' AND `complexities_id`='"+req.params['complexities_id']+"'";
+					connection.query(query_1, function(err, complexities){
+						if(err){
+							console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+						}
+						else{
+							rfq_lines_data[0]["extra_engineering_hours"]=0;
+							res.json({"statusCode": 200, "success":"true", "message": "", "rfq_lines_data": rfq_lines_data, "overheads": overheads, "complexities": complexities});
+						}
+					});
 				}
 			});
 		}
