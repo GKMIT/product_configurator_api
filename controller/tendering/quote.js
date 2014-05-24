@@ -355,3 +355,42 @@ exports.tendering_calculate_sales_price = function(req, res){
 		}
 	});
 };
+
+exports.tendering_save_calculated_sales_price = function(req, res){
+	var fields= ["plants_id", "complexities_id", "product_design_id", "rfq_lines_id", "material_cost", "labor_cost", "labor_hours", "extra_engineering_cost", "dcp", "cost_packaging", "packaging_cost_transformer", "extra_packaging_costs_build_of_parts", "packaging", "engineering_overheads", "plant_overheads", "site_overheads", "regional_overheads", "product_line_overheads", "corporate_overheads", "depreciation", "overheads", "frieght_f_term", "friegth_c_term", "friegth_d_term", "transport", "financial_cost_loc", "financial_cost_bonds", "maintenance_equipment", "administrative_cost_various", "extra_documentation_required", "supervision", "erection_comm", "factory_training", "onsite_training", "warranty_on_full_cost", "extra_cost", "full_cost_excluding_commision", "ebit_percentage", "ebit", "commission_on_net_sales_price", "commission_on_f_term", "commission_on_gross_sales", "commission", "minimum_intercompany_sales", "minimum_sales_price_to_customer"];
+
+		connection.query("SELECT `id` FROM `rfq_lines_calculated_sales_price` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, info){
+			if(err){
+				console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			}
+			else{
+				var query_1="";
+				if(info.length>0){
+					query_1="UPDATE `rfq_lines_calculated_sales_price` SET ";
+					for (var i = 0; i < fields.length; i++) {
+						query_1+=fields[i]+"='"+req.body[fields[i]]+"', ";
+					};
+					query_1=query_1.substring("", query_1.length-2);
+					query_1+=" WHERE rfq_lines_id="+req.body.rfq_lines_id;
+				}
+				else{
+					query_1="INSERT INTO `rfq_lines_calculated_sales_price`(`plants_id`, `complexities_id`, `product_design_id`, `rfq_lines_id`, `material_cost`, `labor_cost`, `labor_hours`, `extra_engineering_cost`, `dcp`, `cost_packaging`, `packaging_cost_transformer`, `extra_packaging_costs_build_of_parts`, `packaging`, `engineering_overheads`, `plant_overheads`, `site_overheads`, `regional_overheads`, `product_line_overheads`, `corporate_overheads`, `depreciation`, `overheads`, `frieght_f_term`, `friegth_c_term`, `friegth_d_term`, `transport`, `financial_cost_loc`, `financial_cost_bonds`, `maintenance_equipment`, `administrative_cost_various`, `extra_documentation_required`, `supervision`, `erection_comm`, `factory_training`, `onsite_training`, `warranty_on_full_cost`, `extra_cost`, `full_cost_excluding_commision`, `ebit_percentage`, `ebit`, `commission_on_net_sales_price`, `commission_on_f_term`, `commission_on_gross_sales`, `commission`, `minimum_intercompany_sales`, `minimum_sales_price_to_customer`) VALUES (";
+					for (var i = 0; i < fields.length; i++) {
+						query_1+="'"+req.body[fields[i]]+"', ";
+					};
+					query_1=query_1.substring("", query_1.length-2);
+					query_1+=")";
+				}
+				connection.query(query_1, function(err, result){
+					if(err){
+						console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "data inserted"});
+					}
+				});
+			}
+		});
+};
