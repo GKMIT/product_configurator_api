@@ -372,13 +372,37 @@ exports.complete_rfq = function(req, res){
 
 
 exports.fetch_property_detail = function(req, res, next){
+	console.log("yoyoyyo");
 	connection.query("SELECT `id`, `property_name`, `product_lines_id`, `categories_id`, `unit_of_measurement` FROM `product_properties` WHERE `id`='"+req.params.property_id+"'", function(err, property){
 		if(err){
 			console.log(err);
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"true", "message":"", "properties": property});
+			var flag=0;
+			var query="SELECT id, name FROM ";
+			if(req.params.property_id==2){
+				query+="product_types";
+				flag=1;
+			}
+			else if(req.params.property_id==3){
+				query+="complexities";
+				flag=1;
+			}
+			else{
+				res.json({"statusCode":200, "success":"true", "message":"", "properties": property, "value":[]});
+			}
+			if(flag==1){
+				connection.query(query, function(err, prop_val){
+					if(err){
+						console.log(err);
+						res.json({"statusCode":500, "success": "false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode":200, "success":"true", "message":"", "properties": property, "value": prop_val});
+					}
+				});
+			}
 		}
 	});
 }
