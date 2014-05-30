@@ -34,7 +34,7 @@ exports.sales_quote_finalize_fetch_one = function(req, res){
 
 
 exports.sales_quote_finalize_submit = function(req, res){
-	var query="UPDATE `rfq` SET `quote_validity_date`='"+req.body.quote_validity_date+"', `quote_submission_date`=NOW(), `probability`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
+	var query="UPDATE `rfq` SET `quote_validity_date`='"+req.body.quote_validity_date+"', `quote_submission_date`=NOW(), `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
