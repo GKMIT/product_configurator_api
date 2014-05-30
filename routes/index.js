@@ -64,7 +64,6 @@ module.exports = function(){
 	app.put("/rfq_no_bid_submit", rfq_bid_validation.rfq_no_bid_submit, rfq_bid.rfq_no_bid_submit);
 
 
-
 	// api for the tendering person
 	var tendering_calls=require('../controller/tendering/quote');
 	var tendering_validation=require('../controller/validation/tendering/quote');
