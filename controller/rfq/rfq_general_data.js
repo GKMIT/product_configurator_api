@@ -38,36 +38,43 @@ exports.rfq_general_data = function(req, res){
 																	res.json({"statusCode":500, "success":"false", "message": "internal error"});
 															}
 															else{
-																if(rfq.length<=0){
-																	res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": "", "channel_to_market": channel_to_market});
-																	// res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": ""});
-																}
-																else{
-																	connection.query("SELECT `sa`.`id`,`sa`.`name` FROM `sales_agents` `sa`, `agent_country_allocation` `aca` WHERE sa.id=aca.sales_agents_id AND countries_id='"+rfq[0].customer_country+"'", function(err, sales_agents) {
-																		if(err){
-																				res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																connection.query("SELECT `id`, `name`, `value` FROM `probability`", function(err, probability) {
+																	if(err){
+																		console.log(err);
+																			res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																	}
+																	else{
+																		if(rfq.length<=0){
+																		res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": "", "channel_to_market": channel_to_market, "probability":probability});
 																		}
 																		else{
-																			connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+rfq[0].sales_hub_id+"'", function(err, sales_persons) {
+																			connection.query("SELECT `sa`.`id`,`sa`.`name` FROM `sales_agents` `sa`, `agent_country_allocation` `aca` WHERE sa.id=aca.sales_agents_id AND countries_id='"+rfq[0].customer_country+"'", function(err, sales_agents) {
 																				if(err){
-																					console.log(err);
 																						res.json({"statusCode":500, "success":"false", "message": "internal error"});
 																				}
 																				else{
-																					connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks) {
+																					connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+rfq[0].sales_hub_id+"'", function(err, sales_persons) {
 																						if(err){
 																							console.log(err);
 																								res.json({"statusCode":500, "success":"false", "message": "internal error"});
 																						}
 																						else{
-																							res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons, "channel_to_market": channel_to_market, "rejection_remarks":rejection_remarks});
+																							connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks) {
+																								if(err){
+																									console.log(err);
+																										res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																								}
+																								else{
+																									res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons, "channel_to_market": channel_to_market, "rejection_remarks":rejection_remarks, "probability":probability});
+																								}
+																							});
 																						}
-																					});
+																					});																					
 																				}
-																			});																					
+																			});																			
 																		}
-																	});																			
-																}
+																	}
+																});
 															}
 														});
 																																
@@ -328,7 +335,7 @@ exports.save_rfq_general_data = function(req, res){
 
 
 					var query="INSERT INTO rfq (";
-					var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, requested_quotation_date, created_by, rfq_status_id, probability";
+					var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, requested_quotation_date, created_by, rfq_status_id, probability_id";
 					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"','"+req.body.requested_quotation_date+"','"+req.body.user_id+"','"+req.body.rfq_status_id+"','"+req.body.probability+"'";
 					for(var i=0; i<param.length; i++){
 						if(i==0){
@@ -345,7 +352,7 @@ exports.save_rfq_general_data = function(req, res){
 					query=query+queryparam+")"+queryValue+")";
 					connection.query(query, function(err, info) {
 						if(err){
-								res.json({"statusCode":500, "success":"false", "message": "22222internal error"});
+								res.json({"statusCode":500, "success":"false", "message": "internal error"});
 						}
 						else{
 							res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": info.insertId});

@@ -323,7 +323,6 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 	});
 };
 
-
 exports.tendering_calculate_sales_price = function(req, res){
 	var query_1="SELECT `material_cost`, `labour_cost`, `no_of_labour_hours` FROM `rfq_lines` WHERE `id`='"+req.params['rfq_lines_id']+"' LIMIT 1";
 	connection.query(query_1, function(err, rfq_lines_data){
