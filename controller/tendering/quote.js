@@ -325,7 +325,7 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 };
 
 exports.tendering_calculate_sales_price = function(req, res){
-	var query_1="SELECT `plants_id`, EXTRACT(YEAR FROM req_delivery_date) as year, EXTRACT(MONTH FROM req_delivery_date) as month FROM `rfq_lines` WHERE `id`='"+req.params['rfq_lines_id']+"' LIMIT 1";
+	var query_1="SELECT `plants_id`, EXTRACT(YEAR FROM req_delivery_date) as year, EXTRACT(MONTH FROM req_delivery_date) as month, `number_of_units` FROM `rfq_lines` WHERE `id`='"+req.params['rfq_lines_id']+"' LIMIT 1";
 	connection.query(query_1, function(err, rfq_lines){
 		if(err){
 			console.log(err);
@@ -359,7 +359,7 @@ exports.tendering_calculate_sales_price = function(req, res){
 								else{
 									if(product_cost_data.length>0)
 										product_cost_data[0]["extra_engineering_hours"]=0;
-									res.json({"statusCode": 200, "success":"true", "message": "", "product_cost_data": product_cost_data, "overheads": overheads, "complexities": complexities});
+									res.json({"statusCode": 200, "success":"true", "message": "", "product_cost_data": product_cost_data, "overheads": overheads, "complexities": complexities, "rfq_lines": rfq_lines});
 								}
 							});
 						}
