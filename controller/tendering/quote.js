@@ -349,7 +349,8 @@ exports.tendering_calculate_sales_price = function(req, res){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND `complexities_id`='"+req.params['complexities_id']+"'";
+							// var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND `complexities_id`='"+req.params['complexities_id']+"'";
+							var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND `complexities_id`='3'";
 							connection.query(query_1, function(err, complexities){
 								if(err){
 									console.log(err);

@@ -242,8 +242,8 @@ exports.tendering_submit_rfq_to_sales = function(req, res, next){
 
 exports.tendering_calculate_sales_price = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_lines_id", "complexities_id", "product_design_id"];
-	// var fields = ["user_id", "rfq_lines_id", "plants_id", "complexities_id"];
+	var fields = ["user_id", "rfq_lines_id", "product_design_id"];
+	// var fields = ["user_id", "rfq_lines_id", "complexities_id", "product_design_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
