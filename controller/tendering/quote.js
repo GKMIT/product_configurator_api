@@ -325,33 +325,47 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 };
 
 exports.tendering_calculate_sales_price = function(req, res){
-	var query_1="SELECT `material_cost`, `labour_cost`, `no_of_labour_hours` FROM `rfq_lines` WHERE `id`='"+req.params['rfq_lines_id']+"' LIMIT 1";
-	connection.query(query_1, function(err, rfq_lines_data){
+	var query_1="SELECT `plants_id`, EXTRACT(YEAR FROM req_delivery_date) as year, EXTRACT(MONTH FROM req_delivery_date) as month FROM `rfq_lines` WHERE `id`='"+req.params['rfq_lines_id']+"' LIMIT 1";
+	connection.query(query_1, function(err, rfq_lines){
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			var query_1="SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+req.params['plants_id']+"'";
-			connection.query(query_1, function(err, overheads){
+			var quarter=Math.ceil(rfq_lines[0].month/3);
+			var year=rfq_lines[0].year;
+			var query_1="SELECT `labor_cost`, `labor_hours`, `material_cost` FROM `product_designs_costs` WHERE product_design_id='"+req.params['product_design_id']+"' AND year='"+year+"' AND quarter='"+quarter+"' LIMIT 1";
+			connection.query(query_1, function(err, product_cost_data){
 				if(err){
 					console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+req.params['plants_id']+"' AND `complexities_id`='"+req.params['complexities_id']+"'";
-					connection.query(query_1, function(err, complexities){
+					var plants_id=rfq_lines[0].plants_id;
+					var query_1="SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+plants_id+"'";
+					connection.query(query_1, function(err, overheads){
 						if(err){
 							console.log(err);
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							rfq_lines_data[0]["extra_engineering_hours"]=0;
-							res.json({"statusCode": 200, "success":"true", "message": "", "rfq_lines_data": rfq_lines_data, "overheads": overheads, "complexities": complexities});
+							var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND `complexities_id`='"+req.params['complexities_id']+"'";
+							connection.query(query_1, function(err, complexities){
+								if(err){
+									console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									if(product_cost_data.length>0)
+										product_cost_data[0]["extra_engineering_hours"]=0;
+									res.json({"statusCode": 200, "success":"true", "message": "", "product_cost_data": product_cost_data, "overheads": overheads, "complexities": complexities});
+								}
+							});
 						}
 					});
 				}
 			});
+			
 		}
 	});
 };
