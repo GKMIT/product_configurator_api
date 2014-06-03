@@ -172,7 +172,7 @@ exports.full_rfq_detail = function(req, res, next){
 		}
 	}
 	if(checkValid==1){
-		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.params.user_id, function(err, organization_users) {
+		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.params.user_id+" LIMIT 1", function(err, organization_users) {
 			if(err){
 				console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});

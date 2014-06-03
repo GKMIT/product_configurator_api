@@ -121,7 +121,8 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 							if(req.body.properties[i].id==range_prop_arr[j]){
 								rangefilter.push(req.body.properties[i]);
 								rangefilterids+=req.body.properties[i].id+",";
-								range_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"') AND";
+								// range_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"') AND";
+								range_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND minimum_value <= '"+req.body.properties[i].value+"' AND maximum_value >= '"+req.body.properties[i].value+"' ) AND";
 							}
 						};
 					};
