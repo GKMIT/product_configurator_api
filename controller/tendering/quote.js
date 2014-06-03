@@ -33,35 +33,52 @@ exports.tendering_fetch_particular_quote = function(req, res){
 					var counter=0;
 					// var counter1=0;
 					var counter2=0;
-					for (var i = 0; i < rfq_lines.length; i++) {
-						connection.query("SELECT `rlts`.`id`, `rlts`.`rfq_lines_id`, `rlts`.`product_properties_id`, `rlts`.`value`, `rlts`.`remark`, `pp`.`property_name`, `pp`.`unit_of_measurement`, `pp`.`data_type` FROM `rfq_lines_technical_specs` `rlts` LEFT JOIN `product_properties` `pp` ON `rlts`.`product_properties_id`=`pp`.id WHERE `rfq_lines_id`='"+rfq_lines[i].id+"'", function(err, rfq_lines_technical_specs) {
-							if(err){
-								console.log(err);
+					connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities){
+						if(err){
+							console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+						}
+						else{
+							connection.query("SELECT `id`, `name` FROM `product_types`", function(err, product_types){
+								if(err){
+									console.log(err);
 									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-							}
-							else{
-								// , `product_designs`.`acc`
-								var loopCounter=0;
-								var quarter=Math.ceil(rfq_lines[counter].month/3);
-								connection.query("SELECT `product_designs`.`id` as `product_design_id`, `product_designs`.`product_lines_id`, `product_designs`.`material_code`, `product_designs`.`design_number`, `product_designs`.`design_variant`, `product_designs`.`design_version`, `product_designs_costs`.`id` as `product_designs_costs_id`, `product_designs_costs`.`year`, `product_designs_costs`.`quarter`, `product_designs_costs`.`currency`, `product_designs_costs`.`labor_cost`, `product_designs_costs`.`labor_hours`, `product_designs_costs`.`material_cost` FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.id=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`quarter`='"+quarter+"' AND `product_designs_costs`.`year`='"+rfq_lines[counter].year+"' WHERE `product_designs`.id='"+rfq_lines[counter].product_designs_id+"' LIMIT 1", function(err, product_design_detail) {
-									if(err){
-										console.log(err);
-											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-									}
-									else{
-										complete_rfq_lines[counter2]["rfq_lines_technical_specs"]=rfq_lines_technical_specs;
-										complete_rfq_lines[counter2]["product_design_detail"]=product_design_detail;
-										counter2++;
-										if(counter2==rfq_lines.length){
-											res.json({"statusCode": 200, "success":"true", "message": "","rfq":rfq ,"rfq_lines":complete_rfq_lines});
+								}
+								else{
+									for (var i = 0; i < rfq_lines.length; i++) {
+									connection.query("SELECT `rlts`.`id`, `rlts`.`rfq_lines_id`, `rlts`.`product_properties_id`, `rlts`.`value`, `rlts`.`remark`, `pp`.`property_name`, `pp`.`unit_of_measurement`, `pp`.`data_type` FROM `rfq_lines_technical_specs` `rlts` LEFT JOIN `product_properties` `pp` ON `rlts`.`product_properties_id`=`pp`.id WHERE `rfq_lines_id`='"+rfq_lines[i].id+"'", function(err, rfq_lines_technical_specs) {
+										if(err){
+											console.log(err);
+												res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 										}
-									}
-									// counter1++;
-								});
-							counter++;
-							}
-						});
-					};
+										else{
+											// , `product_designs`.`acc`
+											var loopCounter=0;
+											var quarter=Math.ceil(rfq_lines[counter].month/3);
+											connection.query("SELECT `product_designs`.`id` as `product_design_id`, `product_designs`.`product_lines_id`, `product_designs`.`material_code`, `product_designs`.`design_number`, `product_designs`.`design_variant`, `product_designs`.`design_version`, `product_designs_costs`.`id` as `product_designs_costs_id`, `product_designs_costs`.`year`, `product_designs_costs`.`quarter`, `product_designs_costs`.`currency`, `product_designs_costs`.`labor_cost`, `product_designs_costs`.`labor_hours`, `product_designs_costs`.`material_cost` FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.id=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`quarter`='"+quarter+"' AND `product_designs_costs`.`year`='"+rfq_lines[counter].year+"' WHERE `product_designs`.id='"+rfq_lines[counter].product_designs_id+"' LIMIT 1", function(err, product_design_detail) {
+												if(err){
+													console.log(err);
+														res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+												}
+												else{
+													complete_rfq_lines[counter2]["rfq_lines_technical_specs"]=rfq_lines_technical_specs;
+													complete_rfq_lines[counter2]["product_design_detail"]=product_design_detail;
+													counter2++;
+													if(counter2==rfq_lines.length){
+														res.json({"statusCode": 200, "success":"true", "message": "","rfq":rfq ,"rfq_lines":complete_rfq_lines, "complexities":complexities, "product_types": product_types});
+													}
+												}
+												// counter1++;
+											});
+										counter++;
+										}
+									});
+								};
+								}
+							});
+						}
+					});
+					
 				}
 			});
 		}
