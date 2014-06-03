@@ -20,7 +20,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
+			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id`, `r_lines`.`minimum_sales_price`, `r_lines`.`rfq_lines_calculated_sales_price_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
 					console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -432,7 +432,23 @@ exports.tendering_save_calculated_sales_price = function(req, res){
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
-						res.json({"statusCode": 200, "success":"true", "message": "data inserted"});
+						connection.query("SELECT `id` FROM `rfq_lines_calculated_sales_price` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'", function(err, sales_price_detail){
+							if(err){
+								console.log(err);
+								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							}
+							else{
+								connection.query("UPDATE `rfq_lines` SET `minimum_sales_price`='"+req.body.minimum_sales_price_to_customer+"', `rfq_lines_calculated_sales_price_id`='"+sales_price_detail[0].id+"' WHERE `id`='"+req.body.rfq_lines_id+"'", function(err, info){
+									if(err){
+										console.log(err);
+										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+									}
+									else{
+										res.json({"statusCode": 200, "success":"true", "message": "data inserted"});
+									}
+								});
+							}
+						});
 					}
 				});
 			}
@@ -451,3 +467,37 @@ exports.tendering_get_sales_price_detail = function(req, res){
 		}
 	});
 };
+
+// exports.tendering_full_view_quote_detail = function(req, res){
+// 	var query_1 = "SELECT * FROM `rfq` LEFT JOIN `plants` ON `rfq`.`plants_id`=`plants`.`id` WHERE `id`='"+req.params.rfq_id+"'";
+// 	connection.query(query_1, function(err, rfq){
+// 		if(err){
+// 			console.log(err);
+// 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+// 		}
+// 		else{
+// 			Q1="`product_designs` ON `product_designs`.`id`=`rfq_lines`.`product_designs_id`";
+// 			Q2="`rfq_lines_calculated_sales_price` ON `rfq_lines`.`id`=`rfq_lines_calculated_sales_price`.`rfq_lines_id`";
+// 			// Q3="`complexities` ON `complexities`.`id`=`rfq_lines_calculated_sales_price`.`complexities_id`";
+// 			var query_2 = "SELECT * FROM `rfq_lines` LEFT JOIN "+Q1+" LEFT JOIN "+Q2+" WHERE `rfq_lines`.`rfq_id`='"+req.params.rfq_id+"'";
+// 			connection.query(query_2, function(err, rfq_lines){
+// 				if(err){
+// 					console.log(err);
+// 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+// 				}
+// 				else{
+// 					// discuss for save complexity_id
+// 					// for the complexity
+// 					// pick plant id from first query
+// 					// otherwise need a loop
+// 						Q1="SELECT product_lines_id FROM `rfq_lines` WHERE id='"+req.params['rfq_lines_id']+"'";
+// 						Q2="SELECT id FROM  `product_properties` WHERE property_name='complexity' AND product_lines_id IN ("+Q1+")";
+// 						Q3="SELECT value FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params['rfq_lines_id']+"' AND product_properties_id IN ("+Q2+")";
+// 						Q4="SELECT id FROM complexities WHERE name=("+Q3+")";
+// 						Q5="SELECT `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND complexities_id IN ("+Q4+")";
+// 						// connection.query();
+// 				}
+// 			});
+// 		}
+// 	});
+// };
