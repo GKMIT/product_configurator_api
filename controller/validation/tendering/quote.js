@@ -286,15 +286,16 @@ exports.tendering_save_calculated_sales_price = function(req, res, next){
 	var checkValid=1;
 	// var fields = ["user_id", "rfq_id", "rfq_status_id"];
 	// , "plants_id", 
-	var fields= ["complexities_id", "user_id", "product_design_id", "rfq_lines_id", "material_cost", "labor_cost", "labor_hours", "extra_engineering_cost", "dcp", "cost_packaging", "packaging_cost_transformer", "extra_packaging_costs_build_of_parts", "packaging", "engineering_overheads", "plant_overheads", "site_overheads", "regional_overheads", "product_line_overheads", "corporate_overheads", "depreciation", "overheads", "frieght_f_term", "friegth_c_term", "friegth_d_term", "transport", "financial_cost_loc", "financial_cost_bonds", "maintenance_equipment", "administrative_cost_various", "extra_documentation_required", "supervision", "erection_comm", "factory_training", "onsite_training", "warranty_on_full_cost", "extra_cost", "full_cost_excluding_commision", "ebit_percentage", "ebit", "commission_on_net_sales_price", "commission_on_f_term", "commission_on_gross_sales", "commission", "minimum_intercompany_sales", "minimum_sales_price_to_customer", "acc", "acc_factor"];
+	// , "material_cost", "labor_cost", "labor_hours", "extra_engineering_cost", "dcp", "cost_packaging", "packaging_cost_transformer", "extra_packaging_costs_build_of_parts", "packaging", "engineering_overheads", "plant_overheads", "site_overheads", "regional_overheads", "product_line_overheads", "corporate_overheads", "depreciation", "overheads", "frieght_f_term", "friegth_c_term", "friegth_d_term", "transport", "financial_cost_loc", "financial_cost_bonds", "maintenance_equipment", "administrative_cost_various", "extra_documentation_required", "supervision", "erection_comm", "factory_training", "onsite_training", "warranty_on_full_cost", "extra_cost", "full_cost_excluding_commision", "ebit_percentage", "ebit", "commission_on_net_sales_price", "commission_on_f_term", "commission_on_gross_sales", "commission", "minimum_intercompany_sales", "minimum_sales_price_to_customer", "acc", "acc_factor"
+	var fields= ["complexities_id", "user_id", "product_design_id", "rfq_lines_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			// || req.body[fields[i]]==""
-			if(typeof req.body[fields[i]]=="undefined" || !validator.isNumeric(req.body[fields[i]])){
+			//  || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])
+			if(typeof req.body[fields[i]]=="undefined"){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not found"});
 				break;
