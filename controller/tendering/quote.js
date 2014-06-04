@@ -355,7 +355,8 @@ exports.tendering_calculate_sales_price = function(req, res){
 		else{
 			var quarter=Math.ceil(rfq_lines[0].month/3);
 			var year=rfq_lines[0].year;
-			var query_1="SELECT `labor_cost`, `labor_hours`, `material_cost` FROM `product_designs_costs` WHERE product_design_id='"+req.params['product_design_id']+"' AND year='"+year+"' AND quarter='"+quarter+"' LIMIT 1";
+			var query_1="SELECT `labor_cost`, `labor_hours`, `material_cost`, `currency` FROM `product_designs_costs` WHERE product_design_id='"+req.params['product_design_id']+"' AND year='"+year+"' AND quarter='"+quarter+"' LIMIT 1";
+			console.log("SELECT `labor_cost`, `labor_hours`, `material_cost`, `currency` FROM `product_designs_costs` WHERE product_design_id='"+req.params['product_design_id']+"' AND year='"+year+"' AND quarter='"+quarter+"' LIMIT 1");
 			connection.query(query_1, function(err, product_cost_data){
 				if(err){
 					console.log(err);
@@ -375,8 +376,8 @@ exports.tendering_calculate_sales_price = function(req, res){
 							Q1="SELECT product_lines_id FROM `rfq_lines` WHERE id='"+req.params['rfq_lines_id']+"'";
 							Q2="SELECT id FROM  `product_properties` WHERE property_name='complexity' AND product_lines_id IN ("+Q1+")";
 							Q3="SELECT value FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params['rfq_lines_id']+"' AND product_properties_id IN ("+Q2+")";
-							Q4="SELECT id FROM complexities WHERE name=("+Q3+")";
-							Q5="SELECT `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND complexities_id IN ("+Q4+")";
+							//Q4="SELECT id FROM complexities WHERE name=("+Q3+")";
+							Q5="SELECT `complexities_id`, `plants_id`, `overhead`, `complexities`.`name` as `complexity_name` FROM `complexities_master_data` LEFT JOIN `complexities` ON `complexities`.`id`=`complexities_master_data`.`complexities_id` WHERE `plants_id`='"+plants_id+"' AND complexities_id ='"+req.params.complexity_id+"'";
 
 							connection.query(Q5, function(err, complexities){
 								if(err){
@@ -468,36 +469,37 @@ exports.tendering_get_sales_price_detail = function(req, res){
 	});
 };
 
-// exports.tendering_full_view_quote_detail = function(req, res){
-// 	var query_1 = "SELECT * FROM `rfq` LEFT JOIN `plants` ON `rfq`.`plants_id`=`plants`.`id` WHERE `id`='"+req.params.rfq_id+"'";
-// 	connection.query(query_1, function(err, rfq){
-// 		if(err){
-// 			console.log(err);
-// 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-// 		}
-// 		else{
-// 			Q1="`product_designs` ON `product_designs`.`id`=`rfq_lines`.`product_designs_id`";
-// 			Q2="`rfq_lines_calculated_sales_price` ON `rfq_lines`.`id`=`rfq_lines_calculated_sales_price`.`rfq_lines_id`";
-// 			// Q3="`complexities` ON `complexities`.`id`=`rfq_lines_calculated_sales_price`.`complexities_id`";
-// 			var query_2 = "SELECT * FROM `rfq_lines` LEFT JOIN "+Q1+" LEFT JOIN "+Q2+" WHERE `rfq_lines`.`rfq_id`='"+req.params.rfq_id+"'";
-// 			connection.query(query_2, function(err, rfq_lines){
-// 				if(err){
-// 					console.log(err);
-// 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-// 				}
-// 				else{
-// 					// discuss for save complexity_id
-// 					// for the complexity
-// 					// pick plant id from first query
-// 					// otherwise need a loop
-// 						Q1="SELECT product_lines_id FROM `rfq_lines` WHERE id='"+req.params['rfq_lines_id']+"'";
-// 						Q2="SELECT id FROM  `product_properties` WHERE property_name='complexity' AND product_lines_id IN ("+Q1+")";
-// 						Q3="SELECT value FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params['rfq_lines_id']+"' AND product_properties_id IN ("+Q2+")";
-// 						Q4="SELECT id FROM complexities WHERE name=("+Q3+")";
-// 						Q5="SELECT `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND complexities_id IN ("+Q4+")";
-// 						// connection.query();
-// 				}
-// 			});
-// 		}
-// 	});
-// };
+exports.tendering_full_view_quote_detail = function(req, res){
+	var query_1 = "SELECT * FROM `rfq` LEFT JOIN `plants` ON `rfq`.`plants_id`=`plants`.`id` WHERE `id`='"+req.params.rfq_id+"'";
+	connection.query(query_1, function(err, rfq){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			Q1="`product_designs` ON `product_designs`.`id`=`rfq_lines`.`product_designs_id`";
+			Q2="`rfq_lines_calculated_sales_price` ON `rfq_lines`.`id`=`rfq_lines_calculated_sales_price`.`rfq_lines_id`";
+			Q3="`complexities` ON `complexities`.`id`=`rfq_lines_calculated_sales_price`.`complexities_id`";
+			var query_2 = "SELECT * FROM `rfq_lines` LEFT JOIN "+Q1+" LEFT JOIN "+Q2+" LEFT JOIN "+Q3+" WHERE `rfq_lines`.`rfq_id`='"+req.params.rfq_id+"'";
+			connection.query(query_2, function(err, rfq_lines){
+				if(err){
+					console.log(err);
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					res.json({"statusCode": 200, "success":"true", "message": "", "rfq": rfq, "rfq_lines": rfq_lines});
+				// 	// discuss for save complexity_id
+				// 	// for the complexity
+				// 	// pick plant id from first query
+				// 	// otherwise need a loop
+				// 		// Q1="SELECT product_lines_id FROM `rfq_lines` WHERE id='"+req.params['rfq_lines_id']+"'";
+				// 		// Q2="SELECT id FROM  `product_properties` WHERE property_name='complexity' AND product_lines_id IN ("+Q1+")";
+				// 		// Q3="SELECT value FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params['rfq_lines_id']+"' AND product_properties_id IN ("+Q2+")";
+				// 		// Q4="SELECT id FROM complexities WHERE name=("+Q3+")";
+				// 		// Q5="SELECT `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND complexities_id IN ("+Q4+")";
+				// 		// connection.query();
+				}
+			});
+		}
+	});
+};
