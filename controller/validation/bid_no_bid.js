@@ -177,21 +177,9 @@ exports.full_rfq_detail = function(req, res, next){
 				console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 			}
-			else{
+			else{;
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM rfq WHERE `rfq`.`rfq_status_id`='2' AND `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
-						if(err){
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if (rfq.length>0) {
-								next();
-							}
-							else{
-								res.json({"statusCode": 401, "success":"false", "message": "invalid access"});
-							}
-						}
-					});
+					next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
