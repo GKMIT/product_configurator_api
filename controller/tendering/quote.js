@@ -445,7 +445,7 @@ exports.tendering_save_calculated_sales_price = function(req, res){
 										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 									}
 									else{
-										res.json({"statusCode": 200, "success":"true", "message": "data inserted"});
+										res.json({"statusCode": 200, "success":"true", "message": "data inserted", "rfq_lines_calculated_sales_price_id":sales_price_detail[0].id});
 									}
 								});
 							}
