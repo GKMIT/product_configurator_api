@@ -420,7 +420,7 @@ exports.tendering_save_calculated_sales_price = function(req, res){
 				}
 				else{
 					// `plants_id`, `complexities_id`,
-					query_1="INSERT INTO `rfq_lines_calculated_sales_price`(`product_design_id`, `rfq_lines_id`, `material_cost`, `labor_cost`, `labor_hours`, `extra_engineering_cost`, `dcp`, `cost_packaging`, `packaging_cost_transformer`, `extra_packaging_costs_build_of_parts`, `packaging`, `engineering_overheads`, `plant_overheads`, `site_overheads`, `regional_overheads`, `product_line_overheads`, `corporate_overheads`, `depreciation`, `overheads`, `frieght_f_term`, `friegth_c_term`, `friegth_d_term`, `transport`, `financial_cost_loc`, `financial_cost_bonds`, `maintenance_equipment`, `administrative_cost_various`, `extra_documentation_required`, `supervision`, `erection_comm`, `factory_training`, `onsite_training`, `warranty_on_full_cost`, `extra_cost`, `full_cost_excluding_commision`, `ebit_percentage`, `ebit`, `commission_on_net_sales_price`, `commission_on_f_term`, `commission_on_gross_sales`, `commission`, `minimum_intercompany_sales`, `minimum_sales_price_to_customer`) VALUES (";
+					query_1="INSERT INTO `rfq_lines_calculated_sales_price`(`complexities_id`, `product_design_id`, `rfq_lines_id`, `material_cost`, `labor_cost`, `labor_hours`, `extra_engineering_cost`, `dcp`, `cost_packaging`, `packaging_cost_transformer`, `extra_packaging_costs_build_of_parts`, `packaging`, `engineering_overheads`, `plant_overheads`, `site_overheads`, `regional_overheads`, `product_line_overheads`, `corporate_overheads`, `depreciation`, `overheads`, `frieght_f_term`, `friegth_c_term`, `friegth_d_term`, `transport`, `financial_cost_loc`, `financial_cost_bonds`, `maintenance_equipment`, `administrative_cost_various`, `extra_documentation_required`, `supervision`, `erection_comm`, `factory_training`, `onsite_training`, `warranty_on_full_cost`, `extra_cost`, `full_cost_excluding_commision`, `ebit_percentage`, `ebit`, `commission_on_net_sales_price`, `commission_on_f_term`, `commission_on_gross_sales`, `commission`, `minimum_intercompany_sales`, `minimum_sales_price_to_customer`) VALUES (";
 					for (var i = 0; i < fields.length; i++) {
 						query_1+="'"+req.body[fields[i]]+"', ";
 					};
@@ -488,16 +488,6 @@ exports.tendering_full_view_quote_detail = function(req, res){
 				}
 				else{
 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq": rfq, "rfq_lines": rfq_lines});
-				// 	// discuss for save complexity_id
-				// 	// for the complexity
-				// 	// pick plant id from first query
-				// 	// otherwise need a loop
-				// 		// Q1="SELECT product_lines_id FROM `rfq_lines` WHERE id='"+req.params['rfq_lines_id']+"'";
-				// 		// Q2="SELECT id FROM  `product_properties` WHERE property_name='complexity' AND product_lines_id IN ("+Q1+")";
-				// 		// Q3="SELECT value FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params['rfq_lines_id']+"' AND product_properties_id IN ("+Q2+")";
-				// 		// Q4="SELECT id FROM complexities WHERE name=("+Q3+")";
-				// 		// Q5="SELECT `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND complexities_id IN ("+Q4+")";
-				// 		// connection.query();
 				}
 			});
 		}

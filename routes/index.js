@@ -80,6 +80,8 @@ module.exports = function(){
 
 	app.post("/tendering_save_calculated_sales_price", tendering_validation.tendering_save_calculated_sales_price, tendering_calls.tendering_save_calculated_sales_price);
 	app.get("/tendering_get_sales_price_detail/:user_id/:rfq_lines_id", tendering_validation.tendering_get_sales_price_detail, tendering_calls.tendering_get_sales_price_detail);
+	// api for the full rfq Detail
+	// app.get("/tendering_full_view_quote_detail/:user_id/:rfq_lines_id", tendering_validation.tendering_get_sales_price_detail, tendering_calls.tendering_get_sales_price_detail);
 
 	app.put("/tendering_submit_rfq_lines", tendering_validation.tendering_submit_rfq_lines, tendering_calls.tendering_submit_rfq_lines);
 	app.put("/tendering_submit_rfq_to_sales", tendering_validation.tendering_submit_rfq_to_sales, tendering_calls.tendering_submit_rfq_to_sales);
