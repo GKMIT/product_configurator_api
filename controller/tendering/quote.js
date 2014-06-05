@@ -152,12 +152,22 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					range_query=range_query.substring("", range_query.length-3);
 					var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
 					var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
-					var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_2+") AND "+range_query;
-					var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_2+")";
+					var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_1+") AND "+equal_query+" AND "+range_query;
+					
 					if(rangefilter.length>0){
 						final_query="SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
 					}
-					
+					else{
+						var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_2+")";
+					}
+					// var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
+					// var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
+					// var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_2+") AND "+range_query;
+					// var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_2+")";
+					// if(rangefilter.length>0){
+					// 	final_query="SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
+					// }
+					// console.log(final_query);
 					connection.query(final_query, function(err, product_designs){
 						if(err){
 							console.log(err);
@@ -469,27 +479,46 @@ exports.tendering_get_sales_price_detail = function(req, res){
 	});
 };
 
-exports.tendering_full_view_quote_detail = function(req, res){
-	var query_1 = "SELECT * FROM `rfq` LEFT JOIN `plants` ON `rfq`.`plants_id`=`plants`.`id` WHERE `id`='"+req.params.rfq_id+"'";
-	connection.query(query_1, function(err, rfq){
+// exports.tendering_full_view_quote_detail = function(req, res){
+// 	var query_1 = "SELECT * FROM `rfq` LEFT JOIN `plants` ON `rfq`.`plants_id`=`plants`.`id` WHERE `id`='"+req.params.rfq_id+"'";
+// 	connection.query(query_1, function(err, rfq){
+// 		if(err){
+// 			console.log(err);
+// 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+// 		}
+// 		else{
+// 			Q1="`product_designs` ON `product_designs`.`id`=`rfq_lines`.`product_designs_id`";
+// 			Q2="`rfq_lines_calculated_sales_price` ON `rfq_lines`.`id`=`rfq_lines_calculated_sales_price`.`rfq_lines_id`";
+// 			Q3="`complexities` ON `complexities`.`id`=`rfq_lines_calculated_sales_price`.`complexities_id`";
+// 			var query_2 = "SELECT * FROM `rfq_lines` LEFT JOIN "+Q1+" LEFT JOIN "+Q2+" LEFT JOIN "+Q3+" WHERE `rfq_lines`.`rfq_id`='"+req.params.rfq_id+"'";
+// 			connection.query(query_2, function(err, rfq_lines){
+// 				if(err){
+// 					console.log(err);
+// 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+// 				}
+// 				else{
+// 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq": rfq, "rfq_lines": rfq_lines});
+// 				}
+// 			});
+// 		}
+// 	});
+// };
+
+
+exports.tendering_view_calculated_sales_price = function(req, res){
+	query_1="SELECT * FROM `rfq_lines_calculated_sales_price` WHERE `rfq_lines_id`='"+req.params.rfq_lines_calculated_sales_price_id+"'";
+	connection.query(query_1, function(err, info){
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			Q1="`product_designs` ON `product_designs`.`id`=`rfq_lines`.`product_designs_id`";
-			Q2="`rfq_lines_calculated_sales_price` ON `rfq_lines`.`id`=`rfq_lines_calculated_sales_price`.`rfq_lines_id`";
-			Q3="`complexities` ON `complexities`.`id`=`rfq_lines_calculated_sales_price`.`complexities_id`";
-			var query_2 = "SELECT * FROM `rfq_lines` LEFT JOIN "+Q1+" LEFT JOIN "+Q2+" LEFT JOIN "+Q3+" WHERE `rfq_lines`.`rfq_id`='"+req.params.rfq_id+"'";
-			connection.query(query_2, function(err, rfq_lines){
-				if(err){
-					console.log(err);
-					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-				}
-				else{
-					res.json({"statusCode": 200, "success":"true", "message": "", "rfq": rfq, "rfq_lines": rfq_lines});
-				}
-			});
+			if(info.length==0){
+				res.json({"statusCode": 200, "success":"true", "message": "calculated sales price not found", "info": []});
+			}
+			else{
+				res.json({"statusCode": 200, "success":"true", "message": "", "info": info});
+			}
 		}
 	});
 };
