@@ -105,9 +105,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 				var range_tech_detail=new Array();
 				var equalfilterids="";
 				var rangefilterids="";
-				equal_query="";
-				range_query="";
-
+				query="";
 				var mandatoryfilter=new Array();
 				var mandatory_prop_arr=mandatory_prop.split(",");
 				for (var i = 0; i < req.body.properties.length; i++) {
@@ -128,46 +126,19 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					var equal_prop_arr=equal_prop.split(",");
 					var range_prop_arr=range_prop.split(",");
 					for (var i = 0; i < req.body.properties.length; i++) {
-						for (var j = 0; j < equal_prop_arr.length; j++) {
-							if(req.body.properties[i].id==equal_prop_arr[j]){
-								equalfilter.push(req.body.properties[i]);
-								equalfilterids+=req.body.properties[i].id+",";
-								equal_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"') AND";
-							}
-						};
+						 	if (equal_prop_arr.indexOf(req.body.properties[i].id) != -1) {
+						 		query+="  (product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"') OR";
+						 	}
+						 	else if (range_prop_arr.indexOf(req.body.properties[i].id) != -1) {
+						 		query+=" (product_properties_id='"+req.body.properties[i].id+"' AND  minimum_value <= '"+req.body.properties[i].value+"' AND maximum_value >= '"+req.body.properties[i].value+"' ) OR";
+						 	}
 					};
-					for (var i = 0; i < req.body.properties.length; i++) {
-						for (var j = 0; j < range_prop_arr.length; j++) {
-							if(req.body.properties[i].id==range_prop_arr[j]){
-								rangefilter.push(req.body.properties[i]);
-								rangefilterids+=req.body.properties[i].id+",";
-								// range_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND spec_value='"+req.body.properties[i].value+"') AND";
-								range_query+=" product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE product_properties_id='"+req.body.properties[i].id+"' AND minimum_value <= '"+req.body.properties[i].value+"' AND maximum_value >= '"+req.body.properties[i].value+"' ) AND";
-							}
-						};
-					};
-					equalfilterids=equalfilterids.substring("", equalfilterids.length-1);
-					rangefilterids=rangefilterids.substring("", rangefilterids.length-1);
-					equal_query=equal_query.substring("", equal_query.length-3);
-					range_query=range_query.substring("", range_query.length-3);
-					var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
-					var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
-					var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_1+") AND "+equal_query+" AND "+range_query;
+					query=query.substring("", query.length-2);
+					var pre_query = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version` AND `pd`.`id`=`pdc`.`product_design_id`";
+					var post_query = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+pre_query+") AND product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE "+query+" GROUP BY product_design_id HAVING count(*) = "+req.body.properties.length+")";
 					
-					if(rangefilter.length>0){
-						final_query="SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
-					}
-					else{
-						var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_2+")";
-					}
-					// var query_1 = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version`";
-					// var query_2 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details` WHERE `product_design_id` IN ("+query_1+") AND "+equal_query;
-					// var query_3 = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+query_2+") AND "+range_query;
-					// var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+query_2+")";
-					// if(rangefilter.length>0){
-					// 	final_query="SELECT distinct id FROM `product_designs` WHERE id IN ("+query_3+")";
-					// }
-					// console.log(final_query);
+					var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+post_query+")";
+					console.log(final_query);
 					connection.query(final_query, function(err, product_designs){
 						if(err){
 							console.log(err);

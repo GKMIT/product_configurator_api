@@ -381,11 +381,19 @@ exports.fetch_property_detail = function(req, res, next){
 		else{
 			var flag=0;
 			var query="SELECT id, name FROM ";
-			if(req.params.property_id==2){
+			// if(req.params.property_id==2){
+			// 	query+="product_types";
+			// 	flag=1;
+			// }
+			// else if(req.params.property_id==3){
+			// 	query+="complexities";
+			// 	flag=1;
+			// }
+			if(req.params.property_id==1){
 				query+="product_types";
 				flag=1;
 			}
-			else if(req.params.property_id==3){
+			else if(req.params.property_id==2){
 				query+="complexities";
 				flag=1;
 			}
