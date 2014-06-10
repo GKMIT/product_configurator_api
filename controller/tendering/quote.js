@@ -337,40 +337,22 @@ exports.tendering_calculate_sales_price = function(req, res){
 			var quarter=Math.ceil(rfq_lines[0].month/3);
 			var year=rfq_lines[0].year;
 			var query_1="SELECT `labor_cost`, `labor_hours`, `material_cost`, `currency` FROM `product_designs_costs` WHERE product_design_id='"+req.params['product_design_id']+"' AND year='"+year+"' AND quarter='"+quarter+"' LIMIT 1";
-			console.log("SELECT `labor_cost`, `labor_hours`, `material_cost`, `currency` FROM `product_designs_costs` WHERE product_design_id='"+req.params['product_design_id']+"' AND year='"+year+"' AND quarter='"+quarter+"' LIMIT 1");
 			connection.query(query_1, function(err, product_cost_data){
 				if(err){
 					console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					var plants_id=rfq_lines[0].plants_id;
-					var query_1="SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+plants_id+"'";
-					connection.query(query_1, function(err, overheads){
+					Q1="SELECT id, name FROM `complexities`";
+					connection.query(Q1, function(err, complexities){
 						if(err){
 							console.log(err);
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							// var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND `complexities_id`='"+req.params['complexities_id']+"'";
-							// var query_1="SELECT `id`, `complexities_id`, `plants_id`, `overhead` FROM `complexities_master_data` WHERE `plants_id`='"+plants_id+"' AND `complexities_id`='3'";
-							Q1="SELECT product_lines_id FROM `rfq_lines` WHERE id='"+req.params['rfq_lines_id']+"'";
-							Q2="SELECT id FROM  `product_properties` WHERE property_name='complexity' AND product_lines_id IN ("+Q1+")";
-							Q3="SELECT value FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params['rfq_lines_id']+"' AND product_properties_id IN ("+Q2+")";
-							//Q4="SELECT id FROM complexities WHERE name=("+Q3+")";
-							Q5="SELECT `complexities_id`, `plants_id`, `overhead`, `complexities`.`name` as `complexity_name` FROM `complexities_master_data` LEFT JOIN `complexities` ON `complexities`.`id`=`complexities_master_data`.`complexities_id` WHERE `plants_id`='"+plants_id+"' AND complexities_id ='"+req.params.complexity_id+"'";
-
-							connection.query(Q5, function(err, complexities){
-								if(err){
-									console.log(err);
-									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-								}
-								else{
-									if(product_cost_data.length>0)
-										product_cost_data[0]["extra_engineering_hours"]=0;
-									res.json({"statusCode": 200, "success":"true", "message": "", "product_cost_data": product_cost_data, "overheads": overheads, "complexities": complexities, "rfq_lines": rfq_lines});
-								}
-							});
+							if(product_cost_data.length>0)
+								product_cost_data[0]["extra_engineering_hours"]=0;
+							res.json({"statusCode": 200, "success":"true", "message": "", "product_cost_data": product_cost_data, "complexities": complexities, "rfq_lines": rfq_lines});
 						}
 					});
 				}
