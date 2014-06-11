@@ -33,13 +33,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 					var counter=0;
 					// var counter1=0;
 					var counter2=0;
-					connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities){
-						if(err){
-							console.log(err);
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							connection.query("SELECT `id`, `name` FROM `product_types`", function(err, product_types){
+					connection.query("SELECT `id`, `name` FROM `product_types`", function(err, product_types){
 								if(err){
 									console.log(err);
 									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -65,7 +59,23 @@ exports.tendering_fetch_particular_quote = function(req, res){
 													complete_rfq_lines[counter2]["product_design_detail"]=product_design_detail;
 													counter2++;
 													if(counter2==rfq_lines.length){
-														res.json({"statusCode": 200, "success":"true", "message": "","rfq":rfq ,"rfq_lines":complete_rfq_lines, "complexities":complexities, "product_types": product_types});
+														 if(checkComplexity(complete_rfq_lines[0].rfq_lines_technical_specs)){
+														 	console.log("okaoksoksoksokokokokokokokook")
+														 	connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities){
+																if(err){
+																	console.log(err);
+																	res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+																}
+																else{
+																	res.json({"statusCode": 200, "success":"true", "message": "","rfq":rfq ,"rfq_lines":complete_rfq_lines, "complexities":complexities, "product_types": product_types});
+																}
+															});
+														 }
+														 else{
+														 	res.json({"statusCode": 200, "success":"true", "message": "","rfq":rfq ,"rfq_lines":complete_rfq_lines, "complexities":[], "product_types": product_types});
+														 }
+														
+														
 													}
 												}
 												// counter1++;
@@ -76,8 +86,15 @@ exports.tendering_fetch_particular_quote = function(req, res){
 								};
 								}
 							});
-						}
-					});
+					// connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities){
+					// 	if(err){
+					// 		console.log(err);
+					// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					// 	}
+					// 	else{
+							
+					// 	}
+					// });
 					
 				}
 			});
@@ -493,3 +510,25 @@ exports.tendering_view_calculated_sales_price = function(req, res){
 		}
 	});
 };
+
+
+// checkComplexity(complete_rfq_lines.rfq_lines[0].rfq_lines_technical_specs)
+function checkComplexity(object){
+	flag=false;
+	object.forEach(function(obj) {
+	  	// console.log('Result: ', match(obj, { "product_properties_id": '2'}));
+	  	if(match(obj, { "product_properties_id": '2'})){
+	  		flag=true;
+	  	}		
+	});
+	return flag;
+}
+
+// extra function 
+function match(item, filter) {
+  var keys = Object.keys(filter);
+  // true if any true
+  return keys.some(function (key) {
+    return item[key] == filter[key];
+  });
+}
