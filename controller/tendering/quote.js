@@ -550,6 +550,19 @@ exports.tendering_view_calculated_sales_price = function(req, res){
 	});
 };
 
+exports.tendering_rfq_lines_technical_spec_delete = function(req, res){
+	var delete_query="DELETE FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params.rfq_lines_id+"' AND `product_properties_id`='"+req.params.product_properties_id+"' LIMIT 1";
+	connection.query(delete_query, function(err, info){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "rfq_lines technical specification successfully deleted", "info": info});
+		}
+	});
+}
+
 
 // checkComplexity(complete_rfq_lines.rfq_lines[0].rfq_lines_technical_specs)
 function checkComplexity(object){

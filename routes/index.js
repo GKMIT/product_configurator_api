@@ -89,6 +89,8 @@ module.exports = function(){
 	app.put("/tendering_submit_rfq_lines", tendering_validation.tendering_submit_rfq_lines, tendering_calls.tendering_submit_rfq_lines);
 	app.put("/tendering_submit_rfq_to_sales", tendering_validation.tendering_submit_rfq_to_sales, tendering_calls.tendering_submit_rfq_to_sales);
 
+	app.delete("/tendering_rfq_lines_technical_spec_delete/:user_id/:rfq_lines_id/:product_properties_id", tendering_validation.tendering_rfq_lines_technical_spec_delete, tendering_calls.tendering_rfq_lines_technical_spec_delete);
+
 
 	// api for the sales_person for the quote finalize and follow up
 	var rfq_quote_calls=require('../controller/rfq/rfq_quote_finalize.js');
