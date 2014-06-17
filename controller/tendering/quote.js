@@ -59,8 +59,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 													complete_rfq_lines[counter2]["product_design_detail"]=product_design_detail;
 													counter2++;
 													if(counter2==rfq_lines.length){
-														 if(checkComplexity(complete_rfq_lines[0].rfq_lines_technical_specs)){
-														 	console.log("okaoksoksoksokokokokokokokook")
+														if(checkComplexity(complete_rfq_lines[0].rfq_lines_technical_specs)){
 														 	connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities){
 																if(err){
 																	console.log(err);
@@ -280,7 +279,7 @@ exports.tendering_submit_rfq_lines = function(req, res){
 	connection.query(query, function(err, info) {
 		if(err){
 			console.log(err);
-				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
 			if(info.affectedRows>0){
@@ -374,7 +373,6 @@ exports.tendering_calculate_sales_price = function(req, res){
 					});
 				}
 			});
-			
 		}
 	});
 };

@@ -48,7 +48,7 @@ exports.fetch_product_plants_properties = function(req, res){
 			res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `product_properties`.`id`, `product_properties`.`property_name` FROM `product_properties` WHERE  product_lines_id='"+req.params.product_lines_id+"'", function(err, product_properties) {
+			connection.query("SELECT `product_properties`.`id`, `product_properties`.`property_name`, `product_properties`.`data_type`, `product_properties`.`input_type` FROM `product_properties` WHERE  product_lines_id='"+req.params.product_lines_id+"'", function(err, product_properties) {
 				if(err){
 					console.log(err);
 						res.json({"statusCode":500, "success":"false", "message": "internal error"});
