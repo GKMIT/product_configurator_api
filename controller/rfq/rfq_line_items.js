@@ -65,7 +65,7 @@ exports.fetch_product_plants_properties = function(req, res){
 										res.json({"statusCode":500, "success":"false", "message": "internal error"});
 									}
 									else{
-										connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities) {
+										connection.query("SELECT `name` as `id`, `name` FROM `complexities`", function(err, complexities) {
 											if(err){
 												res.json({"statusCode":500, "success":"false", "message": "internal error"});
 											}
@@ -380,7 +380,7 @@ exports.fetch_property_detail = function(req, res, next){
 		}
 		else{
 			var flag=0;
-			var query="SELECT id, name FROM ";
+			var query="";
 			// if(req.params.property_id==2){
 			// 	query+="product_types";
 			// 	flag=1;
@@ -390,11 +390,11 @@ exports.fetch_property_detail = function(req, res, next){
 			// 	flag=1;
 			// }
 			if(req.params.property_id==1){
-				query+="product_types";
+				query+="SELECT `id`, `name` FROM `product_types`";
 				flag=1;
 			}
 			else if(req.params.property_id==2){
-				query+="complexities";
+				query+="SELECT `name` as `id`, `name` FROM `complexities`";
 				flag=1;
 			}
 			else{
