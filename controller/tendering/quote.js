@@ -102,7 +102,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 }
 
 exports.tendering_fetch_product_design_detail = function(req, res){
-	connection.query("SELECT `product_lines`.`id`, `product_lines`.`mandatory_properties`, `product_lines`.`equal_properties`, `product_lines`.`range_properties` FROM `product_lines` INNER JOIN `rfq_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"'", function(err, product_lines){
+	connection.query("SELECT `product_lines`.`id`, `product_lines`.`mandatory_properties`, `product_lines`.`equal_properties`, `product_lines`.`range_properties`, `rfq_lines`.`plants_id` FROM `product_lines` INNER JOIN `rfq_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE `rfq_lines`.`id`='"+req.body.rfq_lines_id+"'", function(err, product_lines){
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -150,7 +150,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 						 	}
 					};
 					query=query.substring("", query.length-2);
-					var pre_query = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version` AND `pd`.`id`=`pdc`.`product_design_id`";
+					var pre_query = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version` AND `pd`.`id`=`pdc`.`product_design_id` AND `pd`.`plants_id`='"+product_lines[0].plants_id+"'";
 					var post_query = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+pre_query+") AND product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE "+query+" GROUP BY product_design_id HAVING count(*) = "+req.body.properties.length+")";
 					
 					var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+post_query+")";
