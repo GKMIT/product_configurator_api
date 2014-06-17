@@ -275,28 +275,57 @@ exports.tendering_fetch_particular_design = function(req, res){
 }
 
 exports.tendering_submit_rfq_lines = function(req, res){
-	var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='2', `material_cost`='"+req.body.material_cost+"', `labour_cost`='"+req.body.labor_cost+"', `no_of_labour_hours`='"+req.body.no_of_labor_hours+"' WHERE `id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
-	connection.query(query, function(err, info) {
-		if(err){
-			console.log(err);
-			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-		}
-		else{
-			if(info.affectedRows>0){
-				connection.query("SELECT `id`, `design_number` FROM `product_designs` WHERE `id`='"+req.body.product_designs_id+"'", function(err, product_designs) {
+	var flag_arr=[];
+	req.body.properties.forEach(function(prop){
+		connection.query("select * from `rfq_lines_technical_specs` where `rfq_lines_id`='"+req.body.rfq_lines_id+"' AND `product_properties_id`='"+prop.property_id+"' AND `id`='"+prop.id+"'", function(err, info){
+			if(err){
+				console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			}
+			else{
+				var line_query="";
+				if(info.length>0){
+					line_query="UPDATE `rfq_lines_technical_specs` SET `product_properties_id`='"+prop.property_id+"', `value`='"+prop.value+"', `remark`='"+prop.remark+"' WHERE `id`='"+prop.id+"'";
+				}
+				else{
+					line_query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id` ,`product_properties_id`, `value`, `remark`) values('"+req.body.rfq_lines_id+"', '"+prop.property_id+"', '"+prop.value+"', '"+prop.remark+"')";
+				}
+				connection.query(line_query, function(err, lines){
 					if(err){
 						console.log(err);
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
-						res.json({"statusCode": 200, "success":"true", "message": "rfq_line submitted successfully", "product_designs": product_designs});
+						flag_arr.push(prop);
+						if(flag_arr.length==req.body.properties.length){
+							var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='2', `material_cost`='"+req.body.material_cost+"', `labour_cost`='"+req.body.labor_cost+"', `no_of_labour_hours`='"+req.body.no_of_labor_hours+"' WHERE `id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
+							connection.query(query, function(err, info) {
+								if(err){
+									console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									if(info.affectedRows>0){
+										connection.query("SELECT `id`, `design_number` FROM `product_designs` WHERE `id`='"+req.body.product_designs_id+"'", function(err, product_designs) {
+											if(err){
+												console.log(err);
+												res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+											}
+											else{
+												res.json({"statusCode": 200, "success":"true", "message": "rfq_line submitted successfully", "product_designs": product_designs});
+											}
+										});
+									}
+									else{
+										res.json({"statusCode": 400, "success":"true", "message": "rfq_line not submitted"});
+									}
+								}
+							});
+						}
 					}
 				});
 			}
-			else{
-				res.json({"statusCode": 400, "success":"true", "message": "rfq_line not submitted"});
-			}
-		}
+		});
 	});
 };
 
@@ -370,9 +399,18 @@ exports.tendering_calculate_sales_price = function(req, res){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							if(product_cost_data.length>0)
-								product_cost_data[0]["extra_engineering_hours"]=0;
-							res.json({"statusCode": 200, "success":"true", "message": "", "product_cost_data": product_cost_data, "complexities": complexities, "rfq_lines": rfq_lines});
+							var overheadQuery = "SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+rfq_lines[0].plants_id+"'";
+							connection.query(overheadQuery, function(err, overheads){
+								if(err){
+									console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									if(product_cost_data.length>0)
+									product_cost_data[0]["extra_engineering_hours"]=0;
+									res.json({"statusCode": 200, "success":"true", "message": "", "product_cost_data": product_cost_data, "complexities": complexities, "overheads": overheads, "rfq_lines": rfq_lines});
+								}
+							});
 						}
 					});
 				}
@@ -493,7 +531,6 @@ exports.tendering_get_sales_price_detail = function(req, res){
 // 		}
 // 	});
 // };
-
 
 exports.tendering_view_calculated_sales_price = function(req, res){
 	query_1="SELECT * FROM `rfq_lines_calculated_sales_price` WHERE `rfq_lines_id`='"+req.params.rfq_lines_calculated_sales_price_id+"'";

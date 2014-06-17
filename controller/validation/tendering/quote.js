@@ -166,7 +166,7 @@ exports.tendering_fetch_particular_design = function(req, res, next){
 
 exports.tendering_submit_rfq_lines = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id", "sales_price", "confirmed_delivery_date", "material_cost", "labor_cost", "no_of_labor_hours"];
+	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id", "sales_price", "material_cost", "labor_cost", "no_of_labor_hours"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -180,29 +180,51 @@ exports.tendering_submit_rfq_lines = function(req, res, next){
 				break;
 			}
 		}
-	}
-	// if(checkValid==1){
-	// 	if(typeof req.body.confirmed_delivery_date=="undefined" || req.body.confirmed_delivery_date==""){
-	// 		checkValid=0;
-	// 		res.json({"statusCode": 404, "success": "false", "message": "confirmed_delivery_date not found"});
-	// 	}
-	// }
-	if(checkValid==1){
-		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
-			if(err){
-				console.log(err);
-					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		if(i==fields.length){
+			if(checkValid==1){
+				if(typeof req.body.confirmed_delivery_date=="undefined" || req.body.confirmed_delivery_date==""){
+					checkValid=0;
+					res.json({"statusCode": 404, "success": "false", "message": "confirmed_delivery_date not found"});
+				}
 			}
-			else{
-				if (organization_users.length>0) {
-						next();				
+		}
+	}
+	
+	if(checkValid==1){
+		var prop_arr=["id", "property_id", "value", "remark"];
+		if(typeof req.body.properties=="object" && req.body.properties.length>0){
+			for (var i = 0; i < req.body.properties.length; i++) {
+
+				if(typeof req.body.properties[i]['id']=="undefined" || typeof req.body.properties[i]['property_id']=="undefined" || req.body.properties[i]['property_id']=="" || typeof req.body.properties[i]['value']=="undefined" || typeof req.body.properties[i]['remark']=="undefined"){
+					checkValid=0;
+					res.json({"statusCode": 404, "success": "false", "message": "properties not in proper format"});
+					checkvalid=0;
+					break;
+				}
+			};
+		}
+		else{
+			checkvalid=0;
+			res.json({"statusCode": 404, "success": "false", "message": "properties not found"});
+		}
+		if(checkValid==1){
+			connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
+				if(err){
+					console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
+					if (organization_users.length>0) {
+							next();				
+					}
+					else{
+						res.json({"statusCode": 404, "success":"false", "message": "user not found"});
+					}
 				}
-			}
-		});
+			});
+		}
 	}
+	
 };
 
 exports.tendering_submit_rfq_to_sales = function(req, res, next){
@@ -310,7 +332,7 @@ exports.tendering_complexity_overhead = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-						next();				
+						next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
