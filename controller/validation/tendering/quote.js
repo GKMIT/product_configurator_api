@@ -166,7 +166,7 @@ exports.tendering_fetch_particular_design = function(req, res, next){
 
 exports.tendering_submit_rfq_lines = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id", "sales_price", "material_cost", "labor_cost", "no_of_labor_hours"];
+	var fields = ["user_id", "rfq_id", "rfq_lines_id", "product_designs_id", "sales_price", "confirmed_delivery_date", "material_cost", "labor_cost", "no_of_labor_hours"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -181,14 +181,14 @@ exports.tendering_submit_rfq_lines = function(req, res, next){
 				break;
 			}
 		}
-		if(i==fields.length){
-			if(checkValid==1){
-				if(typeof req.body.confirmed_delivery_date=="undefined" || req.body.confirmed_delivery_date==""){
-					checkValid=0;
-					res.json({"statusCode": 404, "success": "false", "message": "confirmed_delivery_date not found"});
-				}
-			}
-		}
+		// if(i==fields.length){
+		// 	if(checkValid==1){
+		// 		if(typeof req.body.confirmed_delivery_date=="undefined" || req.body.confirmed_delivery_date==""){
+		// 			checkValid=0;
+		// 			res.json({"statusCode": 404, "success": "false", "message": "confirmed_delivery_date not found"});
+		// 		}
+		// 	}
+		// }
 	}
 	
 	if(checkValid==1){
