@@ -35,7 +35,6 @@ exports.all_rfq_product_lines = function(req, res){
 				}
 				else{
 					res.json({"statusCode":200, "success":"true", "message":"", "selected_rfq":rfq, "selected_rfq_lines_items": rfq_lines_items});
-					
 				}
 			});
 		}
@@ -60,7 +59,7 @@ exports.fetch_product_plants_properties = function(req, res){
 								res.json({"statusCode":500, "success":"false", "message": "internal error"});
 						}
 						else{
-							connection.query("SELECT `id`, `name` FROM `product_types`", function(err, product_types) {
+							connection.query("SELECT `id`, `name`, `examples` FROM `product_types`", function(err, product_types) {
 									if(err){
 										res.json({"statusCode":500, "success":"false", "message": "internal error"});
 									}
@@ -389,7 +388,7 @@ exports.fetch_property_detail = function(req, res, next){
 			// 	flag=1;
 			// }
 			if(req.params.property_id==1){
-				query+="SELECT `id`, `name` FROM `product_types`";
+				query+="SELECT `id`, `name`, `examples` FROM `product_types`";
 				flag=1;
 			}
 			else if(req.params.property_id==2){

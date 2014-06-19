@@ -33,7 +33,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 					var counter=0;
 					// var counter1=0;
 					var counter2=0;
-					connection.query("SELECT `id`, `name` FROM `product_types`", function(err, product_types){
+					connection.query("SELECT `id`, `name`, `examples` FROM `product_types`", function(err, product_types){
 								if(err){
 									console.log(err);
 									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
