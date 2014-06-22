@@ -408,7 +408,7 @@ exports.tendering_calculate_sales_price = function(req, res){
 								else{
 									if(product_cost_data.length>0)
 									product_cost_data[0]["extra_engineering_hours"]=0;
-									connection.query("SELECT * FROM `rfq_lines_calculated_sales_price` WHERE `rfq_lines_id`='"+req.params.rfq_lines_id+"'", function(err, info){
+									connection.query("SELECT * FROM `rfq_lines_calculated_sales_price` WHERE `rfq_lines_id`='"+req.params.rfq_lines_id+"' AND `product_design_id`='"+req.params['product_design_id']+"'", function(err, info){
 										if(err){
 											console.log(err);
 											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
