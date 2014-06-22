@@ -192,7 +192,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 												};
 												result_design_ids=result_design_ids.substring("", result_design_ids.length-1);
 
-												query_1="SELECT `pdtd`.`product_design_id`, `pdtd`.`product_properties_id`, `pp`.`property_name`, `pp`.`unit_of_measurement`, `pdtd`.`spec_value`, `pdtd`.`plus_tolerance`, `pdtd`.`minus_tolerance` FROM `product_designs_technical_details` `pdtd`  INNER JOIN `product_properties` `pp` ON `pp`.`id`=`pdtd`.`product_properties_id` WHERE `pdtd`.`product_design_id` IN ("+result_design_ids+") AND "+	range_query +" AND `pdtd`.`product_properties_id` IN ("+rangefilterids+")";
+												query_1="SELECT `pdtd`.`product_design_id`, `pdtd`.`product_properties_id`, `pp`.`property_name`, `pp`.`unit_of_measurement`, `pdtd`.`spec_value`, `pdtd`.`plus_tolerance`, `pdtd`.`minus_tolerance` FROM `product_designs_technical_details` `pdtd`  INNER JOIN `product_properties` `pp` ON `pp`.`id`=`pdtd`.`product_properties_id` WHERE `pdtd`.`product_design_id` IN ("+result_design_ids+") AND `pdtd`.`product_properties_id` IN ("+rangefilterids+")";
 												connection.query(query_1, function(err, range_result){
 													if(err){
 														console.log(err);
@@ -206,21 +206,23 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 														for (var i = 0; i < result.length; i++) {
 															for (var j = 0; j < range_result.length; j++) {
 																if(result[counter].id==range_result[j].product_design_id){
-																		range_result_arr.push({"property_name":range_result[j].property_name, "unit_of_measurement": range_result[j].unit_of_measurement, "spec_value":range_result[j].spec_value, "plus_tolerance": range_result[j].plus_tolerance, "minus_tolerance": range_result[j].minus_tolerance});
+																		range_result_arr.push({"id": range_result[j].product_properties_id,"property_name":range_result[j].property_name, "unit_of_measurement": range_result[j].unit_of_measurement, "spec_value":range_result[j].spec_value, "plus_tolerance": range_result[j].plus_tolerance, "minus_tolerance": range_result[j].minus_tolerance});
 																}
 															};
 															result[counter][name]=range_result_arr;
 															range_result_arr=[];
 															counter++;
 														};
-
-														connection.query("SELECT distinct `id`, `property_name` FROM `product_properties` WHERE `product_properties`.`id` IN ("+rangefilterids+")", function(err, range_property_result){
+														connection.query("SELECT distinct `id`, `property_name` FROM `product_properties` WHERE `product_properties`.`id` IN ("+rangefilterids+")", function(err, filter_result){
 															if(err){
 																console.log(err);
 																res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 															}
 															else{
-																res.json({"statusCode": 200, "success":"true", "message": "", "filter_properties": range_property_result, "product_designs": result});
+																console.log("============");
+														console.log(result[0].range_properties);
+														console.log(filter_result);
+																res.json({"statusCode": 200, "success":"true", "message": "", "filter_properties": filter_result, "product_designs": result});
 															}
 														});
 													}
@@ -231,7 +233,20 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 												for (var i = 0; i < result.length; i++) {
 													result[i]["range_properties"]=[];
 												};
-												res.json({"statusCode": 200, "success":"true", "message": "",  "filter_properties":[], "product_designs": result});
+												// connection.query("SELECT distinct `id`, `property_name` FROM `product_properties` WHERE `product_properties`.`id` IN ( "+equalfilterids+")", function(err, filter_result){
+												// 	if(err){
+												// 		console.log(err);
+												// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+												// 	}
+												// 	else{
+														// filter properties is actually range and here just becoz format of json not differ
+														console.log("============");
+														console.log(result);
+														res.json({"statusCode": 200, "success":"true", "message": "", "filter_properties": [], "product_designs": result});
+														// res.json({"statusCode": 200, "success":"true", "message": "",  "filter_properties":[], "product_designs": result});
+												// 	}
+												// });
+												
 											}
 										}
 									}
