@@ -390,7 +390,6 @@ exports.tendering_calculate_sales_price = function(req, res){
 				else{
 					var query_1="SELECT `spec_value` FROM  `product_designs_technical_details` WHERE  `product_design_id` ='"+req.params['product_design_id']+"' AND  `product_properties_id` =2";
 					var query_2="SELECT `c`.`id`, `c`.`name`, `cmd`.`overhead` FROM `complexities_master_data` `cmd` INNER JOIN `complexities` `c` ON `cmd`.`complexities_id`=`c`.`id` WHERE `c`.`name` IN ("+query_1+") AND `cmd`.`plants_id`='"+rfq_lines[0].plants_id+"'";
-					// console.log(query_2);
 					// var final_query="SELECT `c`.`id`, `c`.`name`, `cmd`.`overhead` FROM `complexities_master_data` `cmd` INNER JOIN `complexities` `c` ON `cmd`.`complexities_id`=`c`.`id` WHERE plants_id="+rfq_lines[0].plants_id + "AND ";
 					// Q1="SELECT id, name FROM `complexities`";
 					connection.query(query_2, function(err, complexities){
@@ -399,6 +398,9 @@ exports.tendering_calculate_sales_price = function(req, res){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
+							if(complexities.length==0){
+								res.json({"statusCode": 422, "success":"false", "message": "Not enough technical specifications available about this product design"});
+							}
 							var overheadQuery = "SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+rfq_lines[0].plants_id+"'";
 							connection.query(overheadQuery, function(err, overheads){
 								if(err){
