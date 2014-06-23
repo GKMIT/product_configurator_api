@@ -132,8 +132,10 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					};
 					// counter++;
 				};
-				if(mandatoryfilter.length!=mandatory_prop_arr.length){
-					res.json({"statusCode":422, "success":"false", "message":"mandatory properties not incomplete"});
+				console.log(mandatoryfilter.length);
+				console.log(mandatory_prop_arr.length);
+				if(mandatoryfilter.length<mandatory_prop_arr.length){
+					res.json({"statusCode":422, "success":"false", "message":"mandatory properties not complete"});
 				}
 				else{
 					// new array declare for the create equalfilter AND rangefilter id, value array
@@ -319,7 +321,14 @@ exports.tendering_submit_rfq_lines = function(req, res){
 					else{
 						flag_arr.push(prop);
 						if(flag_arr.length==req.body.properties.length){
-							var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='2', `material_cost`='"+req.body.material_cost+"', `labour_cost`='"+req.body.labor_cost+"', `no_of_labour_hours`='"+req.body.no_of_labor_hours+"' WHERE `id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
+							var frq_line_status=0;
+							if(req.body.product_designs_id==0 || req.body.product_designs_id==""){
+								frq_line_status=0;
+							}
+							else{
+								frq_line_status=2;
+							}
+							var query="UPDATE `rfq_lines` SET `product_designs_id`='"+req.body.product_designs_id+"', `confirmed_delivery_date`='"+req.body.confirmed_delivery_date+"', `sales_price`='"+req.body.sales_price+"', `rfq_line_status`='"+frq_line_status+"', `material_cost`='"+req.body.material_cost+"', `labour_cost`='"+req.body.labor_cost+"', `no_of_labour_hours`='"+req.body.no_of_labor_hours+"' WHERE `id`='"+req.body.rfq_lines_id+"' AND `rfq_id`='"+req.body.rfq_id+"'";
 							connection.query(query, function(err, info) {
 								if(err){
 									console.log(err);

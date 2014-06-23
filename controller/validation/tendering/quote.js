@@ -106,6 +106,7 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 				}
 			}
 		}
+
 	}
 	if(checkValid==1){
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
@@ -115,7 +116,23 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					next();				
+					flag=0;
+					var exitFlag=0;
+					for (var i = 0; i < req.body.properties.length; i++) {
+						for (var j = 0; j < req.body.properties.length; j++) {
+							if(req.body.properties[i].id==req.body.properties[j].id){
+								flag++;
+							}
+						};
+						if(flag==2){
+							res.json({"statusCode": 500, "success":"false", "message": "Please do not provide multiple entries for same technical specification."});
+						}
+						flag=0;
+						exitFlag++;
+					};
+					if(req.body.properties.length==exitFlag){
+						next();
+					}
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
@@ -252,7 +269,23 @@ exports.tendering_submit_rfq_to_sales = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-						next();				
+						// next();
+						connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.body.rfq_id+"'", function(err, info){
+							if(err){
+								console.log(err);
+								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							}
+							else{
+								connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.body.rfq_id+"' AND `rfq_line_status`='2'", function(err, line_info){
+									if(line_info.length==info.length){
+										next();
+									}
+									else{
+										res.json({"statusCode": 422, "success":"false", "message": "Please select  designs for all rfq lines"});
+									}
+								});
+							}
+						});				
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
