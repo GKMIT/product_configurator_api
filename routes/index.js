@@ -113,5 +113,10 @@ module.exports = function(){
 
 	app.put("/sales_quote_followup_update", rfq_followup_validation.sales_quote_followup_update, rfq_followup_calls.sales_quote_followup_update);
 
+	// dashboard
+	var dashboardValidation = require("../controller/validation/dashboard.js");
+	var dashboard = require("../controller/dashboard.js");
+	app.get("/dashboard/:user_id", dashboardValidation.dashboard, dashboard.dashboard);
+
 
 };

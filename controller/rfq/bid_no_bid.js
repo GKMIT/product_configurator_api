@@ -67,7 +67,7 @@ exports.save_rfq_questions = function(req, res){
 };
 
 exports.full_rfq_detail = function(req, res){
-	connection.query("SELECT rfq.id, `rfq`.`document_no`, `rfq`.`version_no`, `sales_hubs`.`name` as `sales_hub`, `ou`.`user_name` as `sales_person`, `countries`.`name` as `customer_country`, `inst_country`.`name` as `installation_country`, `customers`.`name` as `customer_name`,  `type_of_quotes`.`description` as `quote_type`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `sales_segments`.`name` as `sales_segment`, `sales_agents`.`name` as `sales_agent_name`,  `product_lines`.`name` as `product_lines_name`, `tendering_teams`.`name` as `tendering_team`, `organization_users`.user_name `tendering_team_members`, `rfq`.`requested_quotation_date`, `rfq`.`probability_id`, `probability`.`name` as `probability_name`, `probability`.`value`, `rfq`.`strategic_quote`, `channel_to_market`.`name` as `channel_to_market_name`, `rfq`.`is_bid`, `rejection_remarks`.`description` as `rejection_remarks_name` FROM `rfq` LEFT JOIN `sales_hubs` ON `rfq`.`sales_hub_id`=`sales_hubs`.`id` LEFT JOIN `organization_users` `ou` ON `rfq`.`sales_person_id`=`ou`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` LEFT JOIN `sales_segments` ON `rfq`.`sales_segments_id`=`sales_segments`.`id` LEFT JOIN `sales_agents` ON `rfq`.`sales_agents_id`=`sales_agents`.`id` LEFT JOIN `tendering_teams` ON `rfq`.`tendering_teams_id`=`tendering_teams`.`id` LEFT JOIN `organization_users` ON `rfq`.`tendering_teams_members_id`=`organization_users`.`id` LEFT JOIN `countries` ON `rfq`.`customer_country`=`countries`.`id` LEFT JOIN `countries` `inst_country` ON `rfq`.`installation_country`=`inst_country`.`id` LEFT JOIN `type_of_quotes` ON `rfq`.`type_of_quote_id`=`type_of_quotes`.id LEFT JOIN `product_lines` ON `rfq`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `channel_to_market` ON `channel_to_market`.`id`=`rfq`.`channel_to_market_id` LEFT JOIN `rejection_remarks` ON `rejection_remarks`.`id`=`rfq`.`sales_rejection_remarks_id` LEFT JOIN `probability` ON `probability`.`id`=`rfq`.`probability_id` WHERE `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
+	connection.query("SELECT rfq.id, `rfq`.`document_no`, `rfq`.`version_no`, `sales_hubs`.`name` as `sales_hub`, `ou`.`user_name` as `sales_person`, `countries`.`name` as `customer_country`, `inst_country`.`name` as `installation_country`, `customers`.`name` as `customer_name`,  `type_of_quotes`.`description` as `quote_type`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `sales_segments`.`name` as `sales_segment`, `sales_agents`.`name` as `sales_agent_name`,  `product_lines`.`name` as `product_lines_name`, `tendering_teams`.`name` as `tendering_team`, `organization_users`.user_name `tendering_team_members`, `rfq`.`requested_quotation_date`, `rfq`.`probability_id`, `probability`.`name` as `probability_name`, `probability`.`value`, `rfq`.`strategic_quote`, `channel_to_market`.`name` as `channel_to_market_name`, `rfq`.`is_bid`, `rejection_remarks`.`description` as `rejection_remarks_name`, `rfq`.`estimated_sales_price` FROM `rfq` LEFT JOIN `sales_hubs` ON `rfq`.`sales_hub_id`=`sales_hubs`.`id` LEFT JOIN `organization_users` `ou` ON `rfq`.`sales_person_id`=`ou`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` LEFT JOIN `sales_segments` ON `rfq`.`sales_segments_id`=`sales_segments`.`id` LEFT JOIN `sales_agents` ON `rfq`.`sales_agents_id`=`sales_agents`.`id` LEFT JOIN `tendering_teams` ON `rfq`.`tendering_teams_id`=`tendering_teams`.`id` LEFT JOIN `organization_users` ON `rfq`.`tendering_teams_members_id`=`organization_users`.`id` LEFT JOIN `countries` ON `rfq`.`customer_country`=`countries`.`id` LEFT JOIN `countries` `inst_country` ON `rfq`.`installation_country`=`inst_country`.`id` LEFT JOIN `type_of_quotes` ON `rfq`.`type_of_quote_id`=`type_of_quotes`.id LEFT JOIN `product_lines` ON `rfq`.`product_lines_id`=`product_lines`.`id` LEFT JOIN `channel_to_market` ON `channel_to_market`.`id`=`rfq`.`channel_to_market_id` LEFT JOIN `rejection_remarks` ON `rejection_remarks`.`id`=`rfq`.`sales_rejection_remarks_id` LEFT JOIN `probability` ON `probability`.`id`=`rfq`.`probability_id` WHERE `rfq`.`id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -92,7 +92,25 @@ exports.full_rfq_detail = function(req, res){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": rfq_lines_technical_specs});
+							var default_estimated_sales_price=0;
+							var mva=0;
+							
+								// default_estimated_sales_price=
+							for (var j = 0; j < rfq_lines.length; j++) {
+								for (var i = 0; i < rfq_lines_technical_specs.length; i++) {
+									if(rfq_lines_technical_specs[i].product_properties_id==3 && rfq_lines_technical_specs[i].rfq_lines_id==rfq_lines[j].id){
+										console.log(rfq_lines_technical_specs[i].value);
+										mva=parseInt(rfq_lines_technical_specs[i].value)/1000;
+										default_estimated_sales_price+=mva*10000;
+									}
+								};
+							};
+							if(j==rfq_lines.length){
+								rfq[0]["default_estimated_sales_price"]=default_estimated_sales_price;
+								res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": rfq_lines_technical_specs});
+							}
+							
+							
 						}
 					});
 					}
@@ -106,7 +124,7 @@ exports.full_rfq_detail = function(req, res){
 };
 
 exports.rfq_bid_submit = function(req, res){
-	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"' AND `created_by`='"+req.body.user_id+"'", function(err, info) {
+	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"', `estimated_sales_price`='"+req.body.estimated_sales_price+"' WHERE `id`='"+req.body.rfq_id+"' AND `created_by`='"+req.body.user_id+"'", function(err, info) {
 		if(err){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}

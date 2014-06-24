@@ -192,7 +192,8 @@ exports.full_rfq_detail = function(req, res, next){
 
 exports.rfq_bid_submit = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id", "rfq_status_id"];
+	// var fields = ["user_id", "rfq_id", "rfq_status_id"];
+	var fields = ["user_id", "rfq_id", "rfq_status_id", "estimated_sales_price"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});

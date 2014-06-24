@@ -350,7 +350,7 @@ exports.complete_rfq = function(req, res){
 							});
 						}
 						else{
-							res.json({"statusCode":422, "success": "false", "message": "RFQ Line Items Does not exist"});
+							res.json({"statusCode":404, "success": "false", "message": "Please save the Line Item first before you can Complete the RFQ"});
 						}
 					}
 			});
