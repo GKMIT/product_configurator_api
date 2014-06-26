@@ -70,7 +70,7 @@ exports.sales_quote_finalize_fetch_one = function(req, res, next){
 exports.sales_quote_finalize_submit = function(req, res, next){
 	var checkValid=1;
 	// quote_validity_date
-	var fields = ["user_id", "rfq_id", "probability", "rfq_status_id"];
+	var fields = ["user_id", "rfq_id", "probability", "rfq_status_id", "rejection_remarks_id", "sales_price"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
