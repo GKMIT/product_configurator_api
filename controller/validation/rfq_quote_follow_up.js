@@ -39,7 +39,7 @@ exports.sales_quote_followup_fetch_one = function(req, res, next){
 	var fields = ["user_id", "rfq_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
-		res.json({"statusCode": 404, "success": "false", "message": "1Authentication token not found"});
+		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
