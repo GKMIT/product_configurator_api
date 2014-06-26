@@ -13,38 +13,7 @@ exports.sales_quote_finalize_fetch_all = function(req, res){
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
-						var j=0;
-						for (var i = 0; i < rfq.length; i++) {
-							connection.query("select sum(`minimum_sales_price`) as `minimum_sales_price` from `rfq_lines` where `rfq_id`='"+rfq[i].id+"'", function(err, rfq_lines){
-								if(err){
-									console.log(err);
-									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-								}
-								else{
-									rfq[j]["minimum_sales_price"]=rfq_lines[0].minimum_sales_price;
-									j++;
-									if(i==j){
-										connection.query("SELECT `id`, `name` FROM `probability`", function(err, probability){
-											if(err){
-												console.log(err);
-												res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-											}
-											else{
-												connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks){
-													if(err){
-														console.log(err);
-														res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-													}
-													else{
-														res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability, "rejection_remarks": rejection_remarks});
-													}
-												});
-											}
-										});
-									}
-								}
-							});
-						};
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
 					}
 				});
 			}
@@ -56,42 +25,7 @@ exports.sales_quote_finalize_fetch_all = function(req, res){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
-						var j=0;
-						for (var i = 0; i < rfq.length; i++) {
-							connection.query("select sum(`minimum_sales_price`) as `minimum_sales_price` from `rfq_lines` where `rfq_id`='"+rfq[i].id+"'", function(err, rfq_lines){
-								if(err){
-									console.log(err);
-									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-								}
-								else{
-									rfq[j]["minimum_sales_price"]=rfq_lines[0].minimum_sales_price;
-									j++;
-									if(i==j){
-										rfq[j]["minimum_sales_price"]=rfq_lines[0].minimum_sales_price;
-									j++;
-									if(i==j){
-										connection.query("SELECT `id`, `name` FROM `probability`", function(err, probability){
-											if(err){
-												console.log(err);
-												res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-											}
-											else{
-												connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks){
-													if(err){
-														console.log(err);
-														res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-													}
-													else{
-														res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability, "rejection_remarks": rejection_remarks});
-													}
-												});
-											}
-										});
-									}
-									}
-								}
-							});
-						};
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
 					}
 				});
 			}
@@ -100,22 +34,52 @@ exports.sales_quote_finalize_fetch_all = function(req, res){
 }
 
 exports.sales_quote_finalize_fetch_one = function(req, res){
-	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `estimated_sales_price`, `probability_id` FROM `rfq` WHERE `created_by`='"+req.params.user_id+"' AND `rfq_status_id`='5'  ORDER BY `rfq`.`updated_at` desc";
+	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `estimated_sales_price`, `probability_id` FROM `rfq` WHERE `rfq_status_id`='5'  ORDER BY `rfq`.`updated_at` desc";
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `id`, `name`, `value` FROM `probability`", function(err, probability) {
-				if(err){
-					console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-				}
-				else{
-					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability":probability});
-				}
-			});
+			if(rfq.length>0){
+				connection.query("SELECT `id`, `name`, `value` FROM `probability`", function(err, probability) {
+					if(err){
+						console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						connection.query("select sum(`minimum_sales_price`) as `minimum_sales_price` from `rfq_lines` where `rfq_id`='"+rfq[0].id+"'", function(err, rfq_lines){
+							if(err){
+								console.log(err);
+								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							}
+							else{
+								rfq[0]["minimum_sales_price"]=rfq_lines[0].minimum_sales_price;
+								connection.query("SELECT `id`, `name` FROM `probability`", function(err, probability){
+									if(err){
+										console.log(err);
+										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+									}
+									else{
+										connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks){
+											if(err){
+												console.log(err);
+												res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+											}
+											else{
+												res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability, "rejection_remarks": rejection_remarks});
+											}
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+			else{
+				res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": [], "rejection_remarks": []});
+			}
 		}
 	});
 }
