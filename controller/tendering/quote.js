@@ -109,7 +109,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 		}
 		else{
 			if(product_lines.length==0){
-				res.json({"statusCode":200, "success":"true", "message":"product_lines not found"});
+				res.json({"statusCode":404, "success":"false", "message":"product_lines not found"});
 			}
 			else{
 				// var quarter=Math.ceil(rfq_lines[0].month/3);
@@ -169,7 +169,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 						}
 						else{
 							if(product_designs.length==0){
-								res.json({"statusCode":200, "success":"true", "message":"product designs not found", "product_designs":[]});
+								res.json({"statusCode":404, "success":"false", "message":"product designs not found", "product_designs":[]});
 							}
 							else{
 								final_design_ids="";
@@ -184,7 +184,7 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 									}
 									else{
 										if(result.length==0){
-											res.json({"statusCode": 200, "success":"true", "message": "result not found", "product_designs": "[]"});
+											res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
 										}
 										else{
 											if(rangefilter.length>0){
