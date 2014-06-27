@@ -65,7 +65,17 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 							}
 							else{
 								rfq[0]["minimum_sales_price"]=rfq_lines[0].minimum_sales_price;
-								res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability});
+								
+								connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks){
+									if(err){
+										console.log(err);
+										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+									}
+									else{
+										res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability, "rejection_remarks": rejection_remarks});
+										// res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability, });
+									}
+								});
 							}
 						});
 					}
@@ -92,3 +102,5 @@ exports.sales_quote_followup_update = function(req, res){
 		}
 	});
 }
+
+
