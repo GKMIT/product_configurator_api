@@ -5,6 +5,8 @@ exports.dashboard = function(req, res){
 	var bid_in_tenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='4'";
 	var outTenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='5'";
 	var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6'";
+	var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8'";
+	var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6'";
 	var totalPartialRfq=0;
 	var totalNewRfq=0;
 	var totalNoBidRfq=0;
@@ -53,7 +55,26 @@ exports.dashboard = function(req, res){
 												}
 												else{
 													totalCompletedRfq=info[0].total;
-													res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq});
+													// res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq});
+													connection.query(obsolete, function(err, info){
+														if(err){
+															console.log(err);
+															res.json({"statusCode":500, "success": "false", "message": "internal error"});
+														}
+														else{
+															totalobsoleteRfq=info[0].total;
+															connection.query(expired, function(err, info){
+																if(err){
+																	console.log(err);
+																	res.json({"statusCode":500, "success": "false", "message": "internal error"});
+																}
+																else{
+																	totalExpiredRfq=info[0].total;
+																	res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq, "totalobsoleteRfq": totalobsoleteRfq, "totalExpiredRfq": totalExpiredRfq});
+																}
+															});
+														}
+													});
 												}
 											});
 										}
