@@ -86,7 +86,7 @@ exports.sales_quote_finalize_fetch_one = function(req, res){
 
 
 exports.sales_quote_finalize_submit = function(req, res){
-	var query="UPDATE `rfq` SET `quote_validity_date`='"+req.body.quote_validity_date+"', `quote_submission_date`=NOW(), `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `rejection_remarks_id`='"+req.body.rejection_remarks_id+"', `sales_price`='"+req.body.sales_price+"', `quote_submission_date`='"+req.body.quote_submission_date+"' WHERE `id`='"+req.body.rfq_id+"'";
+	var query="UPDATE `rfq` SET `quote_validity_date`='"+req.body.quote_validity_date+"', `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `rejection_remarks_id`='"+req.body.rejection_remarks_id+"', `sales_price`='"+req.body.sales_price+"', `quote_submission_date`='"+req.body.quote_submission_date+"' WHERE `id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
