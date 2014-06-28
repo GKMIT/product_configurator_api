@@ -32,12 +32,11 @@ exports.add = function(req, res, next){
 					connection.query("SELECT * FROM `customers` where `email`='"+req.body.email+"' LIMIT 1", function(err, info){
 						if(err){
 							console.log(err);
-							res.json({"statusCode": 422, "success":"false", "message": "user already exist"});
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
 							if(info.length>0){
-								console.log(err);
-								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								res.json({"statusCode": 422, "success":"false", "message": "user already exist"});
 							}
 							else{
 								next();
