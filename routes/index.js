@@ -119,6 +119,7 @@ module.exports = function(){
 	var customer=require("../controller/customer/customer.js");
 
 	app.post("/customer", customerValidation.add, customer.add);
+	app.get("/customer/:user_id", customerValidation.show, customer.show);
 
 
 // sales_quote_followup_obsolete

@@ -10,3 +10,16 @@ exports.add = function(req, res){
 		}
 	});
 }
+
+exports.show = function(req, res){
+	var query="SELECT * FROM `customers` ORDER BY `updated_at`";
+	connection.query(query, function(err, customers) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "", "customers":customers});
+		}
+	});
+}
