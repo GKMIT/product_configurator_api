@@ -17,7 +17,7 @@ exports.sales_quote_followup_fetch_all = function(req, res){
 		}
 		else{
 			if(info.length>0){
-				query="SELECT `id`, `document_no`, `version_no`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id` FROM `rfq` WHERE `rfq_status_id`='6' AND `rfq`.`sales_hub_id`='"+info[0].id+"' ORDER BY rfq.updated_at desc";
+				query="SELECT `id`, `document_no`, `version_no`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id` FROM `rfq` WHERE `rfq_status_id`='6' AND `rfq`.`sales_hub_id`='"+info[0].id+"' ORDER BY rfq.quote_validity_date asc";
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
@@ -29,7 +29,7 @@ exports.sales_quote_followup_fetch_all = function(req, res){
 				});
 			}
 			else{
-				query="SELECT `id`, `document_no`, `version_no`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id` FROM `rfq` WHERE `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY `rfq`.`updated_at` desc";
+				query="SELECT `id`, `document_no`, `version_no`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id` FROM `rfq` WHERE `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY `rfq`.`quote_validity_date` asc";
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
