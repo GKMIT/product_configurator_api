@@ -1,13 +1,36 @@
 exports.tendering_teams_quotes = function(req, res){
-	var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id` =  '4' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`updated_at` DESC";
-
-	connection.query(query, function(err, rfq) {
+	connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
 		if(err){
 			console.log(err);
-				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+			if(admin.length>0){
+				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq`, `organization_users` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`updated_at` DESC";
+
+				connection.query(query, function(err, rfq) {
+					if(err){
+						console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+					}
+				});
+			}
+			else{
+				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`updated_at` DESC";
+
+				connection.query(query, function(err, rfq) {
+					if(err){
+						console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+					}
+				});
+			}
 		}
 	});
 }

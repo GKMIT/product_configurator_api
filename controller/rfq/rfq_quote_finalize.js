@@ -7,7 +7,6 @@ exports.sales_quote_finalize_fetch_all = function(req, res){
 		else{
 			if(info.length>0){
 				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_creation_date`, `rfq`.`estimated_sales_price` FROM `rfq` WHERE `rfq_status_id`='5' AND (`rfq`.`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"') ORDER BY rfq.updated_at desc";
-				console.log(query);
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
