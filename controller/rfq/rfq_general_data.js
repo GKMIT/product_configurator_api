@@ -13,7 +13,7 @@ exports.rfq_general_data = function(req, res){
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
 							}
 					else{
-						connection.query("SELECT `id`,`name` FROM `countries`", function(err, countries) {
+						connection.query("SELECT `id`,`name` FROM `countries` ORDER BY `name` asc", function(err, countries) {
 							if(err){
 									res.json({"statusCode":500, "success":"false", "message": "internal error"});
 							}
