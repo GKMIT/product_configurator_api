@@ -123,7 +123,7 @@ exports.full_rfq_detail = function(req, res){
 									if(rfq_lines_technical_specs[i].product_properties_id==3 && rfq_lines_technical_specs[i].rfq_lines_id==rfq_lines[j].id){
 										console.log(rfq_lines_technical_specs[i].value);
 										mva=parseInt(rfq_lines_technical_specs[i].value)/1000;
-										default_estimated_sales_price+=mva*10000;
+										default_estimated_sales_price+=rfq_lines[j].number_of_units*(mva*10000);
 									}
 								};
 							};
