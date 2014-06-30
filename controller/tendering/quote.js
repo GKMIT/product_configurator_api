@@ -403,7 +403,9 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
 							else{
-								connection.query("UPDATE `rfq` SET `estimated_sales_price`='"+estimated_sales_price[0].sales_price+"', `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, product_designs) {
+								// var query="UPDATE `rfq` SET `estimated_sales_price`='"+estimated_sales_price[0].sales_price+"', `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
+								var query="UPDATE `rfq` SET `quote_creation_date`=NOW(), `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
+								connection.query(query, function(err, product_designs) {
 									if(err){
 										console.log(err);
 										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
