@@ -1,24 +1,12 @@
 exports.sales_quote_finalize_fetch_all = function(req, res){
-	connection.query("select * from `sales_hubs` where `head_id`='"+req.params.user_id+"' LIMIT 1", function(err, info){
+	connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
 		if(err){
 			console.log(err);
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			if(info.length>0){
-				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_creation_date`, `rfq`.`estimated_sales_price` FROM `rfq` WHERE `rfq_status_id`='5' AND (`rfq`.`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"') ORDER BY rfq.updated_at desc";
-				connection.query(query, function(err, rfq) {
-					if(err){
-						console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-					}
-					else{
-						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
-					}
-				});
-			}
-			else{
-				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_creation_date`, `rfq`.`estimated_sales_price` FROM `rfq` WHERE `rfq_status_id`='5' AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY `rfq`.`updated_at` desc";
+			if(admin.length>0){
+				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_creation_date`, `rfq`.`estimated_sales_price` FROM `rfq` WHERE `rfq_status_id`='5' ORDER BY `rfq`.`updated_at` desc";
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
@@ -26,6 +14,40 @@ exports.sales_quote_finalize_fetch_all = function(req, res){
 					}
 					else{
 						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+					}
+				});
+			}
+			else{
+				connection.query("select * from `sales_hubs` where `head_id`='"+req.params.user_id+"' LIMIT 1", function(err, info){
+					if(err){
+						console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						if(info.length>0){
+							query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_creation_date`, `rfq`.`estimated_sales_price` FROM `rfq` WHERE `rfq_status_id`='5' AND (`rfq`.`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"') ORDER BY rfq.updated_at desc";
+							connection.query(query, function(err, rfq) {
+								if(err){
+									console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+								}
+							});
+						}
+						else{
+							query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_creation_date`, `rfq`.`estimated_sales_price` FROM `rfq` WHERE `rfq_status_id`='5' AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY `rfq`.`updated_at` desc";
+							connection.query(query, function(err, rfq) {
+								if(err){
+									console.log(err);
+										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+								}
+							});
+						}
 					}
 				});
 			}
