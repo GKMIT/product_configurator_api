@@ -18,38 +18,48 @@ exports.ready_rfq_bid = function(req, res){
 				});
 			}
 			else{
-				connection.query("select * from `sales_hubs` where `head_id`='"+req.params.user_id+"' LIMIT 1", function(err, info){
+				query="SELECT distinct `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` INNER JOIN `organization_users` ON `rfq`.`tendering_teams_id`=`organization_users`.`tendering_teams_id` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' ORDER BY `rfq`.`updated_at` desc";
+				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
-						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
-						if(info.length>0){
-							query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' AND (`rfq`.`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY rfq.updated_at desc";
-							connection.query(query, function(err, rfq) {
-								if(err){
-									console.log(err);
-										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-								}
-								else{
-									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
-								}
-							});
-						}
-						else{
-							query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY `rfq`.`updated_at` desc";
-							connection.query(query, function(err, rfq) {
-								if(err){
-									console.log(err);
-										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-								}
-								else{
-									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
-								}
-							});
-						}
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
 					}
 				});
+				// connection.query("select * from `sales_hubs` where `head_id`='"+req.params.user_id+"' LIMIT 1", function(err, info){
+				// 	if(err){
+				// 		console.log(err);
+				// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				// 	}
+				// 	else{
+				// 		if(info.length>0){
+				// 			query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' AND (`rfq`.`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY rfq.updated_at desc";
+				// 			connection.query(query, function(err, rfq) {
+				// 				if(err){
+				// 					console.log(err);
+				// 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				// 				}
+				// 				else{
+				// 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+				// 				}
+				// 			});
+				// 		}
+				// 		else{
+				// 			query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY `rfq`.`updated_at` desc";
+				// 			connection.query(query, function(err, rfq) {
+				// 				if(err){
+				// 					console.log(err);
+				// 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				// 				}
+				// 				else{
+				// 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+				// 				}
+				// 			});
+				// 		}
+				// 	}
+				// });
 			}
 		}
 	});
