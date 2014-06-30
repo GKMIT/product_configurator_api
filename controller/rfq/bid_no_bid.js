@@ -6,7 +6,7 @@ exports.ready_rfq_bid = function(req, res){
 		}
 		else{
 			if(info.length>0){
-				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' AND `rfq`.`sales_hub_id`='"+info[0].id+"' ORDER BY rfq.updated_at desc";
+				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' AND (`rfq`.`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"') ORDER BY rfq.updated_at desc";
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
@@ -146,7 +146,8 @@ exports.full_rfq_detail = function(req, res){
 };
 
 exports.rfq_bid_submit = function(req, res){
-	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"', `estimated_sales_price`='"+req.body.estimated_sales_price+"' WHERE `id`='"+req.body.rfq_id+"' AND `created_by`='"+req.body.user_id+"'", function(err, info) {
+	 // AND `created_by`='"+req.body.user_id+"'
+	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"', `estimated_sales_price`='"+req.body.estimated_sales_price+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, info) {
 		if(err){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
@@ -169,7 +170,8 @@ exports.get_rejection_remarks = function(req, res){
 
 
 exports.rfq_no_bid_submit = function(req, res){
-	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"', `rejection_remarks_id`='"+req.body.rejection_remarks_id+"', `estimated_sales_price`='"+req.body.estimated_sales_price+"' WHERE `id`='"+req.body.rfq_id+"' AND `created_by`='"+req.body.user_id+"'", function(err, info) {
+	 // AND `created_by`='"+req.body.user_id+"'
+	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"', `rejection_remarks_id`='"+req.body.rejection_remarks_id+"', `estimated_sales_price`='"+req.body.estimated_sales_price+"' WHERE `id`='"+req.body.rfq_id+"'", function(err, info) {
 		if(err){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}

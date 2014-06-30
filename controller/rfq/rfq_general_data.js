@@ -1,7 +1,8 @@
 var validator = require("validator");
 
 exports.rfq_general_data = function(req, res){
-	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+	 // AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"')
+	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
 			if(err){
 				console.log(err);
 				res.json({"statusCode":500, "success":"false", "message": "internal error"});
@@ -430,19 +431,20 @@ function update_rfq_general_dataValidation(req, res, callback){
 						res.json({statusCode: 401, "success":"false", message: "unauthorised user"});
 					}
 					else{
-						connection.query("SELECT `id` FROM `rfq` WHERE id='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, created_by) {
-							if(err){
-								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-							}
-							else{
-								if(created_by.length==0){
-									res.json({statusCode: 401, "success":"false", message: "unauthorised access of RFQ"});
-								}
-								else{
-									callback(req, res);
-								}
-							}
-						});
+						// connection.query("SELECT `id` FROM `rfq` WHERE id='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, created_by) {
+						// 	if(err){
+						// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+						// 	}
+						// 	else{
+						// 		if(created_by.length==0){
+						// 			res.json({statusCode: 401, "success":"false", message: "unauthorised access of RFQ"});
+						// 		}
+						// 		else{
+						// 			callback(req, res);
+						// 		}
+						// 	}
+						// });
+						callback(req, res);
 					}
 				}
 				else{
@@ -492,7 +494,8 @@ exports.update_rfq_general_data = function(req, res){
 			paramValue.push(req.body.is_bid);
 
 				var query="UPDATE rfq ";
-				var queryparam=" SET `sales_hub_id`='"+req.body.sales_hub_id+"', `sales_person_id`='"+req.body.sales_person_id +"', `customers_id`='"+req.body.customers_id+"', `customer_country`='"+req.body.customer_country+"', `type_of_quote_id`='"+req.body.type_of_quote_id+"', `date_rfq_in`='"+req.body.date_rfq_in+"', `sales_segments_id`='"+req.body.sales_segments_id+"', `requested_quotation_date`='"+req.body.requested_quotation_date+"', `created_by`='"+req.body.user_id+"', `probability_id`='"+req.body.probability+"'";
+				// , `created_by`='"+req.body.user_id+"'
+				var queryparam=" SET `sales_hub_id`='"+req.body.sales_hub_id+"', `sales_person_id`='"+req.body.sales_person_id +"', `customers_id`='"+req.body.customers_id+"', `customer_country`='"+req.body.customer_country+"', `type_of_quote_id`='"+req.body.type_of_quote_id+"', `date_rfq_in`='"+req.body.date_rfq_in+"', `sales_segments_id`='"+req.body.sales_segments_id+"', `requested_quotation_date`='"+req.body.requested_quotation_date+"', `probability_id`='"+req.body.probability+"'";
 				var queryValue="";
 				for(var i=0; i<param.length; i++){
 					if(i==0){
@@ -503,7 +506,8 @@ exports.update_rfq_general_data = function(req, res){
 						queryparam=queryparam+",";
 					}
 				}
-				query=query+queryparam+ " WHERE id='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'";
+				query=query+queryparam+ " WHERE id='"+req.body.rfq_id+"'";
+				//  AND created_by='"+req.body.user_id+"'
 				connection.query(query, function(err, info) {
 					if(err){
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});

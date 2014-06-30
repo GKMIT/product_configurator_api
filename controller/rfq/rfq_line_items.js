@@ -1,5 +1,6 @@
 exports.product_lines = function(req, res){
-	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+	//  AND created_by='"+req.params.user_id+"'
+	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
@@ -24,7 +25,8 @@ exports.product_lines = function(req, res){
 }
 
 exports.all_rfq_product_lines = function(req, res){
-	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+	 // AND created_by='"+req.params.user_id+"'
+	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}

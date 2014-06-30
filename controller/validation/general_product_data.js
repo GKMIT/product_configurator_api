@@ -29,19 +29,20 @@ exports.general_product_data_saveValidation = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, rfq) {
-						if(err){
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if(rfq.length>0){
-								next();
-							}
-							else{
-								res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
-							}
-						}
-					});
+					// connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, rfq) {
+					// 	if(err){
+					// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					// 	}
+					// 	else{
+					// 		if(rfq.length>0){
+					// 			next();
+					// 		}
+					// 		else{
+					// 			res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
+					// 		}
+					// 	}
+					// });
+				next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});

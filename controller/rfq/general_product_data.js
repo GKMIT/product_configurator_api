@@ -41,7 +41,8 @@ function rfq_product_linesValidation(req, res, callback){
 exports.rfq_product_lines = function(req, res){
 	rfq_product_linesValidation(req, res, function(req, res, checkValid){
 		if (checkValid==1) {
-					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+			 // AND created_by='"+req.params.user_id+"'
+					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
 						if(err){
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
@@ -148,7 +149,8 @@ exports.rfq_tendering_teams = function(req, res){
 
 
 exports.rfq_tendering_teams_members = function(req, res){
-	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+	 // AND created_by='"+req.params.user_id+"'
+	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
 		if(err){
 			console.log(err);
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -196,7 +198,8 @@ exports.general_product_data_save = function(req, res){
 			query+=",";
 		}
 	};
-		query=query+" WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'";
+		query=query+" WHERE `id`='"+req.body.rfq_id+"'";
+		//  AND created_by='"+req.body.user_id+"'
 		// console.log(query);
 	connection.query(query, function(err, tendering_teams_members) {
 		if(err){

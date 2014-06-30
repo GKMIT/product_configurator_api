@@ -60,19 +60,20 @@ exports.ready_rfq_bid_detail = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM rfq WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
-						if(err){
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if (rfq.length>0) {
-								next();
-							}
-							else{
-								res.json({"statusCode": 401, "success":"false", "message": "invalid access"});
-							}
-						}
-					});
+					// connection.query("SELECT * FROM rfq WHERE `id`='"+req.params.rfq_id+"' AND created_by='"+req.params.user_id+"'", function(err, rfq) {
+					// 	if(err){
+					// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					// 	}
+					// 	else{
+					// 		if (rfq.length>0) {
+					// 			next();
+					// 		}
+					// 		else{
+					// 			res.json({"statusCode": 401, "success":"false", "message": "invalid access"});
+					// 		}
+					// 	}
+					// });
+					next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
@@ -128,19 +129,20 @@ exports.save_rfq_questions = function(req, res, next){
 				}
 				else{
 					if (organization_users.length>0) {
-						connection.query("SELECT * FROM rfq WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, rfq) {
-							if(err){
-								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-							}
-							else{
-								if (rfq.length>0) {
-									next();
-								}
-								else{
-									res.json({"statusCode": 401, "success":"false", "message": "invalid access"});
-								}
-							}
-						});
+						// connection.query("SELECT * FROM rfq WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+req.body.user_id+"'", function(err, rfq) {
+						// 	if(err){
+						// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+						// 	}
+						// 	else{
+						// 		if (rfq.length>0) {
+						// 			next();
+						// 		}
+						// 		else{
+						// 			res.json({"statusCode": 401, "success":"false", "message": "invalid access"});
+						// 		}
+						// 	}
+						// });
+						next();
 					}
 					else{
 						res.json({"statusCode": 404, "success":"false", "message": "user not found"});
@@ -220,19 +222,20 @@ exports.rfq_bid_submit = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
-						if(err){
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if(rfq.length>0){
-								next();
-							}
-							else{
-								res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
-							}
-						}
-					});
+					// connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
+					// 	if(err){
+					// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					// 	}
+					// 	else{
+					// 		if(rfq.length>0){
+					// 			next();
+					// 		}
+					// 		else{
+					// 			res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
+					// 		}
+					// 	}
+					// });
+					next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
@@ -303,19 +306,20 @@ exports.rfq_no_bid_submit = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
-						if(err){
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if(rfq.length>0){
-								next();
-							}
-							else{
-								res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
-							}
-						}
-					});
+					// connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"' AND created_by='"+organization_users[0].id+"'", function(err, rfq) {
+					// 	if(err){
+					// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					// 	}
+					// 	else{
+					// 		if(rfq.length>0){
+					// 			next();
+					// 		}
+					// 		else{
+					// 			res.json({"statusCode": 401, "success":"false", "message": "invalid access of RFQ"});
+					// 		}
+					// 	}
+					// });
+					next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
