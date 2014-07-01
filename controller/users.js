@@ -89,3 +89,16 @@ function testUser(email, password, req, res){
 		}
 	});
 }
+
+exports.updatePassword = function(req, res){
+	var query="UPDATE `organization_users` SET `password`='"+req.body.new_password+"' WHERE `id`='"+req.body.user_id+"'";
+	connection.query(query, function(err, info){
+		if(err){
+			console.log(err);
+			res.json({statusCode: 500, "success":"false", message: "internal error"});
+		}
+		else{
+			res.json({statusCode: 200, "success":"true", message: "password updated successfully"});
+		}
+	});
+}

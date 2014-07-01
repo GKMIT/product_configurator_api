@@ -1,4 +1,5 @@
 var users = require('../controller/users');
+var usersValidation = require('../controller/validation/users');
 // validations
 var rfq_general_data_validation = require('../controller/validation/rfq_general_data');
 var rfq_product_validation = require('../controller/validation/general_product_data');
@@ -14,6 +15,8 @@ var rfq_bid = require('../controller/rfq/bid_no_bid');
 module.exports = function(){
 	
 	app.post("/login", users.login);
+	// update password
+	app.put("/updatePassword", usersValidation.updatePassword, users.updatePassword);
 	// rfq general data
 	app.get("/rfq_general_data/:user_id/:rfq_id", rfq_general_data_validation.rfq_general_data, rfq.rfq_general_data);
 	// NOTE :  country_id is customer country in the below call 
