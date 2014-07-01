@@ -104,14 +104,14 @@ exports.dashboard = function(req, res){
 					}
 					else{
 						if(info.length>0){
-							var partialRfq="select count(`id`) as `total` from `rfq` where (`rfq_status_id`='0' OR `rfq_status_id`='1')  AND sales_hub_id='"+info[0].id+"'";
-							var newRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='2'  AND sales_hub_id='"+info[0].id+"'";
-							var noBidRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='3' AND sales_hub_id='"+info[0].id+"'";
-							var bid_in_tenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='4'  AND sales_hub_id='"+info[0].id+"'";
-							var outTenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='5' AND sales_hub_id='"+info[0].id+"'";
-							var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6' AND sales_hub_id='"+info[0].id+"'";
-							var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8' AND sales_hub_id='"+info[0].id+"'";
-							var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6' AND sales_hub_id='"+info[0].id+"'";
+							var partialRfq="select count(`id`) as `total` from `rfq` where (`rfq_status_id`='0' OR `rfq_status_id`='1')  AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var newRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='2'  AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var noBidRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='3' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var bid_in_tenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='4'  AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var outTenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='5' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
 							var totalPartialRfq=0;
 							var totalNewRfq=0;
 							var totalNoBidRfq=0;
@@ -194,16 +194,17 @@ exports.dashboard = function(req, res){
 							});
 						}
 						else{
-							var partialRfq="select count(`id`) as `total` from `rfq` where (`rfq_status_id`='0' OR `rfq_status_id`='1')  AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							// OR `rfq`.`sales_person_id`='"+req.params.user_id+"'
+							var partialRfq="select count(`id`) as `total` from `rfq` where (`rfq_status_id`='0' OR `rfq_status_id`='1')  AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
 
-							var newRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='2'  AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var newRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='2'  AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
 							 // where `created_by`='"+req.params.user_id+"'";
-							var noBidRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='3' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
-							var bid_in_tenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='4'  AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
-							var outTenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='5' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
-							var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
-							var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
-							var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var noBidRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='3' AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var bid_in_tenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='4'  AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var outTenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='5' AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8' AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
 							var totalPartialRfq=0;
 							var totalNewRfq=0;
 							var totalNoBidRfq=0;
