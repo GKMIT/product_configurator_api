@@ -311,15 +311,15 @@ exports.complete_rfq = function(req, res){
 					}
 					else{
 						if(check_line_item.length>0){
-							connection.query("SELECT r.id, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
+							connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
 								if(err){
 									res.json({"statusCode":500, "success": "false", "message": "internal error"});
 								}
 								else{
 									if(rfq_detail.length>0){
-										// TODO : code this will optimize after some discussion
 										var document_no="";
 										var version_no="1.0";
+										
 										var country=rfq_detail[0].iso_code;
 										var year=""+rfq_detail[0].year;
 										year=year.toString();
@@ -335,6 +335,11 @@ exports.complete_rfq = function(req, res){
 											product_line_name="P";
 										}
 										document_no=country+year+product_line_name+number+"/"+version_no;
+										
+										if(rfq_detail[0].version_no>0){
+											version_no=rfq_detail[0].version_no;
+											document_no=rfq_detail[0].document_no;
+										}
 
 										connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
 											if(err){
