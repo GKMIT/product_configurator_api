@@ -335,6 +335,10 @@ exports.save_rfq_general_data = function(req, res){
 					param.push("requested_quotation_date");
 					paramValue.push(req.body.requested_quotation_date);
 				}
+				if(typeof req.body.customer_reference!=="undefined" && req.body.customer_reference!==""){
+					param.push("customer_reference");
+					paramValue.push(req.body.customer_reference);
+				}
 				param.push("is_bid");
 				paramValue.push(req.body.is_bid);
 
@@ -497,6 +501,10 @@ exports.update_rfq_general_data = function(req, res){
 			if(typeof req.body.requested_quotation_date!=="undefined" && req.body.requested_quotation_date!==""){
 				param.push("requested_quotation_date");
 				paramValue.push(req.body.requested_quotation_date);
+			}
+			if(typeof req.body.customer_reference!=="undefined" && req.body.customer_reference!==""){
+				param.push("customer_reference");
+				paramValue.push(req.body.customer_reference);
 			}
 			param.push("is_bid");
 			paramValue.push(req.body.is_bid);
