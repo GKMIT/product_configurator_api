@@ -261,7 +261,8 @@ function save_rfq_general_dataValidation(req, res, callback){
 				res.json({"statusCode": 404, "success": "false", "message": "sales_rejection_remarks_id not defined"});
 			}
 		}
-		var param = ["date_rfq_in", "requested_quotation_date"];
+		var param = ["date_rfq_in"];
+		// var param = ["date_rfq_in", "requested_quotation_date"];
 		var parameterValue=JSON.parse(JSON.stringify(req.body));
 			for(var i=0; i<param.length; i++){
 				var fieldName=param[i];
@@ -330,14 +331,16 @@ exports.save_rfq_general_data = function(req, res){
 					param.push("sales_rejection_remarks_id");
 					paramValue.push(req.body.sales_rejection_remarks_id);
 				}
+				if(typeof req.body.requested_quotation_date!=="undefined" && req.body.requested_quotation_date!==""){
+					param.push("requested_quotation_date");
+					paramValue.push(req.body.requested_quotation_date);
+				}
 				param.push("is_bid");
 				paramValue.push(req.body.is_bid);
-					
-
 
 					var query="INSERT INTO rfq (";
-					var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, requested_quotation_date, created_by, rfq_status_id, probability_id";
-					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"','"+req.body.requested_quotation_date+"','"+req.body.user_id+"','"+req.body.rfq_status_id+"','"+req.body.probability+"'";
+					var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, created_by, rfq_status_id, probability_id";
+					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"', '"+req.body.user_id+"','"+req.body.rfq_status_id+"','"+req.body.probability+"'";
 					for(var i=0; i<param.length; i++){
 						if(i==0){
 							queryparam=queryparam+",";
@@ -402,7 +405,8 @@ function update_rfq_general_dataValidation(req, res, callback){
 				res.json({"statusCode": 404, "success": "false", "message": "sales_rejection_remarks_id not defined"});
 			}
 		}
-		var param = ["date_rfq_in", "requested_quotation_date"];
+		var param = ["date_rfq_in"];
+		// var param = ["date_rfq_in", "requested_quotation_date"];
 		var parameterValue=JSON.parse(JSON.stringify(req.body));
 			for(var i=0; i<param.length; i++){
 				var fieldName=param[i];
@@ -490,12 +494,16 @@ exports.update_rfq_general_data = function(req, res){
 				param.push("sales_rejection_remarks_id");
 				paramValue.push(req.body.sales_rejection_remarks_id);
 			}
+			if(typeof req.body.requested_quotation_date!=="undefined" && req.body.requested_quotation_date!==""){
+				param.push("requested_quotation_date");
+				paramValue.push(req.body.requested_quotation_date);
+			}
 			param.push("is_bid");
 			paramValue.push(req.body.is_bid);
 
 				var query="UPDATE rfq ";
 				// , `created_by`='"+req.body.user_id+"'
-				var queryparam=" SET `sales_hub_id`='"+req.body.sales_hub_id+"', `sales_person_id`='"+req.body.sales_person_id +"', `customers_id`='"+req.body.customers_id+"', `customer_country`='"+req.body.customer_country+"', `type_of_quote_id`='"+req.body.type_of_quote_id+"', `date_rfq_in`='"+req.body.date_rfq_in+"', `sales_segments_id`='"+req.body.sales_segments_id+"', `requested_quotation_date`='"+req.body.requested_quotation_date+"', `probability_id`='"+req.body.probability+"'";
+				var queryparam=" SET `sales_hub_id`='"+req.body.sales_hub_id+"', `sales_person_id`='"+req.body.sales_person_id +"', `customers_id`='"+req.body.customers_id+"', `customer_country`='"+req.body.customer_country+"', `type_of_quote_id`='"+req.body.type_of_quote_id+"', `date_rfq_in`='"+req.body.date_rfq_in+"', `sales_segments_id`='"+req.body.sales_segments_id+"', `probability_id`='"+req.body.probability+"'";
 				var queryValue="";
 				for(var i=0; i<param.length; i++){
 					if(i==0){
