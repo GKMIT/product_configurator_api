@@ -103,10 +103,19 @@ exports.sales_quote_finalize_submit = function(req, res){
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
-				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode": 200, "success":"true", "message": "quote submitted successfully !"});
+			var update_query="UPDATE `rfq_lines_questions` SET `question_value`='"+req.body.rfq_questions_value+"' WHERE `rfq_id`='"+req.body.rfq_id+"' AND `rfq_questions_id`='"+req.body.rfq_questions_id+"'";
+			connection.query(update_query, function(err, rfq){
+				if(err){
+					console.log(err);
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					res.json({"statusCode": 200, "success":"true", "message": "quote submitted successfully !"});
+				}
+			});
 		}
 	});
 }
