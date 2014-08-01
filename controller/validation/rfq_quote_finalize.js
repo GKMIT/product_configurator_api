@@ -89,10 +89,10 @@ exports.sales_quote_finalize_submit = function(req, res, next){
 			checkValid=0;
 			res.json({"statusCode": 404, "success":"false", "message": "quote_validity_date not found"});
 		}
-		if (typeof req.body.quote_submission_date=="undefined" || req.body.quote_submission_date==""){
-			checkValid=0;
-			res.json({"statusCode": 404, "success":"false", "message": "quote_submission_date not found"});
-		}
+		// if (typeof req.body.quote_submission_date=="undefined" || req.body.quote_submission_date==""){
+		// 	checkValid=0;
+		// 	res.json({"statusCode": 404, "success":"false", "message": "quote_submission_date not found"});
+		// }
 	}
 	if(checkValid==1){
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {

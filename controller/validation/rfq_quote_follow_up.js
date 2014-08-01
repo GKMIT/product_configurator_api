@@ -76,16 +76,6 @@ exports.sales_quote_followup_update = function(req, res, next){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
-	// else if(typeof req.body.quote_submission_date=="undefined" || req.body.quote_submission_date==""){
-	// 			checkValid=0;
-	// 			res.json({"statusCode": 404, "success": "false", "message": "quote_submission_date not found"});
-	// 			// break;
-	// }
-	else if(typeof req.body.quote_validity_date=="undefined" || req.body.quote_validity_date==""){
-				checkValid=0;
-				res.json({"statusCode": 404, "success": "false", "message": "quote_validity_date not found"});
-				// break;
-	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
 			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])){
