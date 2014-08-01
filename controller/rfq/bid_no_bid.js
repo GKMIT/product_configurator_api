@@ -19,7 +19,7 @@ exports.ready_rfq_bid = function(req, res){
 				});
 			}
 			else{
-				query="SELECT distinct `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` FROM `rfq` INNER JOIN `organization_users` ON `rfq`.`tendering_teams_id`=`organization_users`.`tendering_teams_id` AND `organization_users`.`id`='"+req.params.user_id+"' LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` WHERE `rfq_status_id`='2' ORDER BY `rfq`.`updated_at` desc";
+				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` as ` sales_agent_name`, `customers`.`name` as `customer_name`, `organization_users`.`full_name` as `sales_person_name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` LEFT JOIN `customers` ON `customers`.`id`=`rfq`.`customers_id` LEFT JOIN `organization_users` on `organization_users`.`id`=`rfq`.`sales_person_id` WHERE `rfq`.`rfq_status_id`='2' ORDER BY `rfq`.`updated_at` desc";
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
