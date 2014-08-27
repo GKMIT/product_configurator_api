@@ -83,7 +83,7 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 					}
 					else{
-						connection.query("select sum(`minimum_sales_price`) as `minimum_sales_price` from `rfq_lines` where `rfq_id`='"+rfq[0].id+"'", function(err, rfq_lines){
+						connection.query("select sum(`sales_price`) as `minimum_sales_price` from `rfq_lines` where `rfq_id`='"+rfq[0].id+"'", function(err, rfq_lines){
 							if(err){
 								console.log(err);
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -116,7 +116,7 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 // not use till
 exports.sales_quote_followup_update = function(req, res){
 	// console.log(req.body.quote_submission_date);
-	var query="UPDATE `rfq` SET quote_validity_date='"+req.body.quote_validity_date+"', `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
+	var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, quote) {
 		if(err){
 			console.log(err);

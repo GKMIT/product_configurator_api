@@ -64,7 +64,7 @@ exports.sales_quote_finalize_fetch_one = function(req, res){
 		}
 		else{
 			if(rfq.length>0){
-				connection.query("select sum(`minimum_sales_price`) as `minimum_sales_price` from `rfq_lines` where `rfq_id`='"+rfq[0].id+"'", function(err, rfq_lines){
+				connection.query("select sum(`sales_price`) as `minimum_sales_price` from `rfq_lines` where `rfq_id`='"+rfq[0].id+"'", function(err, rfq_lines){
 					if(err){
 						console.log(err);
 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});

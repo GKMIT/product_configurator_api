@@ -3,6 +3,7 @@ module.exports = function () {
   
   var iniparser = require('iniparser');
   var config = iniparser.parseSync('./config/config.ini');
+  smtpConfig = iniparser.parseSync('./config/smtp.ini');
   
   var path = require('path');
 
@@ -35,5 +36,16 @@ module.exports = function () {
   }
   crypto = require('crypto');
   var routes = require('./routes/index')();
+
+  // email configuration
+  var nodemailer = require('nodemailer');
+  transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+          user: smtpConfig.email,
+          pass: smtpConfig.password
+      }
+  });
+
   return app;
 };
