@@ -69,7 +69,7 @@ exports.sales_quote_followup_fetch_all = function(req, res){
 }
 
 exports.sales_quote_followup_fetch_one = function(req, res){
-	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id`, `rfq_status_id`, `sales_price` FROM `rfq` WHERE `rfq_status_id`='6' AND `id`='"+req.params.rfq_id+"'";
+	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id`, `rfq_status_id`, `sales_price`, `won_gross_sale` FROM `rfq` WHERE `rfq_status_id`='6' AND `id`='"+req.params.rfq_id+"'";
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
@@ -97,6 +97,7 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 									}
 									else{
+										console.log("yoyooy");
 										res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability, "rejection_remarks": rejection_remarks});
 										// res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "probability": probability, });
 									}
@@ -116,7 +117,16 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 // not use till
 exports.sales_quote_followup_update = function(req, res){
 	// console.log(req.body.quote_submission_date);
-	var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
+	// var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `sales_price`='"+req.body.sales_price+"' WHERE `id`='"+req.body.rfq_id+"'";
+	var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `sales_price`='"+req.body.sales_price+"'";
+	if(req.body.won_gross_sale){
+		query+=", `won_gross_sale`='"+req.body.won_gross_sale+"'";
+	}
+	if(req.body.rejection_remarks_id){
+		query+=", `lost_remarks_id`='"+req.body.rejection_remarks_id+"'";
+	}
+		query+=" WHERE `id`='"+req.body.rfq_id+"'";
+		console.log(query);
 	connection.query(query, function(err, quote) {
 		if(err){
 			console.log(err);

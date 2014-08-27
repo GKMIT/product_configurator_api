@@ -192,7 +192,20 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 						}
 						else{
 							if(product_designs.length==0){
-								res.json({"statusCode":404, "success":"false", "message":"product designs not found", "product_designs":[]});
+								var mailOptions = {
+								    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+								    to: smtpConfig.design_department_email, // list of receivers seprated by comma also
+								    subject: 'Design Not Found ✔', // Subject line
+								    text: 'Design Not Found for the RFQ Line Item No. '+req.body.rfq_lines_id, // plaintext body
+								    html: '<p>Design Not Found for the RFQ Line Item No. '+req.body.rfq_lines_id+' ✔</p><b>Thanks ✔</b>' // html body
+								};
+								transporter.sendMail(mailOptions, function(error, info){
+								    if(error){
+								        console.log(error);
+								    }else{
+								    	res.json({"statusCode":404, "success":"false", "message":"product designs not found", "product_designs":[]});
+								    }
+								});
 							}
 							else{
 								final_design_ids="";
@@ -207,7 +220,20 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 									}
 									else{
 										if(result.length==0){
-											res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
+											var mailOptions = {
+											    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+											    to: smtpConfig.design_department_email, // list of receivers seprated by comma also
+											    subject: 'Design Not Found ✔', // Subject line
+											    text: 'Design Not Found for the RFQ Line Item No. '+req.body.rfq_lines_id, // plaintext body
+											    html: '<p>Design Not Found for the RFQ Line Item No. '+req.body.rfq_lines_id+' ✔</p><b>Thanks ✔</b>' // html body
+											};
+											transporter.sendMail(mailOptions, function(error, info){
+											    if(error){
+											        console.log(error);
+											    }else{
+											    	res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
+											    }
+											});
 										}
 										else{
 											if(rangefilter.length>0){
@@ -411,7 +437,25 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 									}
 									else{
-										res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+										if(estimated_sales_price[0].sales_price>250000){
+											var mailOptions = {
+											    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+											    to: smtpConfig.sales_and_marketing_director_email+","+smtpConfig.pl_head_email, // list of receivers seprated by comma also
+											    subject: 'Hello, Quote performed ✔', // Subject line
+											    text: 'New RFQ Quote and the amount of it greater then 250000 EURO ✔', // plaintext body
+											    html: '<p>New RFQ Quote and the amount of it greater then 250000 EURO ✔</p><b>Thanks ✔</b>' // html body
+											};
+											transporter.sendMail(mailOptions, function(error, info){
+											    if(error){
+											        console.log(error);
+											    }else{
+											    	res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+											    }
+											});
+										}
+										else{
+											res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+										}
 									}
 								});
 							}
