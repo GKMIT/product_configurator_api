@@ -69,7 +69,7 @@ exports.sales_quote_followup_fetch_all = function(req, res){
 }
 
 exports.sales_quote_followup_fetch_one = function(req, res){
-	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id`, `rfq_status_id`, `sales_price`, `won_gross_sale` FROM `rfq` WHERE `rfq_status_id`='6' AND `id`='"+req.params.rfq_id+"'";
+	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id`, `rfq_status_id`, `sales_price`, `won_gross_sale`, `won_gross_sale` FROM `rfq` WHERE `rfq_status_id`='6' AND `id`='"+req.params.rfq_id+"'";
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);

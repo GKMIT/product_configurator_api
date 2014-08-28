@@ -186,19 +186,26 @@ exports.rfq_bid_submit = function(req, res){
 		}
 		else{
 			if(req.body.estimated_sales_price>250000){
-				var mailOptions = {
-				    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
-				    to: smtpConfig.sales_and_marketing_director_email+","+smtpConfig.pl_head_email, // list of receivers seprated by comma also
-				    subject: 'Hello, Bid New RFQ ✔', // Subject line
-				    text: 'New RFQ Bid and the amount of it greater then 250000 EURO ✔', // plaintext body
-				    html: '<b>Thanks ✔</b>' // html body
-				};
-				transporter.sendMail(mailOptions, function(error, info){
-				    if(error){
-				        console.log(error);
-				    }else{
-				    	res.json({"statusCode": 200, "success":"true", "message": "rfq submitted to tendering team"});
-				    }
+				connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"'", function(err, rfq_info) {
+					if(err){
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						var mailOptions = {
+						    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+						    to: smtpConfig.sales_and_marketing_director_email+","+smtpConfig.pl_head_email, // list of receivers seprated by comma also
+						    subject: 'Bid New RFQ ✔', // Subject line
+						    text: '', // plaintext body
+						    html: '<p>Bid/No Bid decision required on document '+rfq_info[0].document_no+' for an estimated value of '+req.body.estimated_sales_price+'<p>' // html body
+						};
+						transporter.sendMail(mailOptions, function(error, info){
+						    if(error){
+						        console.log(error);
+						    }else{
+						    	res.json({"statusCode": 200, "success":"true", "message": "rfq submitted to tendering team"});
+						    }
+						});
+					}
 				});
 			}
 			else{
