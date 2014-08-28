@@ -208,11 +208,12 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 										    if(error){
 										        console.log(error);
 										    }else{
-										    	res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
+										    	// res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
 										    }
 										});
 									}
 								});
+								res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
 							}
 							else{
 								final_design_ids="";
@@ -243,11 +244,12 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 													    if(error){
 													        console.log(error);
 													    }else{
-													    	res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
+													    	// res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
 													    }
 													});
 												}
 											});
+											res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
 										}
 										else{
 											if(rangefilter.length>0){
@@ -367,15 +369,15 @@ exports.tendering_fetch_particular_design = function(req, res){
 											    if(error){
 											        console.log(error);
 											    }else{
-											    	res.json({"statusCode": 200, "success":"true", "message": "", "design":design, "product_designs_technical_details": design_technical_detail});
+											    	// res.json({"statusCode": 200, "success":"true", "message": "", "design":design, "product_designs_technical_details": design_technical_detail});
 											    }
 											});
 										}
 									});
 								}
-								else{
+								// else{
 									res.json({"statusCode": 200, "success":"true", "message": "", "design":design, "product_designs_technical_details": design_technical_detail});
-								}
+								// }
 								
 							}
 						});
@@ -494,15 +496,15 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 													    if(error){
 													        console.log(error);
 													    }else{
-													    	res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+													    	// res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
 													    }
 													});
 												}
 											});
 										}
-										else{
+										// else{
 											res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
-										}
+										// }
 									}
 								});
 							}

@@ -202,15 +202,15 @@ exports.rfq_bid_submit = function(req, res){
 						    if(error){
 						        console.log(error);
 						    }else{
-						    	res.json({"statusCode": 200, "success":"true", "message": "rfq submitted to tendering team"});
+						    	// res.json({"statusCode": 200, "success":"true", "message": "rfq submitted to tendering team"});
 						    }
 						});
 					}
 				});
 			}
-			else{
+			// else{
 				res.json({"statusCode": 200, "success":"true", "message": "rfq submitted to tendering team"});
-			}
+			// }
 		}
 	});
 };
