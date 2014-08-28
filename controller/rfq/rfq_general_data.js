@@ -478,7 +478,7 @@ exports.update_rfq_general_data = function(req, res){
 				param.push("sales_agents_id");
 				paramValue.push(req.body.sales_agents_id);
 			}
-			if(typeof req.body.project_name!=="undefined" && req.body.project_name!==""){
+			if(typeof req.body.project_name!=="undefined"){
 				param.push("project_name");
 				paramValue.push(req.body.project_name);
 			}
@@ -502,7 +502,7 @@ exports.update_rfq_general_data = function(req, res){
 				param.push("requested_quotation_date");
 				paramValue.push(req.body.requested_quotation_date);
 			}
-			if(typeof req.body.customer_reference!=="undefined" && req.body.customer_reference!==""){
+			if(typeof req.body.customer_reference!=="undefined"){
 				param.push("customer_reference");
 				paramValue.push(req.body.customer_reference);
 			}
