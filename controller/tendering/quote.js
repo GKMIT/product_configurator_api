@@ -180,15 +180,11 @@ exports.tendering_fetch_product_design_detail = function(req, res){
 					query=query.substring("", query.length-2);
 					equalfilterids=equalfilterids.substring("", equalfilterids.length-2);
 					rangefilterids=rangefilterids.substring("", rangefilterids.length-2);
-					var master_data_version_query="Select `last_relevant_design_version` FROM `master_data` WHERE `plants_id`='"+product_lines[0].plants_id+"' LIMIT 1";
-
-					var master_data_pricelist_version_query="Select `most_recent_pricelist_version` FROM `master_data` WHERE `plants_id`='"+product_lines[0].plants_id+"' LIMIT 1";
-
-
-					var pre_query = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc` WHERE `pd`.`design_version_number`> ("+master_data_version_query+") AND `pdc`.`material_pricelist_reference`=("+master_data_pricelist_version_query+") AND `pd`.`id`=`pdc`.`product_design_id` AND `pd`.`plants_id`='"+product_lines[0].plants_id+"'";
+					var pre_query = "SELECT distinct `pd`.`id` FROM `product_designs` `pd`, `product_designs_costs` `pdc`,`master_data` `md` WHERE `pd`.`design_version_number`>`md`.`last_relevant_design_version` AND `pdc`.`material_pricelist_reference`=`md`.`most_recent_pricelist_version` AND `pd`.`id`=`pdc`.`product_design_id` AND `pd`.`plants_id`='"+product_lines[0].plants_id+"'";
 					var post_query = "SELECT distinct `product_design_id` FROM `product_designs_technical_details`	WHERE product_design_id IN ("+pre_query+") AND product_design_id IN ( SELECT product_design_id FROM product_designs_technical_details WHERE "+query+" GROUP BY product_design_id HAVING count(*) = "+req.body.properties.length+")";
 					
 					var final_query = "SELECT distinct id FROM `product_designs` WHERE id IN ("+post_query+")";
+					console.log(final_query);
 					connection.query(final_query, function(err, product_designs){
 						if(err){
 							console.log(err);
