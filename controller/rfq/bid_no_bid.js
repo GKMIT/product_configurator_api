@@ -19,7 +19,7 @@ exports.ready_rfq_bid = function(req, res){
 				});
 			}
 			else{
-				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` as ` sales_agent_name`, `customers`.`name` as `customer_name`, `organization_users`.`full_name` as `sales_person_name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` LEFT JOIN `customers` ON `customers`.`id`=`rfq`.`customers_id` LEFT JOIN `organization_users` on `organization_users`.`id`=`rfq`.`sales_person_id` WHERE `rfq`.`rfq_status_id`='2' ORDER BY `rfq`.`updated_at` desc";
+				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`date_rfq_in`, `rfq`.`sales_agents_id`, `agent`.`name` as ` sales_agent_name`, `customers`.`name` as `customer_name`, `organization_users`.`full_name` as `sales_person_name` FROM `rfq` LEFT JOIN `sales_agents` `agent` ON `rfq`.`sales_agents_id`=`agent`.`id` LEFT JOIN `customers` ON `customers`.`id`=`rfq`.`customers_id` LEFT JOIN `organization_users` on `organization_users`.`id`=`rfq`.`sales_person_id` WHERE `rfq`.`rfq_status_id`='2' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0')) ORDER BY `rfq`.`updated_at` desc";
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
