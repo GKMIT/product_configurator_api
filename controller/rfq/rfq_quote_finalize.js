@@ -77,8 +77,9 @@ exports.sales_quote_finalize_fetch_one = function(req, res){
 								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
 							else{
-								connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks){
-									if(err){
+								connection.query("SELECT `id`, `description` FROM `lost_remarks`", function(err, rejection_remarks){
+									if(err)
+									{
 										console.log(err);
 										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 									}
