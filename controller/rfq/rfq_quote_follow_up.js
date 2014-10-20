@@ -91,7 +91,7 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 							else{
 								rfq[0]["minimum_sales_price"]=rfq_lines[0].minimum_sales_price;
 								
-								connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks){
+								connection.query("SELECT `id`, `description` FROM `lost_remarks`", function(err, rejection_remarks){
 									if(err){
 										console.log(err);
 										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
