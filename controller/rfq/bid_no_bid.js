@@ -269,13 +269,19 @@ exports.duplicateRfq = function(req, res){
 					// var mement = require('moment');
 					console.log(rfq[0].quote_creation_date);
 					console.log(rfq[0].date_rfq_in);
-					
-					var date_rfq_in=moment(new Date(rfq[0].date_rfq_in).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+					var date_rfq_in="0000-00-00 00:00:00";
+					if(rfq[0].date_rfq_in!="0000-00-00 00:00:00"){
+						date_rfq_in=moment(new Date(rfq[0].date_rfq_in).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+					}
 					// var quote_creation_date=moment(new Date(rfq[0].quote_creation_date).toISOString().substring(0,18), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
 					// console.log(quote_creation_date);
 					// var quote_submission_date=moment(new Date(rfq[0].quote_submission_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
 					// var quote_validity_date=moment(new Date(rfq[0].quote_validity_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
-					var requested_quotation_date=moment(new Date(rfq[0].requested_quotation_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+					var requested_quotation_date="0000-00-00 00:00:00";
+					if(rfq[0].requested_quotation_date!="0000-00-00 00:00:00"){
+						requested_quotation_date=moment(new Date(rfq[0].requested_quotation_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+					}
+					
 					// console.log(date_rfq_in);
 					// console.log(rfq[0].date_rfq_in);
 					var document_part=rfq[0].document_no.split("/");

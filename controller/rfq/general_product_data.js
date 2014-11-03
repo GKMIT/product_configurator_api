@@ -42,51 +42,51 @@ exports.rfq_product_lines = function(req, res){
 	rfq_product_linesValidation(req, res, function(req, res, checkValid){
 		if (checkValid==1) {
 			 // AND created_by='"+req.params.user_id+"'
-					connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
-						if(err){
-								res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if(rfq.length==0){
-								res.json({"statusCode": 401, "success": "false", "message": "unauthorized access"});
+			connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
+				if(err){
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					if(rfq.length==0){
+						res.json({"statusCode": 401, "success": "false", "message": "unauthorized access"});
+					}
+					else{
+						connection.query("SELECT `id`,`name` FROM `product_lines`", function(err, product_lines) {
+							if(err){
+								console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 							}
 							else{
-								connection.query("SELECT `id`,`name` FROM `product_lines`", function(err, product_lines) {
+								// if(rfq[0].tenderinr_teams_id>0){}
+								// if(rfq[0].tendering_teams_members_id>0){}
+
+								connection.query("SELECT `id`,`name` FROM `tendering_teams` WHERE product_lines_id='"+rfq[0].product_lines_id+"'", function(err, tendering_teams) {
 									if(err){
 										console.log(err);
 											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 									}
 									else{
-										// if(rfq[0].tenderinr_teams_id>0){}
-										// if(rfq[0].tendering_teams_members_id>0){}
-
-										connection.query("SELECT `id`,`name` FROM `tendering_teams` WHERE product_lines_id='"+rfq[0].product_lines_id+"'", function(err, tendering_teams) {
+										connection.query("SELECT `id`,`user_name` FROM `organization_users` WHERE tendering_teams_id='"+rfq[0].tendering_teams_id+"'", function(err, tendering_teams_members) {
 											if(err){
 												console.log(err);
 													res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 											}
 											else{
-												connection.query("SELECT `id`,`user_name` FROM `organization_users` WHERE tendering_teams_id='"+rfq[0].tendering_teams_id+"'", function(err, tendering_teams_members) {
-													if(err){
-														console.log(err);
-															res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-													}
-													else{
-														res.json({"statusCode": 200, "success":"true", "message":"", "product_lines":product_lines, "selected_rfq":rfq, "tendering_teams": tendering_teams, "tendering_teams_members": tendering_teams_members});
-													}
-												});
+												res.json({"statusCode": 200, "success":"true", "message":"", "product_lines":product_lines, "selected_rfq":rfq, "tendering_teams": tendering_teams, "tendering_teams_members": tendering_teams_members});
 											}
 										});
-
-										
 									}
 								});
-							}
-							
-						}
-					});
 
+								
+							}
+						});
+					}
+					
 				}
+			});
+
+		}
 	});
 };
 
@@ -175,10 +175,10 @@ exports.rfq_tendering_teams_members = function(req, res){
 exports.general_product_data_save = function(req, res){
 	var param = new Array();
 	var paramValue = new Array();
-	if(typeof req.body.product_lines_id!=="undefined" || req.body.product_lines_id!==""){
-		param.push("product_lines_id");
-		paramValue.push(req.body.product_lines_id);
-	}
+	// if(typeof req.body.product_lines_id!=="undefined" || req.body.product_lines_id!==""){
+	// 	param.push("product_lines_id");
+	// 	paramValue.push(req.body.product_lines_id);
+	// }
 	if(typeof req.body.tendering_teams_id!=="undefined" || req.body.tendering_teams_id!==""){
 		param.push("tendering_teams_id");
 		paramValue.push(req.body.tendering_teams_id);

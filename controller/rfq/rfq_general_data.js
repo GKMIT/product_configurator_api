@@ -225,7 +225,7 @@ exports.rfq_general_data_sales_persons=function(req, res){
 // API Code for the save new rfq
 function save_rfq_general_dataValidation(req, res, callback){
 	var checkValid=1;
-	var param = ["user_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "sales_segments_id", "probability", "rfq_status_id"];
+	var param = ["user_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "sales_segments_id", "probability", "rfq_status_id", "product_lines_id"];
 	if(req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -339,33 +339,86 @@ exports.save_rfq_general_data = function(req, res){
 					param.push("customer_reference");
 					paramValue.push(req.body.customer_reference);
 				}
+				if(typeof req.body.product_lines_id!=="undefined" && req.body.product_lines_id!==""){
+					param.push("product_lines_id");
+					paramValue.push(req.body.product_lines_id);
+				}
 				param.push("is_bid");
 				paramValue.push(req.body.is_bid);
 
-					var query="INSERT INTO rfq (";
-					var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, created_by, rfq_status_id, probability_id";
-					var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"', '"+req.body.user_id+"','"+req.body.rfq_status_id+"','"+req.body.probability+"'";
-					for(var i=0; i<param.length; i++){
-						if(i==0){
-							queryparam=queryparam+",";
-							queryValue=queryValue+",";
-						}
-						queryparam=queryparam+""+param[i];
-						queryValue=queryValue+"'"+paramValue[i]+"'";
-						if(i+1<param.length){
-							queryparam=queryparam+",";
-							queryValue=queryValue+",";
-						}
+				var query="INSERT INTO rfq (";
+				var queryparam="sales_hub_id, sales_person_id, customers_id, customer_country, type_of_quote_id, date_rfq_in, sales_segments_id, created_by, rfq_status_id, probability_id";
+				var queryValue="VALUES('"+req.body.sales_hub_id+"','"+req.body.sales_person_id+"','"+req.body.customers_id+"','"+req.body.customer_country+"','"+req.body.type_of_quote_id+"','"+req.body.date_rfq_in+"','"+req.body.sales_segments_id+"', '"+req.body.user_id+"','"+req.body.rfq_status_id+"','"+req.body.probability+"'";
+				for(var i=0; i<param.length; i++){
+					if(i==0){
+						queryparam=queryparam+",";
+						queryValue=queryValue+",";
 					}
-					query=query+queryparam+")"+queryValue+")";
-					connection.query(query, function(err, info) {
-						if(err){
-								res.json({"statusCode":500, "success":"false", "message": "internal error"});
-						}
-						else{
-							res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": info.insertId});
-						}
-					});
+					queryparam=queryparam+""+param[i];
+					queryValue=queryValue+"'"+paramValue[i]+"'";
+					if(i+1<param.length){
+						queryparam=queryparam+",";
+						queryValue=queryValue+",";
+					}
+				}
+				query=query+queryparam+")"+queryValue+")";
+				connection.query(query, function(err, info) {
+					if(err){
+							res.json({"statusCode":500, "success":"false", "message": "internal error"});
+					}
+					else{
+						connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+info.insertId+"'", function(err, rfq_detail){
+							if(err){
+								res.json({"statusCode":500, "success": "false", "message": "internal error"});
+							}
+							else{
+								if(rfq_detail.length>0){
+									var document_no="";
+									var version_no="1.0";
+									
+									var country=rfq_detail[0].iso_code;
+									var year=""+rfq_detail[0].year;
+									year=year.toString();
+									year=year[2]+year[3];
+									var number=rfq_detail[0].id;
+									var product_line=rfq_detail[0].product_lines_id;
+									var product_line_name="";
+									var rfq_id=rfq_detail[0].id;
+									if(product_line==1){
+										product_line_name="D";
+									}
+									if(product_line==2){
+										product_line_name="P";
+									}
+
+									console.log("country : "+country);
+									console.log("year : "+year);
+									console.log("product_line_name : "+product_line_name);
+									document_no=country+year+product_line_name+number+"/"+version_no;
+									
+									if(rfq_detail[0].version_no>0){
+										version_no=rfq_detail[0].version_no;
+										document_no=rfq_detail[0].document_no;
+									}
+
+									console.log("document NUmber :::="+document_no);
+
+									connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+info.insertId+"'", function(err, info_tech){
+										if(err){
+											res.json({"statusCode":500, "success": "false", "message": "internal error"});
+										}
+										else{
+											res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": info.insertId});
+										}
+									});
+								}
+								else{
+									res.json({"statusCode":206, "success":"true", "message":"rfq detail not completed"});
+								}
+							}
+						});
+					}
+				});
 	});
 		
 };
@@ -373,7 +426,7 @@ exports.save_rfq_general_data = function(req, res){
 // API Code for the update call rfq
 function update_rfq_general_dataValidation(req, res, callback){
 	var checkValid=1;
-	var param = ["user_id", "rfq_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "sales_segments_id", "probability", "rfq_status_id"];
+	var param = ["user_id", "rfq_id", "sales_hub_id", "sales_person_id", "customers_id", "customer_country", "type_of_quote_id", "sales_segments_id", "probability", "rfq_status_id", "product_lines_id"];
 	if(req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -469,7 +522,7 @@ exports.update_rfq_general_data = function(req, res){
 	update_rfq_general_dataValidation(req, res, function(req, res){
 			var param = new Array();
 				var paramValue = new Array();
-			
+
 				param.push("rfq_status_id");
 				// partial status code is 0 OR 1
 				paramValue.push(req.body.rfq_status_id);
@@ -506,6 +559,10 @@ exports.update_rfq_general_data = function(req, res){
 				param.push("customer_reference");
 				paramValue.push(req.body.customer_reference);
 			}
+			if(typeof req.body.product_lines_id!=="undefined" && req.body.product_lines_id!==""){
+				param.push("product_lines_id");
+				paramValue.push(req.body.product_lines_id);
+			}
 			param.push("is_bid");
 			paramValue.push(req.body.is_bid);
 
@@ -529,7 +586,50 @@ exports.update_rfq_general_data = function(req, res){
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
 					}
 					else{
-						res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": req.body.rfq_id});
+						connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
+							if(err){
+								res.json({"statusCode":500, "success": "false", "message": "internal error"});
+							}
+							else{
+								if(rfq_detail.length>0){
+									var document_no="";
+									var version_no="";
+									
+									// var country=rfq_detail[0].iso_code;
+									// var year=""+rfq_detail[0].year;
+									// year=year.toString();
+									// year=year[2]+year[3];
+									// var number=rfq_detail[0].id;
+									// var product_line=rfq_detail[0].product_lines_id;
+									// var product_line_name="";
+									// var rfq_id=rfq_detail[0].id;
+									// if(product_line==1){
+									// 	product_line_name="D";
+									// }
+									// if(product_line==2){
+									// 	product_line_name="P";
+									// }
+									// document_no=country+year+product_line_name+number+"/"+version_no;
+									
+									if(rfq_detail[0].version_no>0){
+										version_no=rfq_detail[0].version_no;
+										document_no=rfq_detail[0].document_no;
+									}
+
+									connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+										if(err){
+											res.json({"statusCode":500, "success": "false", "message": "internal error"});
+										}
+										else{
+											res.json({"statusCode":200, "success": "true", "message": "", "rfq_id": req.body.rfq_id});
+										}
+									});
+								}
+								else{
+									res.json({"statusCode":206, "success": "true", "message": "rfq detail not completed", "rfq_id": req.body.rfq_id});
+								}
+							}
+						});
 					}
 				});
 	});	
