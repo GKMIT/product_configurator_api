@@ -1,96 +1,103 @@
 var validator = require("validator");
 
 exports.rfq_general_data = function(req, res){
-	 // AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"')
+	// AND (`created_by`='"+req.params.user_id+"' OR `sales_person_id`='"+req.params.user_id+"')
 	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
-			if(err){
-				console.log(err);
-				res.json({"statusCode":500, "success":"false", "message": "internal error"});
-			}
-			else{
-				connection.query("SELECT `id`,`name` FROM `sales_hubs`", function(err, sales_hubs) {
-					if(err){
+		if(err){
+			console.log(err);
+			res.json({"statusCode":500, "success":"false", "message": "internal error"});
+		}
+		else{
+
+			connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks) {
+				if(err){
+					console.log(err);
+					res.json({"statusCode":500, "success":"false", "message": "internal error"});
+				}
+				else{
+					connection.query("SELECT `id`, `name` FROM `product_lines`", function(err, product_line){
+						if(err){
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
-							}
-					else{
-						connection.query("SELECT `id`,`name` FROM `countries` ORDER BY `name` asc", function(err, countries) {
-							if(err){
-									res.json({"statusCode":500, "success":"false", "message": "internal error"});
-							}
-							else{
-								connection.query("SELECT `id`,`name` FROM `customers`", function(err, customers) {
-									if(err){
-											res.json({"statusCode":500, "success":"false", "message": "internal error"});
-									}
-									else{
-										connection.query("SELECT `id`,`description` FROM `type_of_quotes`", function(err, type_of_quote) {
-											if(err){
-													res.json({"statusCode":500, "success":"false", "message": "internal error"});
-											}
-											else{
-												connection.query("SELECT `id`,`name` FROM `sales_segments`", function(err, sales_segments) {
-													if(err){
-															res.json({"statusCode":500, "success":"false", "message": "internal error"});
-													}
-													else{
-														connection.query("SELECT `id`, `name` FROM `channel_to_market`", function(err, channel_to_market) {
-															if(err){
-																console.log(err);
-																	res.json({"statusCode":500, "success":"false", "message": "internal error"});
-															}
-															else{
-																connection.query("SELECT `id`, `name`, `value` FROM `probability`", function(err, probability) {
-																	if(err){
-																		console.log(err);
-																			res.json({"statusCode":500, "success":"false", "message": "internal error"});
-																	}
-																	else{
-																		if(rfq.length<=0){
-																		res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": "", "channel_to_market": channel_to_market, "probability":probability});
+						}
+						else{
+							connection.query("SELECT `id`,`name` FROM `sales_hubs`", function(err, sales_hubs) {
+								if(err){
+										res.json({"statusCode":500, "success":"false", "message": "internal error"});
+										}
+								else{
+									connection.query("SELECT `id`,`name` FROM `countries` ORDER BY `name` asc", function(err, countries) {
+										if(err){
+												res.json({"statusCode":500, "success":"false", "message": "internal error"});
+										}
+										else{
+											connection.query("SELECT `id`,`name` FROM `customers`", function(err, customers) {
+												if(err){
+														res.json({"statusCode":500, "success":"false", "message": "internal error"});
+												}
+												else{
+													connection.query("SELECT `id`,`description` FROM `type_of_quotes`", function(err, type_of_quote) {
+														if(err){
+																res.json({"statusCode":500, "success":"false", "message": "internal error"});
+														}
+														else{
+															connection.query("SELECT `id`,`name` FROM `sales_segments`", function(err, sales_segments) {
+																if(err){
+																		res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																}
+																else{
+																	connection.query("SELECT `id`, `name` FROM `channel_to_market`", function(err, channel_to_market) {
+																		if(err){
+																			console.log(err);
+																				res.json({"statusCode":500, "success":"false", "message": "internal error"});
 																		}
 																		else{
-																			connection.query("SELECT `sa`.`id`,`sa`.`name` FROM `sales_agents` `sa`, `agent_country_allocation` `aca` WHERE sa.id=aca.sales_agents_id AND countries_id='"+rfq[0].customer_country+"'", function(err, sales_agents) {
+																			connection.query("SELECT `id`, `name`, `value` FROM `probability`", function(err, probability) {
 																				if(err){
+																					console.log(err);
 																						res.json({"statusCode":500, "success":"false", "message": "internal error"});
 																				}
 																				else{
-																					connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+rfq[0].sales_hub_id+"'", function(err, sales_persons) {
-																						if(err){
-																							console.log(err);
-																								res.json({"statusCode":500, "success":"false", "message": "internal error"});
-																						}
-																						else{
-																							connection.query("SELECT `id`, `description` FROM `rejection_remarks`", function(err, rejection_remarks) {
-																								if(err){
-																									console.log(err);
-																										res.json({"statusCode":500, "success":"false", "message": "internal error"});
-																								}
-																								else{
-																									res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons, "channel_to_market": channel_to_market, "rejection_remarks":rejection_remarks, "probability":probability});
-																								}
-																							});
-																						}
-																					});																					
+																					if(rfq.length<=0){
+																					res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": "", "sales_agents": "", "sales_persons": "", "channel_to_market": channel_to_market, "probability":probability, "product_lines": product_line});
+																					}
+																					else{
+																						connection.query("SELECT `sa`.`id`,`sa`.`name` FROM `sales_agents` `sa`, `agent_country_allocation` `aca` WHERE sa.id=aca.sales_agents_id AND countries_id='"+rfq[0].customer_country+"'", function(err, sales_agents) {
+																							if(err){
+																									res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																							}
+																							else{
+																								connection.query("SELECT `id`, `user_name` FROM `organization_users` WHERE `sales_hubs_id`='"+rfq[0].sales_hub_id+"'", function(err, sales_persons) {
+																									if(err){
+																										console.log(err);
+																											res.json({"statusCode":500, "success":"false", "message": "internal error"});
+																									}
+																									else{
+																										res.json({"statusCode":200, "success":"true", "message": "", "sales_hubs": sales_hubs, "countries": countries, "customers": customers, "type_of_quote": type_of_quote, "sales_segments": sales_segments, "selected_rfq": rfq, "sales_agents": sales_agents, "sales_persons": sales_persons, "channel_to_market": channel_to_market, "rejection_remarks":rejection_remarks, "probability":probability, "product_lines": product_line});
+																									}
+																								});																					
+																							}
+																						});																			
+																					}
 																				}
-																			});																			
+																			});
 																		}
-																	}
-																});
-															}
-														});
-																																
-													}
-												});
-											}
-										});
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-		});
+																	});
+																}
+															});
+														}
+													});
+												}
+											});
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	});
 };
 
 // API Code for GET Agents

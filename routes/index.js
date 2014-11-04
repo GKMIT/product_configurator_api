@@ -125,13 +125,18 @@ module.exports = function(){
 	app.post("/customer", customerValidation.add, customer.add);
 	app.get("/customer/:user_id", customerValidation.show, customer.show);
 
+	var archive_followup_validation = require('../controller/validation/followup.js');
+	var archive_followup = require('../controller/rfq/followup.js');
 
-// sales_quote_followup_obsolete
+	app.get("/archive_followup/:user_id", archive_followup_validation.followup_archive_quote, archive_followup.followup_archive_quote);
+
+	app.post("/archive_rfq_copy", archive_followup_validation.followup_archive_quote_copy, archive_followup.followup_archive_quote_copy);
+
+	// sales_quote_followup_obsolete
 
 	// dashboard
 	var dashboardValidation = require("../controller/validation/dashboard.js");
 	var dashboard = require("../controller/dashboard.js");
 	app.get("/dashboard/:user_id", dashboardValidation.dashboard, dashboard.dashboard);
-
 
 };
