@@ -600,27 +600,29 @@ exports.update_rfq_general_data = function(req, res){
 							else{
 								if(rfq_detail.length>0){
 									var document_no="";
-									var version_no="";
-									
-									// var country=rfq_detail[0].iso_code;
-									// var year=""+rfq_detail[0].year;
-									// year=year.toString();
-									// year=year[2]+year[3];
-									// var number=rfq_detail[0].id;
-									// var product_line=rfq_detail[0].product_lines_id;
-									// var product_line_name="";
-									// var rfq_id=rfq_detail[0].id;
-									// if(product_line==1){
-									// 	product_line_name="D";
-									// }
-									// if(product_line==2){
-									// 	product_line_name="P";
-									// }
-									// document_no=country+year+product_line_name+number+"/"+version_no;
+									var version_no="1.0";
 									
 									if(rfq_detail[0].version_no>0){
 										version_no=rfq_detail[0].version_no;
 										document_no=rfq_detail[0].document_no;
+									}
+									else{
+										var country=rfq_detail[0].iso_code;
+										var year=""+rfq_detail[0].year;
+										year=year.toString();
+										year=year[2]+year[3];
+										var number=rfq_detail[0].id;
+										var product_line=rfq_detail[0].product_lines_id;
+										var product_line_name="";
+										var rfq_id=rfq_detail[0].id;
+										if(product_line==1){
+											product_line_name="D";
+										}
+										if(product_line==2){
+											product_line_name="P";
+										}
+										document_no=country+year+product_line_name+number+"/"+version_no;
+										
 									}
 
 									connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
