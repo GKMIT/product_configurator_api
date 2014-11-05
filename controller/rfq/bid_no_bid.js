@@ -281,7 +281,7 @@ exports.duplicateRfq = function(req, res){
 					if(rfq[0].requested_quotation_date!="0000-00-00 00:00:00"){
 						requested_quotation_date=moment(new Date(rfq[0].requested_quotation_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
 					}
-					
+
 					// console.log(date_rfq_in);
 					// console.log(rfq[0].date_rfq_in);
 					var document_part=rfq[0].document_no.split("/");
@@ -357,6 +357,40 @@ function technical_sepc(index, rfq_lines_id, technical_specs, callback){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
+		}
+	});
+};
+
+
+exports.revert_to_sales = function(req, res){
+	var query="SELECT `rfq`.`sales_hub_id`, `rfq`.`sales_person_id`, `rfq`.`sales_segments_id`, `rfq`.`sales_agents_id`, `rfq`.`tendering_teams_id`, `rfq`.`tendering_teams_members_id`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `rfq`.`customer_country`, `rfq`.`installation_country`, `rfq`.`version_no`, `document_no`, `created_by`, `organization_users`.`email` FROM `rfq` LEFT JOIN `organization_users` ON `rfq`.`created_by`=`organization_users`.`id` WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
+	connection.query(query, function(err, rfq_info){
+		if(err){
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			var mailOptions = {
+			    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+			    to: smtpConfig.sales_and_marketing_director_email+', '+rfq_info[0].email, // list of receivers seprated by comma also
+			    subject: 'RFQ Revert to sales ✔', // Subject line
+			    text: 'RFQ #docnr is Reverted to sales', // plaintext body
+			    html: '<p>RFQ '+rfq_info[0].document_no+' is reverted to sales</p>' // html body
+			};
+			transporter.sendMail(mailOptions, function(error, info){
+			    if(error){
+			        console.log(error);
+			    }else{
+			    	// res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
+			    }
+			});
+		}
+	});
+	connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+		if(err){
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
 		}
 	});
 };
