@@ -306,37 +306,71 @@ exports.delete_line_item = function(req, res){
 exports.complete_rfq = function(req, res){
 	if(req.body.rfq_status_id==2){
 		connection.query("SELECT * FROM `rfq_lines` WHERE rfq_id='"+req.body.rfq_id+"'", function(err, check_line_item){
-					if(err){
-						res.json({"statusCode":500, "success": "false", "message": "internal error"});
+				if(err){
+					res.json({"statusCode":500, "success": "false", "message": "internal error"});
+				}
+				else{
+					if(check_line_item.length>0){
+						connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+							if(err){
+								res.json({"statusCode":500, "success": "false", "message": "internal error"});
+							}
+							else{
+								res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+							}
+						});
 					}
 					else{
-						if(check_line_item.length>0){
-							connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
-								if(err){
-									res.json({"statusCode":500, "success": "false", "message": "internal error"});
-								}
-								else{
-									res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
-								}
-							});
-						}
-						else{
-							res.json({"statusCode":404, "success": "false", "message": "Please save the Line Item first before you can Complete the RFQ"});
-						}
+						res.json({"statusCode":404, "success": "false", "message": "Please save the Line Item first before you can Complete the RFQ"});
 					}
-			});
+				}
+		});
 		
 	}
 	else
 	{
-		connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
-			if(err){
-				res.json({"statusCode":500, "success": "false", "message": "internal error"});
-			}
-			else{
-				res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
-			}
-		});
+		if(req.body.revert_to_sales){
+			var query="SELECT `rfq`.`sales_hub_id`, `rfq`.`sales_person_id`, `rfq`.`sales_segments_id`, `rfq`.`sales_agents_id`, `rfq`.`tendering_teams_id`, `rfq`.`tendering_teams_members_id`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `rfq`.`customer_country`, `rfq`.`installation_country`, `rfq`.`version_no`, `document_no`, `created_by`, `organization_users`.`email` FROM `rfq` LEFT JOIN `organization_users` ON `rfq`.`created_by`=`organization_users`.`id` WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
+			connection.query(query, function(err, rfq_info){
+				if(err){
+					res.json({"statusCode":500, "success": "false", "message": "internal error"});
+				}
+				else{
+					var mailOptions = {
+					    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+					    to: smtpConfig.sales_and_marketing_director_email+', '+rfq_info[0].email, // list of receivers seprated by comma also
+					    subject: 'RFQ Revert to sales ✔', // Subject line
+					    text: 'RFQ #docnr is Reverted to sales', // plaintext body
+					    html: '<p>RFQ '+rfq_info[0].document_no+' is reverted to sales</p>' // html body
+					};
+					transporter.sendMail(mailOptions, function(error, info){
+					    if(error){
+					        console.log(error);
+					    }else{
+					    	// res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
+					    }
+					});
+				}
+			});
+			connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+				if(err){
+					res.json({"statusCode":500, "success": "false", "message": "internal error"});
+				}
+				else{
+					res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+				}
+			});
+		}
+		else{
+			connection.query("UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+req.body.rfq_id+"'", function(err, info_tech){
+				if(err){
+					res.json({"statusCode":500, "success": "false", "message": "internal error"});
+				}
+				else{
+					res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+				}
+			});
+		}
 	}
 }
 
