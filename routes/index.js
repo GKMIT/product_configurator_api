@@ -55,6 +55,7 @@ module.exports = function(){
 
 	// rfq finalize
 	app.get("/rfq_finalize/:user_id",rfq_finalize_validation.rfq_partial_show, rfq_finalize.rfq_partial_show);
+	app.delete("/delete_rfq/:user_id/:rfq_id", rfq_finalize_validation.delete_rfq, rfq_finalize.delete_rfq);
 
 	// bid no bid
 

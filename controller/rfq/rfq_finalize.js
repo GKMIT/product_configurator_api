@@ -1,3 +1,4 @@
+var async = require('async');
 exports.rfq_partial_show = function(req, res){
 	connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
 		if(err){
@@ -55,3 +56,72 @@ exports.rfq_partial_show = function(req, res){
 	});
 	
 };
+
+exports.delete_rfq = function(req, res){
+	var rfq="select * from `rfq` where `id`='"+req.params.rfq_id+"'";
+	var rfq_lines="select `id` from `rfq_lines` where `rfq_id`='"+req.params.rfq_id+"'";
+	var rfq_lines_calculated_sales_price_delete="";
+	var rfq_lines_technical_specs_delete="";
+	var rfq_lines_delete="delete from `rfq_lines` where `rfq_id`='"+req.params.rfq_id+"'";
+	var rfq_delete="delete from `rfq` where `id`='"+req.params.rfq_id+"'";
+	var rfq_lines_questions_delete="delete from `rfq_lines_questions` where `rfq_id`='"+req.params.rfq_id+"'";
+	console.log(rfq_lines);
+	connection.query(rfq_lines, function(err, rfq_lines){
+		if(err){
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			async.each(rfq_lines, function(item, done){
+				rfq_lines_calculated_sales_price_delete="delete from `rfq_lines_calculated_sales_price` where `rfq_lines_id`='"+item.id+"'";
+				connection.query(rfq_lines_calculated_sales_price_delete, function(err, info){
+					if(err){
+						done(err);
+					}
+					else{
+						rfq_lines_technical_specs_delete="delete from `rfq_lines_technical_specs` where `rfq_lines_id`='"+item.id+"'";
+						connection.query(rfq_lines_technical_specs_delete, function(err, line_entry){
+							if(err){
+								done(err);
+							}
+							else{
+								done();
+							}
+						});
+					}
+		    	});
+			},
+		    function(err){
+		      	if (err){
+			      	console.log(err);
+			      	res.json({"statusCode": 500, "success": "false", "message":"internal error"});
+			    }
+			    else{
+			    	connection.query(rfq_lines_delete, function(err, lines_items){
+			    		if(err){
+			    			console.log(err);
+			    			res.json({"statusCode": 500, "success": "false", "message":"internal error"});
+			    		}
+			    		else{
+			    			connection.query(rfq_lines_questions_delete, function(err, lines_items){
+					    		if(err){
+					    			res.json({"statusCode": 500, "success": "false", "message":"internal error"});
+					    		}
+					    		else{
+					    			connection.query(rfq_delete, function(err, lines_items){
+							    		if(err){
+							    			res.json({"statusCode": 500, "success": "false", "message":"internal error"});
+							    		}
+							    		else{
+							    			res.json({"statusCode": 202, "success":"true", "message":"RFQ Removed Successfully"});
+							    		}
+							    	});
+					    		}
+					    	});
+			    		}
+			    	});
+			    }
+			}
+	    );
+		}
+	});
+}
