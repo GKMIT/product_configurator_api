@@ -5,7 +5,8 @@ exports.product_lines = function(req, res){
 			res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `rfq_lines`.id, `rfq_lines`.product_lines_id, `rfq_lines`.plants_id, `rfq_lines`.rfq_id, `rfq_lines`.number_of_units, `rfq_lines`.`req_delivery_date`, `product_lines`.name as `product_lines_name`, `plants`.name as `plant_name` FROM `rfq_lines`, `product_lines`, `plants` WHERE rfq_id='"+req.params.rfq_id+"' AND rfq_lines.product_lines_id=product_lines.id AND rfq_lines.plants_id=plants.id", function(err, rfq_lines_items) {
+			var line_item_query="SELECT `rfq_lines`.id, `rfq_lines`.product_lines_id, `rfq_lines`.plants_id, `rfq_lines`.rfq_id, `rfq_lines`.number_of_units, `rfq_lines`.`req_delivery_date`, `product_lines`.name as `product_lines_name`, `plants`.name as `plant_name` FROM `rfq_lines` LEFT JOIN `product_lines` ON rfq_lines.product_lines_id=product_lines.id LEFT JOIN `plants` ON rfq_lines.plants_id=plants.id WHERE rfq_id='"+req.params.rfq_id+"'";
+			connection.query(line_item_query, function(err, rfq_lines_items) {
 				if(err){
 					res.json({"statusCode":500, "success":"false", "message": "internal error"});
 				}
@@ -164,7 +165,8 @@ exports.save_line_item = function(req, res){
 			};
 			console.log(counter);
 			if(counter>=testIds.length){
-				connection.query("INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`) VALUES('"+req.body.product_lines_id+"', '"+req.body.plants_id+"', '"+req.body.rfq_id+"', '"+req.body.number_of_units+"', '"+req.body.req_delivery_date+"')", function(err, info){
+				//connection.query("INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`) VALUES('"+req.body.product_lines_id+"', '"+req.body.plants_id+"', '"+req.body.rfq_id+"', '"+req.body.number_of_units+"', '"+req.body.req_delivery_date+"')", function(err, info){
+				connection.query("INSERT INTO `rfq_lines` (`product_lines_id`, `rfq_id`, `number_of_units`, `req_delivery_date`) VALUES('"+req.body.product_lines_id+"', '"+req.body.rfq_id+"', '"+req.body.number_of_units+"', '"+req.body.req_delivery_date+"')", function(err, info){
 					if(err){
 						res.json({"statusCode":500, "success": "false", "message": "internal error"});
 					}
@@ -214,7 +216,8 @@ exports.save_line_item = function(req, res){
 
 exports.update_line_item = function(req, res){
 	// console.log(req.body.technical_specifications.length);
-	connection.query("UPDATE `rfq_lines` SET `product_lines_id` = '"+req.body.product_lines_id+"', `plants_id` = '"+req.body.plants_id+"', `rfq_id` = '"+req.body.rfq_id+"', `number_of_units` = '"+req.body.number_of_units+"', `req_delivery_date` = '"+req.body.req_delivery_date+"' WHERE `id`='"+req.body.rfq_lines_id+"'", function(err, info){
+	//connection.query("UPDATE `rfq_lines` SET `product_lines_id` = '"+req.body.product_lines_id+"', `plants_id` = '"+req.body.plants_id+"', `rfq_id` = '"+req.body.rfq_id+"', `number_of_units` = '"+req.body.number_of_units+"', `req_delivery_date` = '"+req.body.req_delivery_date+"' WHERE `id`='"+req.body.rfq_lines_id+"'", function(err, info){
+	connection.query("UPDATE `rfq_lines` SET `product_lines_id` = '"+req.body.product_lines_id+"', `rfq_id` = '"+req.body.rfq_id+"', `number_of_units` = '"+req.body.number_of_units+"', `req_delivery_date` = '"+req.body.req_delivery_date+"' WHERE `id`='"+req.body.rfq_lines_id+"'", function(err, info){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}

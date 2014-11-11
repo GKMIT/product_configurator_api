@@ -69,7 +69,7 @@ exports.tendering_fetch_particular_quote = function(req, res, next){
 
 exports.tendering_fetch_product_design_detail = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id", "rfq_lines_id"];
+	var fields = ["user_id", "rfq_id", "rfq_lines_id", "plants_id"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -106,7 +106,6 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 				}
 			}
 		}
-
 	}
 	if(checkValid==1){
 		connection.query("SELECT `id`, `authentication_token` FROM `organization_users` WHERE `authentication_token`='"+req.header("authentication_token")+"' AND `id`="+req.body.user_id, function(err, organization_users) {
