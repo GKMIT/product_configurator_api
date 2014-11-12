@@ -121,6 +121,8 @@ module.exports = function(){
 
 	app.post("/sales_quote_followup_obsolete", rfq_followup_validation.sales_quote_followup_obsolete, rfq_followup_calls.sales_quote_followup_obsolete);
 
+	app.post("/extend_validity_period_quote", rfq_followup_validation.extend_validity_period_quote, rfq_followup_calls.extend_validity_period_quote);
+
 	var customerValidation=require("../controller/validation/customer.js");
 	var customer=require("../controller/customer/customer.js");
 
