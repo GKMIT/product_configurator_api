@@ -15,6 +15,7 @@ exports.dashboard = function(req, res){
 				var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6'";
 				var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8'";
 				var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6'";
+				var rfq_list="select `rfq`.`id`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `rfq`.`version_no`, `rfq`.`document_no`, `rfq`.`rfq_status_id`, `rfq`.`probability_id`, `rfq`.`customer_reference`, `rfq_status`.`name` as `status_name`, `customers`.`name` as `customer_name` from `rfq` LEFT JOIN `rfq_status` ON `rfq`.`rfq_status_id`=`rfq_status`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`";
 				var totalPartialRfq=0;
 				var totalNewRfq=0;
 				var totalNoBidRfq=0;
@@ -78,7 +79,16 @@ exports.dashboard = function(req, res){
 																			}
 																			else{
 																				totalExpiredRfq=info[0].total;
-																				res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq, "totalobsoleteRfq": totalobsoleteRfq, "totalExpiredRfq": totalExpiredRfq});
+																				connection.query(rfq_list, function(err, dashboard_rfq_list){
+																					if(err){
+																						console.log(err);
+																						res.json({"statusCode":500, "success": "false", "message": "internal error"});
+																					}
+																					else{
+																						console.log(dashboard_rfq_list.length);
+																						res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq, "totalobsoleteRfq": totalobsoleteRfq, "totalExpiredRfq": totalExpiredRfq, "rfq_list":dashboard_rfq_list});
+																					}
+																				});
 																			}
 																		});
 																	}
@@ -112,6 +122,7 @@ exports.dashboard = function(req, res){
 							var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
 							var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
 							var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6' AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
+							var rfq_list="select `rfq`.`id`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `rfq`.`version_no`, `rfq`.`document_no`, `rfq`.`rfq_status_id`, `rfq`.`probability_id`, `rfq`.`customer_reference`, `rfq_status`.`name` as `status_name`, `customers`.`name` as `customer_name` from `rfq` LEFT JOIN `rfq_status` ON `rfq`.`rfq_status_id`=`rfq_status`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` where `rfq`.`rfq_status_id` IN (0, 1 , 6) AND (`sales_hub_id`='"+info[0].id+"' OR `created_by`='"+req.params.user_id+"')";
 							var totalPartialRfq=0;
 							var totalNewRfq=0;
 							var totalNoBidRfq=0;
@@ -175,7 +186,16 @@ exports.dashboard = function(req, res){
 																						}
 																						else{
 																							totalExpiredRfq=info[0].total;
-																							res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq, "totalobsoleteRfq": totalobsoleteRfq, "totalExpiredRfq": totalExpiredRfq});
+																							connection.query(rfq_list, function(err, dashboard_rfq_list){
+																								if(err){
+																									console.log(err);
+																									res.json({"statusCode":500, "success": "false", "message": "internal error"});
+																								}
+																								else{
+																									console.log(dashboard_rfq_list.length);
+																									res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq, "totalobsoleteRfq": totalobsoleteRfq, "totalExpiredRfq": totalExpiredRfq, "rfq_list":dashboard_rfq_list});
+																								}
+																							});
 																						}
 																					});
 																				}
@@ -205,6 +225,7 @@ exports.dashboard = function(req, res){
 							var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
 							var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
 							var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
+							var rfq_list="select `rfq`.`id`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `rfq`.`version_no`, `rfq`.`document_no`, `rfq`.`rfq_status_id`, `rfq`.`probability_id`, `rfq`.`customer_reference`, `rfq_status`.`name` as `status_name`, `customers`.`name` as `customer_name` from `rfq` LEFT JOIN `rfq_status` ON `rfq`.`rfq_status_id`=`rfq_status`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` where `rfq`.`rfq_status_id` IN (2, 4) AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0'))";
 							var totalPartialRfq=0;
 							var totalNewRfq=0;
 							var totalNoBidRfq=0;
@@ -268,7 +289,16 @@ exports.dashboard = function(req, res){
 																						}
 																						else{
 																							totalExpiredRfq=info[0].total;
-																							res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq, "totalobsoleteRfq": totalobsoleteRfq, "totalExpiredRfq": totalExpiredRfq});
+																							connection.query(rfq_list, function(err, dashboard_rfq_list){
+																								if(err){
+																									console.log(err);
+																									res.json({"statusCode":500, "success": "false", "message": "internal error"});
+																								}
+																								else{
+																									console.log(dashboard_rfq_list.length);
+																									res.json({"statusCode":200, "success": "true", "message": "", "partial": totalPartialRfq, "new": totalNewRfq, "nobid": totalNoBidRfq, "bid_in_tendering": totalbid_in_tenderingRfq, "outTendering": totaloutTenderingRfq, "completed": totalCompletedRfq, "totalobsoleteRfq": totalobsoleteRfq, "totalExpiredRfq": totalExpiredRfq, "rfq_list":dashboard_rfq_list});
+																								}
+																							});
 																						}
 																					});
 																				}
