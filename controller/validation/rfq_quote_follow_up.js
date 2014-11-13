@@ -71,14 +71,14 @@ exports.sales_quote_followup_fetch_one = function(req, res, next){
 
 exports.sales_quote_followup_update = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id", "probability", "rfq_status_id"];
+	var fields = ["user_id", "rfq_id", "probability", "rfq_status_id", "next_action", "by_when"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]=="" || !validator.isNumeric(req.body[fields[i]])){
+			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]==""){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not found"});
 				break;
