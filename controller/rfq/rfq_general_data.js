@@ -374,7 +374,7 @@ exports.save_rfq_general_data = function(req, res){
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
 					}
 					else{
-						connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+info.insertId+"'", function(err, rfq_detail){
+						connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM `r`.`created_at`) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+info.insertId+"'", function(err, rfq_detail){
 							if(err){
 								res.json({"statusCode":500, "success": "false", "message": "internal error"});
 							}
@@ -593,7 +593,7 @@ exports.update_rfq_general_data = function(req, res){
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
 					}
 					else{
-						connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM date_rfq_in) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
+						connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM `r`.`created_at`) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+req.body.rfq_id+"'", function(err, rfq_detail){
 							if(err){
 								res.json({"statusCode":500, "success": "false", "message": "internal error"});
 							}
