@@ -18,7 +18,7 @@ exports.sales_quote_followup_fetch_all = function(req, res){
 		}
 		else{
 			if(admin.length>0){
-				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_submission_date`, `rfq`.`estimated_sales_price`, `rfq`.`quote_validity_date`, `rfq`.`probability_id`, `customers`.`name` FROM `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` WHERE `rfq_status_id`='6' ORDER BY `rfq`.`quote_validity_date` asc";
+				query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`quote_submission_date`, `rfq`.`estimated_sales_price`, `rfq`.`quote_validity_date`, `rfq`.`probability_id`, `rfq`.`by_when`, `customers`.`name` FROM `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` WHERE `rfq_status_id`='6' ORDER BY `rfq`.`quote_validity_date` asc";
 				connection.query(query, function(err, rfq) {
 					if(err){
 						console.log(err);
