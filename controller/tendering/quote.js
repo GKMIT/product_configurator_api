@@ -389,21 +389,40 @@ exports.tendering_fetch_particular_design = function(req, res){
 				info[0]['validity_date_from']=null;
 				info[0]['validity_date_to']=null;
 
-
 				var product_designs_technical_details=new Array();
 				var temp={};
-				temp['id']= 0;
-			    temp['product_design_id']= 0;
-			    temp['product_properties_id']= 0;
-			    temp['property_name']= "";
-			    temp['unit_of_measurement']= "";
-			    temp['spec_value']= 0;
-			    temp['calculated_value']= 0;
-			    temp['measured_value']= 0;
-			    product_designs_technical_details.push(temp);
 
-
-				res.json({"statusCode": 200, "success":"true", "message": "", "design":info, "product_designs_technical_details": product_designs_technical_details});
+				connection.query("SELECT * FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.params.rfq_lines_id+"' and `product_properties_id`='2' LIMIT 1", function(err, tech_detail){
+					if(err){
+						console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						if(tech_detail.length>0){
+							temp['id']= tech_detail[0].id;
+							temp['product_design_id']= 0;
+							temp['product_properties_id']= tech_detail[0].product_properties_id;
+							temp['property_name']= "complexity";
+							temp['unit_of_measurement']= "";
+							temp['spec_value']= tech_detail[0].value;
+							temp['calculated_value']= 0;
+							temp['measured_value']= 0;
+							product_designs_technical_details.push(temp);
+						}
+						else{
+							temp['id']= 0;
+							temp['product_design_id']= 0;
+							temp['product_properties_id']= 0;
+							temp['property_name']= "";
+							temp['unit_of_measurement']= "";
+							temp['spec_value']= 0;
+							temp['calculated_value']= 0;
+							temp['measured_value']= 0;
+							product_designs_technical_details.push(temp);
+						}
+						res.json({"statusCode": 200, "success":"true", "message": "", "design":info, "product_designs_technical_details": product_designs_technical_details});
+					}
+				});
 			}
 			else{
 				var query="SELECT `rfq_lines`.`id`, `rfq_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year FROM `rfq_lines` WHERE `rfq_lines`.`id`='"+req.params.rfq_lines_id+"' LIMIT 1";
