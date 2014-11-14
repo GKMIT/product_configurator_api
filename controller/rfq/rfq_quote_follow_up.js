@@ -117,12 +117,24 @@ exports.sales_quote_followup_fetch_one = function(req, res){
 exports.sales_quote_followup_update = function(req, res){
 	// console.log(req.body.quote_submission_date);
 	// var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `sales_price`='"+req.body.sales_price+"' WHERE `id`='"+req.body.rfq_id+"'";
-	try{
-		req.body.by_when=moment(new Date(req.body.by_when).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
-	}catch(ex){
-		req.body.by_when='0000-00-00 00:00:00';
+
+	var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `sales_price`='"+req.body.sales_price+"'";
+
+	if(req.body.rfq_status_id==6){
+		if(req.body.by_when){
+			query+=" , `next_action`='"+req.body.next_action+"'";
+		}
+
+		if(req.body.by_when){
+			try{
+				req.body.by_when=moment(new Date(req.body.by_when).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+			}catch(ex){
+				req.body.by_when='0000-00-00 00:00:00';
+			}
+			query+=" , `by_when`='"+req.body.by_when+"'";
+		}
 	}
-	var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `sales_price`='"+req.body.sales_price+"', `next_action`='"+req.body.next_action+"', `by_when`='"+req.body.by_when+"'";
+
 	if(req.body.won_gross_sale){
 		query+=", `won_gross_sale`='"+req.body.won_gross_sale+"'";
 	}
@@ -130,6 +142,7 @@ exports.sales_quote_followup_update = function(req, res){
 		query+=", `lost_remarks_id`='"+req.body.rejection_remarks_id+"'";
 	}
 		query+=" WHERE `id`='"+req.body.rfq_id+"'";
+	console.log(query);
 	connection.query(query, function(err, quote) {
 		if(err){
 			console.log(err);
