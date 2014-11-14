@@ -76,7 +76,7 @@ exports.tendering_fetch_product_design_detail = function(req, res, next){
 	}
 	else if(checkValid==1){
 		for(var i=0; i<fields.length; i++){
-			if(typeof req.body[fields[i]]=="undefined"){
+			if(typeof req.body[fields[i]]=="undefined" || req.body[fields[i]]==0){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
 				break;
