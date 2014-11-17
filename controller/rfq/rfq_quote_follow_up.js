@@ -314,7 +314,7 @@ exports.extend_validity_period_quote = function(req, res){
 
 			var version_no = new_version;
 			var document_no = document_no;
-			var rfq_status_id = rfq[0].rfq_status_id;
+			var rfq_status_id = 4;
 			try{
 				rfq[0].quote_creation_date=moment(new Date(rfq[0].quote_creation_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
 			}catch(ex){
