@@ -297,6 +297,11 @@ exports.extend_validity_period_quote = function(req, res){
 			var lost_remarks_id = rfq[0].lost_remarks_id;
 			var type_of_quote_id = rfq[0].type_of_quote_id;
 			var project_name = rfq[0].project_name;
+			try{
+				rfq[0].date_rfq_in=moment(new Date(rfq[0].date_rfq_in).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+			}catch(ex){
+				rfq[0].date_rfq_in='0000-00-00 00:00:00';
+			}
 			var date_rfq_in = rfq[0].date_rfq_in;
 			var customer_country = rfq[0].customer_country;
 			var installation_country = rfq[0].installation_country;
@@ -553,9 +558,6 @@ exports.extend_validity_period_quote = function(req, res){
 					});
 				}
 			});
-
-
-
 		}
 	});
 };
