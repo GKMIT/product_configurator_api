@@ -86,39 +86,73 @@ exports.followup_archive_quote_copy = function(req, res){
 				}
 				else{
 					var new_rfq_id=rfq.insertId;
-					connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.body.rfq_id+"'", function(err, rfq_lines){
+					connection.query("SELECT r.id, r.version_no, r.document_no, EXTRACT(YEAR FROM `r`.`created_at`) as year, c.iso_code, pl.id as product_lines_id, pl.name FROM rfq r JOIN countries c ON r.customer_country=c.id JOIN product_lines pl ON r.product_lines_id=pl.id WHERE r.id='"+new_rfq_id+"'", function(err, rfq_detail){
 						if(err){
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							res.json({"statusCode":500, "success": "false", "message": "internal error"});
 						}
 						else{
-							async.each(rfq_lines, function(line_item, done){
-									connection.query("SELECT * FROM `rfq_lines` WHERE `id`='"+line_item.id+"'", function(err, info){
+							var document_no="";
+							var version_no="1.0";
+
+								var country=rfq_detail[0].iso_code;
+								var year=""+rfq_detail[0].year;
+								year=year.toString();
+								year=year[2]+year[3];
+								var number=rfq_detail[0].id;
+								var product_line=rfq_detail[0].product_lines_id;
+								var product_line_name="";
+								var rfq_id=rfq_detail[0].id;
+								if(product_line==1){
+									product_line_name="D";
+								}
+								if(product_line==2){
+									product_line_name="P";
+								}
+								document_no=country+year+product_line_name+number+"/"+version_no;
+
+							connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+new_rfq_id+"'", function(err, info_tech){
+								if(err){
+									res.json({"statusCode":500, "success": "false", "message": "internal error"});
+								}
+								else{
+									connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.body.rfq_id+"'", function(err, rfq_lines){
 										if(err){
-											done(err);
+											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 										}
 										else{
-											query="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`) VALUES('"+info[0].product_lines_id+"', '"+info[0].plants_id+"', '"+new_rfq_id+"', '"+info[0].number_of_units+"', '"+info[0].req_delivery_date+"', '1')";
-											connection.query(query, function(err, line_entry){
-												if(err){
-													done(err);
+											async.each(rfq_lines, function(line_item, done){
+													connection.query("SELECT * FROM `rfq_lines` WHERE `id`='"+line_item.id+"'", function(err, info){
+														if(err){
+															done(err);
+														}
+														else{
+															query="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`) VALUES('"+info[0].product_lines_id+"', '"+info[0].plants_id+"', '"+new_rfq_id+"', '"+info[0].number_of_units+"', '"+info[0].req_delivery_date+"', '1')";
+															connection.query(query, function(err, line_entry){
+																if(err){
+																	done(err);
+																}
+																else{
+																	done();
+																}
+															});
+														}
+													});
+												},
+												function(err){
+													if (err){
+														console.log(err);
+														res.json({"statusCode": 500, "success": "false", "message":"internal error"});
+													}
+													else{
+														res.json({"statusCode": 200, "success":"true", "message":"rfq copied"});
+													}
 												}
-												else{
-													done();
-												}
-											});
+											);
 										}
-							    	});
-								},
-							    function(err){
-							      	if (err){
-								      	console.log(err);
-								      	res.json({"statusCode": 500, "success": "false", "message":"internal error"});
-								    }
-								    else{
-								    	res.json({"statusCode": 200, "success":"true", "message":"rfq copied"});
-								    }
+									});
 								}
-						    );
+							});
+
 						}
 					});
 				}
