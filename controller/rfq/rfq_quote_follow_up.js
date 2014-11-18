@@ -368,197 +368,148 @@ exports.extend_validity_period_quote = function(req, res){
 				}
 				else{
 					new_rfq_id=new_rfq_info.insertId;
-					var query="select * from `rfq_lines_questions` where `rfq_id`='"+req.body.rfq_id+"'";
-					connection.query(query, function(err, rfq_question){
+					connection.query("SELECT * FROM `rfq_lines` where `rfq_lines`.`rfq_id`='"+req.body.rfq_id+"'", function(err, rfq_lines){
 						if(err){
-							console.log(err);
 							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 						}
 						else{
-							async.forEach(rfq_question, function(question, done){
-								var query="INSERT INTO `rfq_lines_questions`(`rfq_id`, `rfq_questions_id`, `question_value`) VALUES('"+new_rfq_info.insertId+"', '"+question.rfq_questions_id+"', '"+question.question_value+"')";
-								connection.query(query, function(err, new_rfq_question){
-									if(err){
-										console.log(err);
-										done(err);
-									}
-									else{
-										done();
-									}
-								});
-							}, function(err){
-								if(err){
-									console.log(err);
-									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+							async.each(rfq_lines, function(lines, done){
+								var product_lines_id = lines.product_lines_id;
+								var plants_id = lines.plants_id;
+								var rfq_id = lines.rfq_id;
+								var number_of_units = lines.number_of_units;
+								try{
+									lines.req_delivery_date=moment(new Date(lines.req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+								}catch(ex) {
+									lines.req_delivery_date = '0000-00-00 00:00:00';
 								}
-								else{
-									connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.body.rfq_id+"'", function(err, line_items){
+								var req_delivery_date = lines.req_delivery_date;
+								var rfq_line_status = lines.rfq_line_status;
+								var product_designs_id = lines.product_designs_id;
+								var material_code = lines.material_code
+								var material_cost = lines.material_cost;
+								var labour_cost = lines.labour_cost;
+								var no_of_labour_hours = lines.no_of_labour_hours;
+								var sales_price = lines.sales_price;
+								try{
+									lines.confirmed_delivery_date=moment(new Date(lines.confirmed_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+								}
+								catch(ex){
+									lines.confirmed_delivery_date = '0000-00-00 00:00:00';
+								}
+								var confirmed_delivery_date = lines.confirmed_delivery_date;
+								var minimum_sales_price = lines.minimum_sales_price;
+								var rfq_lines_calculated_sales_price_id = lines.rfq_lines_calculated_sales_price_id;
+								var line_insert_query = "INSERT INTO `rfq_lines`( `product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `product_designs_id`, `material_code`, `material_cost`, `labour_cost`, `no_of_labour_hours`, `sales_price`, `confirmed_delivery_date`, `minimum_sales_price`, `rfq_lines_calculated_sales_price_id`) VALUES ('"+product_lines_id+"', '"+plants_id+"', '"+new_rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+product_designs_id+"', '"+material_code+"', '"+material_cost+"', '"+labour_cost+"', '"+no_of_labour_hours+"', '"+sales_price+"', '"+confirmed_delivery_date+"', '"+minimum_sales_price+"', '"+rfq_lines_calculated_sales_price_id+"')";
+									connection.query(line_insert_query, function(err, new_line_item){
 										if(err){
-											console.log(err);
-											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+											done(err);
 										}
 										else{
-											async.forEach(line_items, function(item, done){
-													var new_rfq_lines_id=0;
-													var product_lines_id = item.product_lines_id;
-													var plants_id = item.plants_id;
-													var rfq_id = new_rfq_id;
-													var number_of_units = item.number_of_units;
-													try{
-														rfq[0].req_delivery_date=moment(new Date(rfq[0].req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
-													}catch(ex){
-														rfq[0].req_delivery_date='0000-00-00 00:00:00';
-													}
-													var req_delivery_date = item.req_delivery_date;
-													var rfq_line_status = item.rfq_line_status;
-													var product_designs_id = item.product_designs_id;
-													var material_code = item.material_code;
-													var material_cost = item.material_cost;
-													var labour_cost = item.labour_cost;
-													var no_of_labour_hours = item.no_of_labour_hours;
-													var sales_price = item.sales_price;
-													try{
-														rfq[0].confirmed_delivery_date=moment(new Date(rfq[0].confirmed_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
-													}catch(ex){
-														rfq[0].confirmed_delivery_date='0000-00-00 00:00:00';
-													}
-													var confirmed_delivery_date = item.confirmed_delivery_date;
-													var minimum_sales_price = item.minimum_sales_price;
-													var rfq_lines_calculated_sales_price_id = item.rfq_lines_calculated_sales_price_id;
+											var new_line_item_id=new_line_item.insertId;
+											var tech_query="SELECT * FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+lines.id+"'";
+											connection.query(tech_query, function(err, tech_spec){
+												if(err){
+													done(err);
+												}
+												else{
+													async.each(tech_spec, function(spec, done){
+														var spec_insert_query="INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES ('"+new_line_item_id+"','"+spec.product_properties_id+"','"+spec.value+"','"+spec.remark+"')";
+														connection.query(spec_insert_query, function(err, info){
+															if(err){
+																done(err);
+															}
+															else{
+																var new_line_item = info.insertId;
+																var sales_price_query="SELECT * FROM `rfq_lines_calculated_sales_price` WHERE `rfq_lines_id`='"+lines.id+"'";
+																console.log(sales_price_query);
+																connection.query(sales_price_query, function(err, line_sales_price){
+																	if(err){
+																		done(err);
+																	}
+																	else{
+																		var complexities_id = line_sales_price[0].complexities_id;
+																		var product_design_id = line_sales_price[0].product_design_id;
+																		var rfq_lines_id = new_line_item;
+																		var material_cost = line_sales_price[0].material_cost;
+																		var labor_cost = line_sales_price[0].labor_cost;
+																		var labor_hours = line_sales_price[0].labor_hours;
+																		var extra_engineering_cost = line_sales_price[0].extra_engineering_cost;
+																		var dcp = line_sales_price[0].dcp;
+																		var cost_packaging = line_sales_price[0].cost_packaging;
+																		var packaging_cost_transformer = line_sales_price[0].packaging_cost_transformer;
+																		var extra_packaging_costs_build_of_parts = line_sales_price[0].extra_packaging_costs_build_of_parts;
+																		var packaging = line_sales_price[0].packaging;
+																		var engineering_overheads = line_sales_price[0].engineering_overheads;
+																		var plant_overheads = line_sales_price[0].plant_overheads;
+																		var site_overheads = line_sales_price[0].site_overheads;
+																		var regional_overheads = line_sales_price[0].regional_overheads;
+																		var product_line_overheads = line_sales_price[0].product_line_overheads;
+																		var corporate_overheads = line_sales_price[0].corporate_overheads;
+																		var depreciation = line_sales_price[0].depreciation;
+																		var overheads = line_sales_price[0].overheads;
+																		var frieght_f_term = line_sales_price[0].frieght_f_term;
+																		var friegth_c_term = line_sales_price[0].friegth_c_term;
+																		var friegth_d_term = line_sales_price[0].friegth_d_term;
+																		var transport = line_sales_price[0].transport;
+																		var financial_cost_loc = line_sales_price[0].financial_cost_loc;
+																		var financial_cost_bonds = line_sales_price[0].financial_cost_bonds;
+																		var maintenance_equipment = line_sales_price[0].maintenance_equipment;
+																		var administrative_cost_various = line_sales_price[0].administrative_cost_various;
+																		var extra_documentation_required = line_sales_price[0].extra_documentation_required;
+																		var supervision = line_sales_price[0].supervision;
+																		var erection_comm = line_sales_price[0].erection_comm;
+																		var factory_training = line_sales_price[0].factory_training;
+																		var onsite_training = line_sales_price[0].onsite_training;
+																		var warranty_on_full_cost = line_sales_price[0].warranty_on_full_cost;
+																		var extra_cost = line_sales_price[0].extra_cost;
+																		var full_cost_excluding_commision = line_sales_price[0].full_cost_excluding_commision;
+																		var ebit_percentage = line_sales_price[0].ebit_percentage;
+																		var ebit = line_sales_price[0].ebit;
+																		var commission_on_net_sales_price = line_sales_price[0].commission_on_net_sales_price;
+																		var commission_on_f_term = line_sales_price[0].commission_on_f_term;
+																		var commission_on_gross_sales = line_sales_price[0].commission_on_gross_sales;
+																		var commission = line_sales_price[0].commission;
+																		var minimum_intercompany_sales = line_sales_price[0].minimum_intercompany_sales;
+																		var minimum_sales_price_to_customer = line_sales_price[0].minimum_sales_price_to_customer;
+																		var acc = line_sales_price[0].acc;
+																		var acc_factor = line_sales_price[0].acc_factor;
+																		var extra_engineering_hours = line_sales_price[0].extra_engineering_hours;
 
-													var rfq_line_insert_query = "INSERT INTO `rfq_lines`(`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `product_designs_id`, `material_code`, `material_cost`, `labour_cost`, `no_of_labour_hours`, `sales_price`, `confirmed_delivery_date`, `minimum_sales_price`, `rfq_lines_calculated_sales_price_id`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+product_designs_id+"', '"+material_code+"', '"+material_cost+"', '"+labour_cost+"', '"+no_of_labour_hours+"', '"+sales_price+"', '"+confirmed_delivery_date+"', '"+minimum_sales_price+"', '"+rfq_lines_calculated_sales_price_id+"')";
-
-													connection.query(rfq_line_insert_query, function(err, info){
+																		var insert_sales_price_query="INSERT INTO `rfq_lines_calculated_sales_price`(`complexities_id`, `product_design_id`, `rfq_lines_id`, `material_cost`, `labor_cost`, `labor_hours`, `extra_engineering_cost`, `dcp`, `cost_packaging`, `packaging_cost_transformer`, `extra_packaging_costs_build_of_parts`, `packaging`, `engineering_overheads`, `plant_overheads`, `site_overheads`, `regional_overheads`, `product_line_overheads`, `corporate_overheads`, `depreciation`, `overheads`, `frieght_f_term`, `friegth_c_term`, `friegth_d_term`, `transport`, `financial_cost_loc`, `financial_cost_bonds`, `maintenance_equipment`, `administrative_cost_various`, `extra_documentation_required`, `supervision`, `erection_comm`, `factory_training`, `onsite_training`, `warranty_on_full_cost`, `extra_cost`, `full_cost_excluding_commision`, `ebit_percentage`, `ebit`, `commission_on_net_sales_price`, `commission_on_f_term`, `commission_on_gross_sales`, `commission`, `minimum_intercompany_sales`, `minimum_sales_price_to_customer`, `acc`, `acc_factor`, `extra_engineering_hours`) VALUES ('"+complexities_id+"','"+product_design_id+"', '"+rfq_lines_id+"', '"+material_cost+"', '"+labor_cost+"', '"+labor_hours+"', '"+extra_engineering_cost+"', '"+dcp+"', '"+cost_packaging+"', '"+packaging_cost_transformer+"', '"+extra_packaging_costs_build_of_parts+"', '"+packaging+"', '"+engineering_overheads+"', '"+plant_overheads+"', '"+site_overheads+"', '"+regional_overheads+"', '"+product_line_overheads+"', '"+corporate_overheads+"', '"+depreciation+"', '"+overheads+"', '"+frieght_f_term+"', '"+friegth_c_term+"', '"+friegth_d_term+"', '"+transport+"', '"+financial_cost_loc+"', '"+financial_cost_bonds+"', '"+maintenance_equipment+"', '"+administrative_cost_various+"', '"+extra_documentation_required+"', '"+supervision+"', '"+erection_comm+"', '"+factory_training+"', '"+onsite_training+"', '"+warranty_on_full_cost+"', '"+extra_cost+"', '"+full_cost_excluding_commision+"', '"+ebit_percentage+"', '"+ebit+"', '"+commission_on_net_sales_price+"', '"+commission_on_f_term+"', '"+commission_on_gross_sales+"', '"+commission+"', '"+minimum_intercompany_sales+"', '"+minimum_sales_price_to_customer+"', '"+acc+"', '"+acc_factor+"', '"+extra_engineering_hours+"')";
+																		connection.query(insert_sales_price_query, function(err, calc_sales_price_insert){
+																			if(err){
+																				done(err);
+																			}
+																			else{
+																				done();
+																			}
+																		});
+																	}
+																});
+															}
+														});
+													},
+													function(err){
 														if(err){
 															done(err);
 														}
 														else{
-															new_rfq_lines_id = info.insertId;
-															connection.query("SELECT * FROM `rfq_lines_calculated_sales_price` where `rfq_lines_id`='"+item.id+"'", function(err, calc_sales_price){
-																if(err){
-																	done(err);
-																}
-																else{
-																	if(calc_sales_price.length>0) {
-																		var complexities_id = calc_sales_price[0].complexities_id;
-																		var product_design_id = calc_sales_price[0].product_design_id;
-
-																		var material_cost = calc_sales_price[0].material_cost;
-																		var labor_cost = calc_sales_price[0].labor_cost;
-																		var labor_hours = calc_sales_price[0].labor_hours;
-																		var extra_engineering_cost = calc_sales_price[0].extra_engineering_cost;
-																		var dcp = calc_sales_price[0].dcp;
-																		var cost_packaging = calc_sales_price[0].cost_packaging;
-																		var packaging_cost_transformer = calc_sales_price[0].packaging_cost_transformer;
-																		var extra_packaging_costs_build_of_parts = calc_sales_price[0].extra_packaging_costs_build_of_parts;
-																		var packaging = calc_sales_price[0].packaging;
-																		var engineering_overheads = calc_sales_price[0].engineering_overheads;
-																		var plant_overheads = calc_sales_price[0].plant_overheads;
-																		var site_overheads = calc_sales_price[0].site_overheads;
-																		var regional_overheads = calc_sales_price[0].regional_overheads;
-																		var product_line_overheads = calc_sales_price[0].product_line_overheads;
-																		var corporate_overheads = calc_sales_price[0].corporate_overheads;
-																		var depreciation = calc_sales_price[0].depreciation;
-																		var overheads = calc_sales_price[0].overheads;
-																		var frieght_f_term = calc_sales_price[0].frieght_f_term;
-																		var friegth_c_term = calc_sales_price[0].friegth_c_term;
-																		var friegth_d_term = calc_sales_price[0].friegth_d_term;
-																		var transport = calc_sales_price[0].transport;
-																		var financial_cost_loc = calc_sales_price[0].financial_cost_loc;
-																		var financial_cost_bonds = calc_sales_price[0].financial_cost_bonds;
-																		var maintenance_equipment = calc_sales_price[0].maintenance_equipment;
-																		var administrative_cost_various = calc_sales_price[0].administrative_cost_various;
-																		var extra_documentation_required = calc_sales_price[0].extra_documentation_required;
-																		var supervision = calc_sales_price[0].supervision;
-																		var erection_comm = calc_sales_price[0].erection_comm;
-																		var factory_training = calc_sales_price[0].factory_training;
-																		var onsite_training = calc_sales_price[0].onsite_training;
-																		var warranty_on_full_cost = calc_sales_price[0].warranty_on_full_cost;
-																		var extra_cost = calc_sales_price[0].extra_cost;
-																		var full_cost_excluding_commision = calc_sales_price[0].full_cost_excluding_commision;
-																		var ebit_percentage = calc_sales_price[0].ebit_percentage;
-																		var ebit = calc_sales_price[0].ebit;
-																		var commission_on_net_sales_price = calc_sales_price[0].commission_on_net_sales_price;
-																		var commission_on_f_term = calc_sales_price[0].commission_on_f_term;
-																		var commission_on_gross_sales = calc_sales_price[0].commission_on_gross_sales;
-																		var commission = calc_sales_price[0].commission;
-																		var minimum_intercompany_sales = calc_sales_price[0].minimum_intercompany_sales;
-																		var minimum_sales_price_to_customer = calc_sales_price[0].minimum_sales_price_to_customer;
-																		var acc = calc_sales_price[0].acc;
-																		var acc_factor = calc_sales_price[0].acc_factor;
-																		var extra_engineering_hours = calc_sales_price[0].extra_engineering_hours;
-																		var rfq_lines_calculated_sales_price_query = "INSERT INTO `rfq_lines_calculated_sales_price` (`complexities_id`, `product_design_id`, `rfq_lines_id`, `material_cost`, `labor_cost`, `labor_hours`, `extra_engineering_cost`, `dcp`, `cost_packaging`, `packaging_cost_transformer`, `extra_packaging_costs_build_of_parts`, `packaging`, `engineering_overheads`, `plant_overheads`, `site_overheads`, `regional_overheads`, `product_line_overheads`, `corporate_overheads`, `depreciation`, `overheads`, `frieght_f_term`, `friegth_c_term`, `friegth_d_term`, `transport`, `financial_cost_loc`, `financial_cost_bonds`, `maintenance_equipment`, `administrative_cost_various`, `extra_documentation_required`, `supervision`, `erection_comm`, `factory_training`, `onsite_training`, `warranty_on_full_cost`, `extra_cost`, `full_cost_excluding_commision`, `ebit_percentage`, `ebit`, `commission_on_net_sales_price`, `commission_on_f_term`, `commission_on_gross_sales`, `commission`, `minimum_intercompany_sales`, `minimum_sales_price_to_customer`, `acc`, `acc_factor`, `extra_engineering_hours`) VALUES('" + complexities_id + "', '" + product_design_id + "', '" + new_rfq_lines_id + "', '" + material_cost + "', '" + labor_cost + "', '" + labor_hours + "', '" + extra_engineering_cost + "', '" + dcp + "', '" + cost_packaging + "', '" + packaging_cost_transformer + "', '" + extra_packaging_costs_build_of_parts + "', '" + packaging + "', '" + engineering_overheads + "', '" + plant_overheads + "', '" + site_overheads + "', '" + regional_overheads + "', '" + product_line_overheads + "', '" + corporate_overheads + "', '" + depreciation + "', '" + overheads + "', '" + frieght_f_term + "', '" + friegth_c_term + "', '" + friegth_d_term + "', '" + transport + "', '" + financial_cost_loc + "', '" + financial_cost_bonds + "', '" + maintenance_equipment + "', '" + administrative_cost_various + "', '" + extra_documentation_required + "', '" + supervision + "', '" + erection_comm + "', '" + factory_training + "', '" + onsite_training + "', '" + warranty_on_full_cost + "', '" + extra_cost + "', '" + full_cost_excluding_commision + "', '" + ebit_percentage + "', '" + ebit + "', '" + commission_on_net_sales_price + "', '" + commission_on_f_term + "', '" + commission_on_gross_sales + "', '" + commission + "', '" + minimum_intercompany_sales + "', '" + minimum_sales_price_to_customer + "', '" + acc + "', '" + acc_factor + "', '" + extra_engineering_hours + "')";
-
-																		connection.query(rfq_lines_calculated_sales_price_query, function (err, rfq_line_sales_price) {
-																			if (err) {
-																				done(err)
-																			}
-																			else {
-																				connection.query("SELECT * FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='" + item.id + "'", function (err, tech_spec) {
-																					if (err) {
-																						done(err);
-																					}
-																					else {
-																						var product_properties_id = tech_spec[0].product_properties_id;
-																						var value = tech_spec[0].value;
-																						var remark = tech_spec[0].remark;
-																						var tech_spec_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES('"+new_rfq_lines_id+"','"+product_properties_id+"', '"+value+"', '"+remark+"')";
-																						connection.query(tech_spec_query, function (err, rfq_line_tech_spec) {
-																							if (err) {
-																								done(err);
-																							}
-																							else {
-																								done();
-																							}
-																						});
-																					}
-																				});
-																			}
-																		});
-																	}
-																	else{
-																		connection.query("SELECT * FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='" + item.id + "'", function (err, tech_spec) {
-																			if (err) {
-																				done(err);
-																			}
-																			else {
-																				if(tech_spec.length>0){
-																					var product_properties_id = tech_spec[0].product_properties_id;
-																					var value = tech_spec[0].value;
-																					var remark = tech_spec[0].remark;
-																					var tech_spec_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES('"+new_rfq_lines_id+"', '"+product_properties_id+"', '"+value+"', '"+remark+"')";
-																					connection.query(tech_spec_query, function (err, rfq_line_tech_spec) {
-																						if (err) {
-																							done(err);
-																						}
-																						else {
-																							done();
-																						}
-																					});
-																				}
-																				else{
-																					done();
-																				}
-																			}
-																		});
-																	}
-																}
-															});
+															done();
 														}
 													});
-
-												},
-												function(err){
-													if(err){
-														console.log(err);
-														res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-													}
-													else{
-														res.json({"statusCode": 200, "success":"true", "message": "validity date updated with new version successfully"});
-													}
-												});
+												}
+											});
 										}
 									});
+
+							},
+							function(err){
+								if(err){
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									res.json({ statusCode: 200, success: 'true', message: 'validity date updated with new version successfully' });
 								}
 							});
 						}
