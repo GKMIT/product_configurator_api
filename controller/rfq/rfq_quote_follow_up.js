@@ -309,8 +309,9 @@ exports.extend_validity_period_quote = function(req, res){
 			var new_version=parseInt(rfq[0].version_no)+1;
 			new_version=new_version+".0";
 
-			var document_part=rfq[0].document_no.split("/");
-			var document_no=document_part[0]+"/"+new_version;
+			//var document_part=rfq[0].document_no.split("/");
+			//var document_no=document_part[0]+"/"+new_version;
+			var document_no=rfq[0].document_no;
 
 			var version_no = new_version;
 			var document_no = document_no;
