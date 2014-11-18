@@ -340,6 +340,12 @@ exports.extend_validity_period_quote = function(req, res){
 			var quote_validity_date = req.body.validity_date;
 
 			var probability_id = rfq[0].probability_id;
+
+			try{
+				rfq[0].requested_quotation_date=moment(new Date(rfq[0].requested_quotation_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+			}catch(ex){
+				rfq[0].requested_quotation_date='0000-00-00 00:00:00';
+			}
 			var requested_quotation_date = rfq[0].requested_quotation_date;
 			var estimated_sales_price = rfq[0].estimated_sales_price;
 			var created_by = rfq[0].created_by;
