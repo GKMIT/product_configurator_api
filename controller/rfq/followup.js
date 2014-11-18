@@ -8,7 +8,7 @@ exports.followup_archive_quote = function(req, res){
 		}
 		else{
 			if(admin.length>0){
-				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq`, `organization_users` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`created_at` asc";
+				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`, `organization_users` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`created_at` asc";
 
 				connection.query(query, function(err, rfq) {
 					if(err){
@@ -29,7 +29,7 @@ exports.followup_archive_quote = function(req, res){
 					else{
 						if(info.length>0){
 
-							var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`sales_hub_id` =  `organization_users`.`sales_hubs_id` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
+							var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`sales_hub_id` =  `organization_users`.`sales_hubs_id` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
 
 							connection.query(query, function(err, rfq){
 								if(err){
@@ -41,8 +41,7 @@ exports.followup_archive_quote = function(req, res){
 							});
 						}
 						else{
-							var query="SELECT DISTINCT `rfq`.`id`, `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' AND `rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
-
+							var query="SELECT DISTINCT `rfq`.`id`, `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' AND `rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
 							connection.query(query, function(err, rfq) {
 								if(err){
 									console.log(err);
@@ -126,17 +125,52 @@ exports.followup_archive_quote_copy = function(req, res){
 															done(err);
 														}
 														else{
+															if(info[0].requested_quotation_date!="0000-00-00 00:00:00"){
+																info[0].req_delivery_date=moment(new Date(info[0].req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+															}
+															else{
+																info[0].req_delivery_date="0000-00-00 00:00:00";
+															}
 															query="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`) VALUES('"+info[0].product_lines_id+"', '"+info[0].plants_id+"', '"+new_rfq_id+"', '"+info[0].number_of_units+"', '"+info[0].req_delivery_date+"', '1')";
 															connection.query(query, function(err, line_entry){
 																if(err){
 																	done(err);
 																}
 																else{
-																	done();
+																	var new_line_entry_id=line_entry.insertId;
+																	var query="SELECT * FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+line_item.id+"'";
+																	connection.query(query,  function(err, line_tech_spec){
+																		if(err){
+																			done(err);
+																		}
+																		else{
+																			async.each(line_tech_spec, function(spec, done){
+																					var spec_query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES('"+new_line_entry_id+"', '"+spec.product_properties_id+"', '"+spec.value+"', '"+spec.remark+"')";
+																					connection.query(spec_query, function(err, spec_query_info){
+																						if(err){
+																							done(err);
+																						}
+																						else{
+																							done();
+																						}
+																					});
+																				},
+																				function(err){
+																					if (err){
+																						console.log(err);
+																						done(err);
+																					}
+																					else{
+																						done();
+																					}
+																				});
+																		}
+																	});
 																}
 															});
 														}
 													});
+
 												},
 												function(err){
 													if (err){
@@ -144,7 +178,7 @@ exports.followup_archive_quote_copy = function(req, res){
 														res.json({"statusCode": 500, "success": "false", "message":"internal error"});
 													}
 													else{
-														res.json({"statusCode": 200, "success":"true", "message":"rfq copied"});
+														res.json({"statusCode": 200, "success":"true", "message":"RFQ copy generated Successfully"});
 													}
 												}
 											);
@@ -152,7 +186,6 @@ exports.followup_archive_quote_copy = function(req, res){
 									});
 								}
 							});
-
 						}
 					});
 				}
