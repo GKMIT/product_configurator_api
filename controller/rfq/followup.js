@@ -109,7 +109,7 @@ exports.followup_archive_quote_copy = function(req, res){
 								}
 								document_no=country+year+product_line_name+number+"/"+version_no;
 
-							connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"', `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE id='"+new_rfq_id+"'", function(err, info_tech){
+							connection.query("UPDATE `rfq` SET `version_no`='"+version_no+"', `document_no`='"+document_no+"' WHERE id='"+new_rfq_id+"'", function(err, info_tech){
 								if(err){
 									res.json({"statusCode":500, "success": "false", "message": "internal error"});
 								}
