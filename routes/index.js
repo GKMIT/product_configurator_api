@@ -52,6 +52,8 @@ module.exports = function(){
 	app.delete("/delete_line_item/:user_id/:rfq_lines_id", rfq_line_items_validation.delete_line_item, rfq_line_items.delete_line_item);
 	app.put("/complete_rfq", rfq_line_items_validation.complete_rfq, rfq_line_items.complete_rfq);
 
+	app.put("/variant_to", rfq_line_items_validation.variant_to, rfq_line_items.variant_to);
+
 
 	// rfq finalize
 	app.get("/rfq_finalize/:user_id",rfq_finalize_validation.rfq_partial_show, rfq_finalize.rfq_partial_show);

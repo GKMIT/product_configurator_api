@@ -1,3 +1,4 @@
+var moment = require("moment");
 exports.product_lines = function(req, res){
 	//  AND created_by='"+req.params.user_id+"'
 	connection.query("SELECT * FROM `rfq` WHERE `id`='"+req.params.rfq_id+"'", function(err, rfq) {
@@ -5,7 +6,7 @@ exports.product_lines = function(req, res){
 			res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
 		else{
-			var line_item_query="SELECT `rfq_lines`.id, `rfq_lines`.product_lines_id, `rfq_lines`.plants_id, `rfq_lines`.rfq_id, `rfq_lines`.number_of_units, `rfq_lines`.`req_delivery_date`, `product_lines`.name as `product_lines_name`, `plants`.name as `plant_name` FROM `rfq_lines` LEFT JOIN `product_lines` ON rfq_lines.product_lines_id=product_lines.id LEFT JOIN `plants` ON rfq_lines.plants_id=plants.id WHERE rfq_id='"+req.params.rfq_id+"'";
+			var line_item_query="SELECT `rfq_lines`.id, `rfq_lines`.product_lines_id, `rfq_lines`.plants_id, `rfq_lines`.rfq_id, `rfq_lines`.number_of_units, `rfq_lines`.`req_delivery_date`, `rfq_lines`.`variant_to`, `product_lines`.`name` as `product_lines_name`, `plants`.name as `plant_name` FROM `rfq_lines` LEFT JOIN `product_lines` ON rfq_lines.product_lines_id=product_lines.id LEFT JOIN `plants` ON rfq_lines.plants_id=plants.id WHERE rfq_id='"+req.params.rfq_id+"'";
 			connection.query(line_item_query, function(err, rfq_lines_items) {
 				if(err){
 					res.json({"statusCode":500, "success":"false", "message": "internal error"});
@@ -420,3 +421,82 @@ exports.fetch_property_detail = function(req, res, next){
 		}
 	});
 }
+
+
+exports.variant_to = function(req, res){
+	connection.query("UPDATE `rfq_lines` SET `has_variant`='1' WHERE `id`='"+req.body.rfq_lines_id+"'", function(err, update_rfq){
+		if(err){
+			console.log(err);
+			res.json({"statusCode":500, "success": "false", "message": "internal error"});
+		}
+		else{
+			var async = require("async");
+			var rfq_lines_id=1;
+			var query="SELECT * FROM `rfq_lines` WHERE `id`='"+req.body.rfq_lines_id+"' AND `variant_to`=0";
+			connection.query(query, function(err, line_items){
+				if(err){
+					console.log(err);
+					res.json({"statusCode":500, "success": "false", "message": "internal error"});
+				}
+				else{
+					if(line_items.length>0){
+						var id = line_items[0].id;
+						var plants_id = line_items[0].plants_id;
+						var product_lines_id = line_items[0].product_lines_id;
+						var rfq_id = line_items[0].rfq_id;
+						var number_of_units = line_items[0].number_of_units;
+						try{
+							line_items[0].req_delivery_date=moment(new Date(line_items[0].req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+						}catch(ex) {
+							line_items[0].req_delivery_date = '0000-00-00 00:00:00';
+						}
+						var req_delivery_date = line_items[0].req_delivery_date;
+						var rfq_line_status = line_items[0].rfq_line_status;
+						query="INSERT INTO `rfq_lines`(`plants_id`, `product_lines_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `variant_to`) VALUES('"+plants_id+"', '"+product_lines_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+req.body.rfq_lines_id+"')";
+						connection.query(query, function(err, info){
+							if(err){
+								console.log(err);
+								res.json({"statusCode":500, "success": "false", "message": "internal error"});
+							}
+							else{
+								var new_rfq_lines_id=info.insertId;
+								query="SELECT * FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+req.body.rfq_lines_id+"'";
+								connection.query(query, function(err, tech_specs){
+									if(err){
+										console.log(err);
+										res.json({"statusCode":500, "success": "false", "message": "internal error"});
+									}
+									else{
+										async.each(tech_specs, function(specs, done){
+											query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES('"+new_rfq_lines_id+"', '"+specs.product_properties_id+"', '"+specs.value+"', '"+specs.remark+"')";
+											connection.query(query, function(err, tech_entry){
+												if(err){
+													done(err);
+												}
+												else{
+													done();
+												}
+											});
+
+										}, function(err){
+											if(err){
+												console.log(err);
+												res.json({"statusCode":500, "success": "false", "message": "internal error"});
+											}
+											else{
+												res.json({"statusCode":200, "success": "true", "message": "Variant generated successfully"});
+											}
+										});
+									}
+								});
+							}
+						});
+					}
+					else{
+						res.json({"statusCode":406, "success": "true", "message": "Variant can't generate another variant"});
+					}
+				}
+			});
+		}
+	});
+};

@@ -44,7 +44,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id`, `r_lines`.`minimum_sales_price`, `r_lines`.`rfq_lines_calculated_sales_price_id` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
+			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id`, `r_lines`.`minimum_sales_price`, `r_lines`.`rfq_lines_calculated_sales_price_id`, `r_lines`.`variant_to` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
 					console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -555,7 +555,7 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 	connection.query(query, function(err, rfq_lines) {
 		if(err){
 			console.log(err);
-				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
 			connection.query("select * from rfq_lines where rfq_id='"+req.body.rfq_id+"'", function(err, all_rfq_lines) {
@@ -586,24 +586,24 @@ exports.tendering_submit_rfq_to_sales = function(req, res){
 												}
 												else{
 													var mailOptions = {
-													    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
-													    to: smtpConfig.sales_and_marketing_director_email+","+smtpConfig.pl_head_email, // list of receivers seprated by comma also
-													    subject: 'Quote Submitted to sales', // Subject line
-													    text: 'Quotation #docnr for a total Sales Price of #SalesPrice is about to be submitted to customer #customerName', // plaintext body
-													    html: '<p>Quotation '+rfq_info[0].document_no+' for a total Sales Price of '+estimated_sales_price[0].sales_price+' is about to be submitted to customer '+rfq_info[0].name+'</p>' // html body
+														from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+														to: smtpConfig.sales_and_marketing_director_email+","+smtpConfig.pl_head_email, // list of receivers seprated by comma also
+														subject: 'Quote Submitted to sales', // Subject line
+														text: 'Quotation #docnr for a total Sales Price of #SalesPrice is about to be submitted to customer #customerName', // plaintext body
+														html: '<p>Quotation '+rfq_info[0].document_no+' for a total Sales Price of '+estimated_sales_price[0].sales_price+' is about to be submitted to customer '+rfq_info[0].name+'</p>' // html body
 													};
 													transporter.sendMail(mailOptions, function(error, info){
-													    if(error){
-													        console.log(error);
-													    }else{
-													    	// res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
-													    }
+														if(error){
+															console.log(error);
+														}else{
+															// res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+														}
 													});
 												}
 											});
 										}
 										// else{
-											res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
+										res.json({"statusCode": 200, "success":"true", "message": "submitted successfully !"});
 										// }
 									}
 								});

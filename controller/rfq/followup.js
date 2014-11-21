@@ -114,39 +114,139 @@ exports.followup_archive_quote_copy = function(req, res){
 									res.json({"statusCode":500, "success": "false", "message": "internal error"});
 								}
 								else{
-									connection.query("SELECT * FROM `rfq_lines` WHERE `rfq_id`='"+req.body.rfq_id+"'", function(err, rfq_lines){
+									//var new_rfq_id=new_rfq.insertId;
+									var rfq_lines_query="select * from `rfq_lines` where `rfq_id`='"+req.body.rfq_id+"' and has_variant='1'";
+									var async = require("async");
+									connection.query(rfq_lines_query, function(err, line_items){
 										if(err){
+											console.log(err);
 											res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 										}
 										else{
-											async.each(rfq_lines, function(line_item, done){
-													connection.query("SELECT * FROM `rfq_lines` WHERE `id`='"+line_item.id+"'", function(err, info){
+											var line_item_id=0;
+											async.each(line_items, function(items, done){
+													var line_item_id = items.id;
+													var product_lines_id = items.product_lines_id;
+													var plants_id = items.plants_id;
+													var rfq_id = new_rfq_id;
+													var number_of_units = items.number_of_units;
+													try{
+														items.req_delivery_date=moment(new Date(items.req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+													}catch(ex) {
+														items.req_delivery_date = '0000-00-00 00:00:00';
+													}
+													var req_delivery_date = items.req_delivery_date;
+													var rfq_line_status = items.rfq_line_status;
+													var product_designs_id = items.product_designs_id;
+													var material_code = items.material_code;
+													var material_cost = items.material_cost;
+													var labour_cost = items.labour_cost;
+													var no_of_labour_hours = items.no_of_labour_hours;
+													var sales_price = items.sales_price;
+													var confirmed_delivery_date = items.confirmed_delivery_date;
+													var minimum_sales_price = items.minimum_sales_price;
+													var rfq_lines_calculated_sales_price_id = items.rfq_lines_calculated_sales_price_id;
+													var variant_to = items.variant_to;
+													var has_variant = items.has_variant;
+													var new_rfq_lines_id =0;
+													var q1="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `product_designs_id`, `material_code`, `material_cost`, `labour_cost`, `no_of_labour_hours`, `sales_price`, `confirmed_delivery_date`, `minimum_sales_price`, `rfq_lines_calculated_sales_price_id`, `variant_to`, `has_variant`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+product_designs_id+"', '"+material_code+"', '"+material_cost+"', '"+labour_cost+"', '"+no_of_labour_hours+"', '"+sales_price+"', '"+confirmed_delivery_date+"', '"+minimum_sales_price+"', '"+rfq_lines_calculated_sales_price_id+"', '"+variant_to+"', '"+has_variant+"')";
+													connection.query(q1, function(err, item_insert){
 														if(err){
 															done(err);
 														}
 														else{
-															if(info[0].requested_quotation_date!="0000-00-00 00:00:00"){
-																info[0].req_delivery_date=moment(new Date(info[0].req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
-															}
-															else{
-																info[0].req_delivery_date="0000-00-00 00:00:00";
-															}
-															query="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`) VALUES('"+info[0].product_lines_id+"', '"+info[0].plants_id+"', '"+new_rfq_id+"', '"+info[0].number_of_units+"', '"+info[0].req_delivery_date+"', '1')";
-															connection.query(query, function(err, line_entry){
+															new_rfq_lines_id = item_insert.insertId;
+															var spec_query="select * from `rfq_lines_technical_specs` where `rfq_lines_id`='"+line_item_id+"'";
+															connection.query(spec_query, function(err, tech_spacs){
 																if(err){
 																	done(err);
 																}
 																else{
-																	var new_line_entry_id=line_entry.insertId;
-																	var query="SELECT * FROM `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+line_item.id+"'";
-																	connection.query(query,  function(err, line_tech_spec){
+																	async.each(tech_spacs, function(specs, done){
+																		var tech_insert_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES ('"+new_rfq_lines_id+"','"+specs.product_properties_id+"','"+specs.value+"','"+specs.remark+"')";
+																		connection.query(tech_insert_query, function(err, info_tech_insert){
+																			if(err){
+																				done(err);
+																			}
+																			else{
+																				done();
+																			}
+																		});
+																	}, function(err){
 																		if(err){
 																			done(err);
 																		}
 																		else{
-																			async.each(line_tech_spec, function(spec, done){
-																					var spec_query="INSERT INTO `rfq_lines_technical_specs` (`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES('"+new_line_entry_id+"', '"+spec.product_properties_id+"', '"+spec.value+"', '"+spec.remark+"')";
-																					connection.query(spec_query, function(err, spec_query_info){
+																			var variant_rfq_lines_query="select * from `rfq_lines` where `rfq_id`='"+req.body.rfq_id+"' and variant_to='"+line_item_id+"'";
+																			connection.query(variant_rfq_lines_query, function(err, variant_line_items){
+																				if(err){
+																					done(err);
+																				}
+																				else{
+																					async.each(variant_line_items, function(variant_line, done){
+																						var line_item_id = variant_line.id;
+																						var product_lines_id = variant_line.product_lines_id;
+																						var plants_id = variant_line.plants_id;
+																						var rfq_id = new_rfq_id;
+																						var number_of_units = variant_line.number_of_units;
+																						try{
+																							variant_line.req_delivery_date=moment(new Date(variant_line.req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+																						}catch(ex) {
+																							variant_line.req_delivery_date = '0000-00-00 00:00:00';
+																						}
+																						var req_delivery_date = variant_line.req_delivery_date;
+																						var rfq_line_status = variant_line.rfq_line_status;
+																						var product_designs_id = variant_line.product_designs_id;
+																						var material_code = variant_line.material_code;
+																						var material_cost = variant_line.material_cost;
+																						var labour_cost = variant_line.labour_cost;
+																						var no_of_labour_hours = variant_line.no_of_labour_hours;
+																						var sales_price = variant_line.sales_price;
+																						var confirmed_delivery_date = variant_line.confirmed_delivery_date;
+																						var minimum_sales_price = variant_line.minimum_sales_price;
+																						var rfq_lines_calculated_sales_price_id = variant_line.rfq_lines_calculated_sales_price_id;
+																						var variant_to = new_rfq_lines_id;
+																						var has_variant = variant_line.has_variant;
+																						var new_variant_rfq_lines_id =0;
+																						//var q2="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `product_designs_id`, `material_code`, `material_cost`, `labour_cost`, `no_of_labour_hours`, `sales_price`, `confirmed_delivery_date`, `minimum_sales_price`, `rfq_lines_calculated_sales_price_id`, `variant_to`, `has_variant`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+product_designs_id+"', '"+material_code+"', '"+material_cost+"', '"+labour_cost+"', '"+no_of_labour_hours+"', '"+sales_price+"', '"+confirmed_delivery_date+"', '"+minimum_sales_price+"', '"+rfq_lines_calculated_sales_price_id+"', '"+variant_to+"', '"+has_variant+"')";
+																						var q2="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `variant_to`, `has_variant`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+variant_to+"', '"+has_variant+"')";
+																						connection.query(q2, function(err, variant_line_insert){
+																							if(err){
+																								done(err);
+																							}
+																							else{
+																								//var new_rfq_lines_id = variant_line_insert.insertId;
+																								//console.log(new_rfq_lines_id);
+																								var spec_query="select * from `rfq_lines_technical_specs` where `rfq_lines_id`='"+line_item_id+"'";
+																								connection.query(spec_query, function(err, tech_spacs) {
+																									if (err) {
+																										done(err);
+																									}
+																									else{
+																										new_rfq_lines_id = variant_line_insert.insertId;
+																										async.each(tech_spacs, function(specs, done){
+																											var tech_insert_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES ('"+new_rfq_lines_id+"','"+specs.product_properties_id+"','"+specs.value+"','"+specs.remark+"')";
+																											connection.query(tech_insert_query, function(err, info_tech_insert){
+																												if(err){
+																													done(err);
+																												}
+																												else{
+																													done();
+																												}
+																											});
+																										}, function(err){
+																											if(err){
+																												done(err);
+																											}
+																											else{
+																												done();
+																											}
+																										});
+																									}
+																								});
+																							}
+																						});
+																					}, function(err){
 																						if(err){
 																							done(err);
 																						}
@@ -154,34 +254,99 @@ exports.followup_archive_quote_copy = function(req, res){
 																							done();
 																						}
 																					});
-																				},
-																				function(err){
-																					if (err){
-																						console.log(err);
-																						done(err);
-																					}
-																					else{
-																						done();
-																					}
-																				});
+																				}
+																			});
 																		}
 																	});
 																}
 															});
 														}
 													});
-
 												},
 												function(err){
-													if (err){
-														console.log(err);
-														res.json({"statusCode": 500, "success": "false", "message":"internal error"});
+													if(err){
+														done(err);
 													}
 													else{
-														res.json({"statusCode": 200, "success":"true", "message":"RFQ copy generated Successfully"});
+														var query="select * from `rfq_lines` where `rfq_id`='"+req.body.rfq_id+"' and has_variant='0' and `variant_to`='0'";
+														connection.query(query, function(err, line_info){
+															if(err){
+																done(err);
+															}
+															else{
+																async.each(line_info, function(items, done){
+																	var line_item_id = items.id;
+																	var product_lines_id = items.product_lines_id;
+																	var plants_id = items.plants_id;
+																	var rfq_id = new_rfq_id;
+																	var number_of_units = items.number_of_units;
+																	try{
+																		items.req_delivery_date=moment(new Date(items.req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+																	}catch(ex) {
+																		items.req_delivery_date = '0000-00-00 00:00:00';
+																	}
+																	var req_delivery_date = items.req_delivery_date;
+																	var rfq_line_status = items.rfq_line_status;
+																	//var product_designs_id = items.product_designs_id;
+																	var material_code = items.material_code;
+																	var material_cost = items.material_cost;
+																	var labour_cost = items.labour_cost;
+																	var no_of_labour_hours = items.no_of_labour_hours;
+																	var sales_price = items.sales_price;
+																	var confirmed_delivery_date = items.confirmed_delivery_date;
+																	var minimum_sales_price = items.minimum_sales_price;
+																	var rfq_lines_calculated_sales_price_id = items.rfq_lines_calculated_sales_price_id;
+																	var variant_to = 0;
+																	var has_variant = 0;
+																	var new_rfq_lines_id =0;
+																	var q1="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `variant_to`, `has_variant`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+variant_to+"', '"+has_variant+"')";
+																	connection.query(q1, function(err, item_insert){
+																		if(err){
+																			done(err);
+																		}
+																		else{
+																			new_rfq_lines_id = item_insert.insertId;
+																			var spec_query="select * from `rfq_lines_technical_specs` where `rfq_lines_id`='"+line_item_id+"'";
+																			connection.query(spec_query, function(err, tech_spacs) {
+																				if (err) {
+																					done(err);
+																				}
+																				else{
+																					async.each(tech_spacs, function(specs, done){
+																						var tech_insert_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES ('"+new_rfq_lines_id+"','"+specs.product_properties_id+"','"+specs.value+"','"+specs.remark+"')";
+																						connection.query(tech_insert_query, function(err, info_tech_insert){
+																							if(err){
+																								done(err);
+																							}
+																							else{
+																								done();
+																							}
+																						});
+																					}, function(err){
+																						if(err){
+																							done(err);
+																						}
+																						else{
+																							done();
+																						}
+																					});
+																				}
+																			});
+																		}
+																	});
+
+																}, function(err){
+																	if(err){
+																		res.json({"statusCode":500, "success": "false", "message": "internal error"});
+																	}
+																	else{
+																		res.json({"statusCode": 200, "success":"true", "message": "RFQ Copy Generated Successfully"});
+																	}
+																});
+															}
+														});
 													}
-												}
-											);
+												});
 										}
 									});
 								}

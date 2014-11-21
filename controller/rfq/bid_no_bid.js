@@ -128,46 +128,91 @@ exports.full_rfq_detail = function(req, res){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `rfq_lines`.`rfq_id`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, `rfq_lines`.`rfq_line_status`, `rfq_lines`.`material_code`, `rfq_lines`.`material_cost`, `rfq_lines`.`labour_cost`, `rfq_lines`.`no_of_labour_hours`, `rfq_lines`.`sales_price`, `rfq_lines`.`confirmed_delivery_date`, `rfq_lines`.`created_at`, `rfq_lines`.`updated_at`, `plants`.`name` as `plant_name` FROM `rfq_lines` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE rfq_id='"+rfq[0].id+"'", function(err, rfq_lines) {
+			connection.query("SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `rfq_lines`.`rfq_id`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, `rfq_lines`.`rfq_line_status`, `rfq_lines`.`material_code`, `rfq_lines`.`material_cost`, `rfq_lines`.`labour_cost`, `rfq_lines`.`no_of_labour_hours`, `rfq_lines`.`sales_price`, `rfq_lines`.`confirmed_delivery_date`, `rfq_lines`.`variant_to`, `rfq_lines`.`created_at`, `rfq_lines`.`updated_at`, `plants`.`name` as `plant_name` FROM `rfq_lines` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE rfq_id='"+rfq[0].id+"'", function(err, rfq_lines) {
 				if(err){
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
 					if(rfq_lines.length>0){
-					var query="SELECT * FROM  `rfq_lines_technical_specs` WHERE ";
-					for (var i = 0; i < rfq_lines.length; i++) {
-						query=query+"rfq_lines_id='"+rfq_lines[i].id+"'";
-						if(i+1<rfq_lines.length){
-							query=query+" OR "
-						}
-					};
-					// console.log(query);
-					connection.query(query, function(err, rfq_lines_technical_specs) {
-						if(err){
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							var default_estimated_sales_price=0;
-							var mva=0;
-							
-								// default_estimated_sales_price=
-							for (var j = 0; j < rfq_lines.length; j++) {
-								for (var i = 0; i < rfq_lines_technical_specs.length; i++) {
-									if(rfq_lines_technical_specs[i].product_properties_id==3 && rfq_lines_technical_specs[i].rfq_lines_id==rfq_lines[j].id){
-										console.log(rfq_lines_technical_specs[i].value);
-										mva=parseInt(rfq_lines_technical_specs[i].value)/1000;
-										default_estimated_sales_price+=rfq_lines[j].number_of_units*(mva*10000);
+						var default_estimated_sales_price = 0;
+						var max_estimated_sales_price = 0;
+						var async = require("async");
+
+						//async.each();
+
+						var not_in_id=0;
+
+
+						async.each(rfq_lines, function(item, done){
+								var line_query="select * from `rfq_lines` where ((rfq_lines.id='"+item.id+"' AND variant_to='0') OR rfq_lines.variant_to='"+item.id+"') AND id NOT IN ("+not_in_id+")";
+								not_in_id+=", "+item.id;
+								connection.query(line_query, function(err, filter_line_items){
+									if(err){
+										done(err);
 									}
-								};
-							};
-							if(j==rfq_lines.length){
-								rfq[0]["default_estimated_sales_price"]=default_estimated_sales_price;
-								res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": rfq_lines_technical_specs});
-							}
-							
-							
-						}
-					});
+									else{
+										//console.log(filter_line_items);
+										async.each(filter_line_items, function(line_item, done){
+												var query = "SELECT * FROM  `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+line_item.id+"'";
+												connection.query(query, function(err, spec_line_item){
+													if(err){
+														done(err);
+													}
+													else{
+														async.each(spec_line_item, function(specs, done){
+																if(specs.product_properties_id==3 && specs.rfq_lines_id==line_item.id){
+																	mva=parseInt(specs.value)/1000;
+																	if(max_estimated_sales_price<(line_item.number_of_units*(mva*10000))){
+																		console.log(line_item.id);
+																		max_estimated_sales_price=line_item.number_of_units*(mva*10000);
+																		done();
+																	}
+																	else{
+																		done();
+																	}
+																	//max_estimated_sales_price=line_item.number_of_units*(mva*10000);
+																	//if()
+																}
+																else{
+																	done();
+																}
+															},
+															function(err){
+																if(err){
+																	done(err);
+																}
+																else{
+																	done();
+																}
+															});
+													}
+												});
+											},
+											function(err){
+												if(err){
+													done();
+												}
+												else{
+													console.log(max_estimated_sales_price);
+													default_estimated_sales_price+=max_estimated_sales_price;
+													max_estimated_sales_price=0;
+													done();
+												}
+											});
+									}
+								});
+							},
+							function(err){
+								if(err){
+									console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									rfq[0]["default_estimated_sales_price"]=default_estimated_sales_price;
+									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": []});
+								}
+							});
+
 					}
 					else{
 						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": []});
@@ -295,28 +340,254 @@ exports.duplicateRfq = function(req, res){
 						}
 						else{
 							var new_rfq_id=new_rfq.insertId;
-							var rfq_lines_query="select * from `rfq_lines` where `rfq_id`='"+req.body.rfq_id+"'";
-							connection.query(rfq_lines_query, function(err, rfq_lines){
+							var rfq_lines_query="select * from `rfq_lines` where `rfq_id`='"+req.body.rfq_id+"' and has_variant='1'";
+							console.log(rfq_lines_query);
+							var async = require("async");
+							connection.query(rfq_lines_query, function(err, line_items){
 								if(err){
 									console.log(err);
 									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 								}
 								else{
-									var rfq_lines_counter=0;
-									var lengthTest=new Array();
-									for (var i = 0; i < rfq_lines.length; i++) {
-										sync(i, rfq_lines, new_rfq.insertId, function(){
-											res.json({"statusCode": 200, "success":"true", "message": "new Partial RFQ created successfully"})
-										})
-									};
+									//var line_item_id=0;
+									async.each(line_items, function(items, done){
+											console.log("YOOYOYO");
+											var line_item_id = items.id;
+											var line_item_id_1 = items.id;
+											var product_lines_id = items.product_lines_id;
+											var plants_id = items.plants_id;
+											var rfq_id = new_rfq_id;
+											var number_of_units = items.number_of_units;
+											try{
+												items.req_delivery_date=moment(new Date(items.req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+											}catch(ex) {
+												items.req_delivery_date = '0000-00-00 00:00:00';
+											}
+											var req_delivery_date = items.req_delivery_date;
+											var rfq_line_status = items.rfq_line_status;
+											var product_designs_id = items.product_designs_id;
+											var material_code = items.material_code;
+											var material_cost = items.material_cost;
+											var labour_cost = items.labour_cost;
+											var no_of_labour_hours = items.no_of_labour_hours;
+											var sales_price = items.sales_price;
+											var confirmed_delivery_date = items.confirmed_delivery_date;
+											var minimum_sales_price = items.minimum_sales_price;
+											var rfq_lines_calculated_sales_price_id = items.rfq_lines_calculated_sales_price_id;
+											var variant_to = items.variant_to;
+											var has_variant = items.has_variant;
+											var new_rfq_lines_id =0;
+											var q1="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `product_designs_id`, `material_code`, `material_cost`, `labour_cost`, `no_of_labour_hours`, `sales_price`, `confirmed_delivery_date`, `minimum_sales_price`, `rfq_lines_calculated_sales_price_id`, `variant_to`, `has_variant`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+product_designs_id+"', '"+material_code+"', '"+material_cost+"', '"+labour_cost+"', '"+no_of_labour_hours+"', '"+sales_price+"', '"+confirmed_delivery_date+"', '"+minimum_sales_price+"', '"+rfq_lines_calculated_sales_price_id+"', '"+variant_to+"', '"+has_variant+"')";
+											connection.query(q1, function(err, item_insert){
+												if(err){
+													done(err);
+												}
+												else{
+													new_rfq_lines_id = item_insert.insertId;
+													var spec_query="select * from `rfq_lines_technical_specs` where `rfq_lines_id`='"+line_item_id+"'";
+													connection.query(spec_query, function(err, tech_spacs){
+														if(err){
+															done(err);
+														}
+														else{
+															async.each(tech_spacs, function(specs, done){
+																var tech_insert_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES ('"+new_rfq_lines_id+"','"+specs.product_properties_id+"','"+specs.value+"','"+specs.remark+"')";
+																connection.query(tech_insert_query, function(err, info_tech_insert){
+																	if(err){
+																		done(err);
+																	}
+																	else{
+																		done();
+																	}
+																});
+															}, function(err){
+																if(err){
+																	done(err);
+																}
+																else{
+																	console.log("++++++++============++++++++++");
+																	console.log(line_item_id);
+																	console.log("++++++++============++++++++++");
+																	var variant_rfq_lines_query="select * from `rfq_lines` where `rfq_id`='"+req.body.rfq_id+"' and variant_to='"+line_item_id+"'";
+																	console.log(variant_rfq_lines_query);
+																	connection.query(variant_rfq_lines_query, function(err, variant_line_items){
+																		if(err){
+																			done(err);
+																		}
+																		else{
+																			async.each(variant_line_items, function(variant_line, done){
+																				var line_item_id = variant_line.id;
+																				var product_lines_id = variant_line.product_lines_id;
+																				var plants_id = variant_line.plants_id;
+																				var rfq_id = new_rfq_id;
+																				var number_of_units = variant_line.number_of_units;
+																				try{
+																					variant_line.req_delivery_date=moment(new Date(variant_line.req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+																				}catch(ex) {
+																					variant_line.req_delivery_date = '0000-00-00 00:00:00';
+																				}
+																				var req_delivery_date = variant_line.req_delivery_date;
+																				var rfq_line_status = variant_line.rfq_line_status;
+																				var product_designs_id = variant_line.product_designs_id;
+																				var material_code = variant_line.material_code;
+																				var material_cost = variant_line.material_cost;
+																				var labour_cost = variant_line.labour_cost;
+																				var no_of_labour_hours = variant_line.no_of_labour_hours;
+																				var sales_price = variant_line.sales_price;
+																				var confirmed_delivery_date = variant_line.confirmed_delivery_date;
+																				var minimum_sales_price = variant_line.minimum_sales_price;
+																				var rfq_lines_calculated_sales_price_id = variant_line.rfq_lines_calculated_sales_price_id;
+																				var variant_to = new_rfq_lines_id;
+																				var has_variant = variant_line.has_variant;
+																				var new_variant_rfq_lines_id =0;
+																				var q2="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `product_designs_id`, `material_code`, `material_cost`, `labour_cost`, `no_of_labour_hours`, `sales_price`, `confirmed_delivery_date`, `minimum_sales_price`, `rfq_lines_calculated_sales_price_id`, `variant_to`, `has_variant`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+product_designs_id+"', '"+material_code+"', '"+material_cost+"', '"+labour_cost+"', '"+no_of_labour_hours+"', '"+sales_price+"', '"+confirmed_delivery_date+"', '"+minimum_sales_price+"', '"+rfq_lines_calculated_sales_price_id+"', '"+variant_to+"', '"+has_variant+"')";
+																				connection.query(q2, function(err, variant_line_insert){
+																					if(err){
+																						done(err);
+																					}
+																					else{
+																						//var new_rfq_lines_id = variant_line_insert.insertId;
+																						//console.log(new_rfq_lines_id);
+																						var spec_query="select * from `rfq_lines_technical_specs` where `rfq_lines_id`='"+line_item_id+"'";
+																						connection.query(spec_query, function(err, tech_spacs) {
+																							if (err) {
+																								done(err);
+																							}
+																							else{
+																								new_rfq_lines_id = variant_line_insert.insertId;
+																								async.each(tech_spacs, function(specs, done){
+																									var tech_insert_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES ('"+new_rfq_lines_id+"','"+specs.product_properties_id+"','"+specs.value+"','"+specs.remark+"')";
+																									//console.log(tech_insert_query);
+																									connection.query(tech_insert_query, function(err, info_tech_insert){
+																										if(err){
+																											done(err);
+																										}
+																										else{
+																											done();
+																										}
+																									});
+																								}, function(err){
+																									if(err){
+																										done(err);
+																									}
+																									else{
+																										console.log("dsdfsdfsf");
+																										done();
+																									}
+																								});
+																							}
+																						});
+																					}
+																				});
+																			}, function(err){
+																				if(err){
+																					done(err);
+																				}
+																				else{
+																					done();
+																				}
+																			});
+																		}
+																	});
+																}
+															});
+														}
+													});
+												}
+											});
+										},
+										function(err){
+											if(err){
+												done(err);
+											}
+											else{
+												console.log("asdalsdkjasdjalksdjlajsdl");
+											//	same process follow for the has_variant = 0 and variant_to=0
+												var query="select * from `rfq_lines` where `rfq_id`='"+req.body.rfq_id+"' and has_variant='0' and `variant_to`='0'";
+												connection.query(query, function(err, line_info){
+													if(err){
+														done(err);
+													}
+													else{
+														async.each(line_info, function(items, done){
+															var line_item_id = items.id;
+															var product_lines_id = items.product_lines_id;
+															var plants_id = items.plants_id;
+															var rfq_id = new_rfq_id;
+															var number_of_units = items.number_of_units;
+															try{
+																items.req_delivery_date=moment(new Date(items.req_delivery_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+															}catch(ex) {
+																items.req_delivery_date = '0000-00-00 00:00:00';
+															}
+															var req_delivery_date = items.req_delivery_date;
+															var rfq_line_status = items.rfq_line_status;
+															var product_designs_id = items.product_designs_id;
+															var material_code = items.material_code;
+															var material_cost = items.material_cost;
+															var labour_cost = items.labour_cost;
+															var no_of_labour_hours = items.no_of_labour_hours;
+															var sales_price = items.sales_price;
+															var confirmed_delivery_date = items.confirmed_delivery_date;
+															var minimum_sales_price = items.minimum_sales_price;
+															var rfq_lines_calculated_sales_price_id = items.rfq_lines_calculated_sales_price_id;
+															var variant_to = 0;
+															var has_variant = 0;
+															var new_rfq_lines_id =0;
+															var q1="INSERT INTO `rfq_lines` (`product_lines_id`, `plants_id`, `rfq_id`, `number_of_units`, `req_delivery_date`, `rfq_line_status`, `product_designs_id`, `material_code`, `material_cost`, `labour_cost`, `no_of_labour_hours`, `sales_price`, `confirmed_delivery_date`, `minimum_sales_price`, `rfq_lines_calculated_sales_price_id`, `variant_to`, `has_variant`) VALUES('"+product_lines_id+"', '"+plants_id+"', '"+rfq_id+"', '"+number_of_units+"', '"+req_delivery_date+"', '"+rfq_line_status+"', '"+product_designs_id+"', '"+material_code+"', '"+material_cost+"', '"+labour_cost+"', '"+no_of_labour_hours+"', '"+sales_price+"', '"+confirmed_delivery_date+"', '"+minimum_sales_price+"', '"+rfq_lines_calculated_sales_price_id+"', '"+variant_to+"', '"+has_variant+"')";
+															connection.query(q1, function(err, item_insert){
+																if(err){
+																	done(err);
+																}
+																else{
+																	new_rfq_lines_id = item_insert.insertId;
+																	var spec_query="select * from `rfq_lines_technical_specs` where `rfq_lines_id`='"+line_item_id+"'";
+																	connection.query(spec_query, function(err, tech_spacs) {
+																		if (err) {
+																			done(err);
+																		}
+																		else{
+																			async.each(tech_spacs, function(specs, done){
+																				var tech_insert_query = "INSERT INTO `rfq_lines_technical_specs`(`rfq_lines_id`, `product_properties_id`, `value`, `remark`) VALUES ('"+new_rfq_lines_id+"','"+specs.product_properties_id+"','"+specs.value+"','"+specs.remark+"')";
+																				connection.query(tech_insert_query, function(err, info_tech_insert){
+																					if(err){
+																						done(err);
+																					}
+																					else{
+																						done();
+																					}
+																				});
+																			}, function(err){
+																				if(err){
+																					done(err);
+																				}
+																				else{
+																					done();
+																				}
+																			});
+																		}
+																	});
+																}
+															});
+
+														}, function(err){
+															if(err){
+																done(err);
+															}
+															else{
+																res.json({"statusCode": 200, "success":"true", "message": "new Partial RFQ created successfully"})
+															}
+														});
+													}
+												});
+											}
+										});
 								}
 							});
 						}
 					});
 				}
 			});
-	// 	}
-	// });
 }
 
 function sync(index, rfq_lines, rfq_id, callback){
