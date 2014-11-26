@@ -9,11 +9,13 @@ exports.product_lines = function(req, res){
 			var line_item_query="SELECT `rfq_lines`.id, `rfq_lines`.product_lines_id, `rfq_lines`.plants_id, `rfq_lines`.rfq_id, `rfq_lines`.number_of_units, `rfq_lines`.`req_delivery_date`, `rfq_lines`.`variant_to`, `product_lines`.`name` as `product_lines_name`, `plants`.name as `plant_name` FROM `rfq_lines` LEFT JOIN `product_lines` ON rfq_lines.product_lines_id=product_lines.id LEFT JOIN `plants` ON rfq_lines.plants_id=plants.id WHERE rfq_id='"+req.params.rfq_id+"'";
 			connection.query(line_item_query, function(err, rfq_lines_items) {
 				if(err){
+					console.log(err);
 					res.json({"statusCode":500, "success":"false", "message": "internal error"});
 				}
 				else{
 					connection.query("SELECT `id`, `name` FROM `product_lines`", function(err, product_lines) {
 						if(err){
+							console.log(err);
 							res.json({"statusCode":500, "success":"false", "message": "internal error"});
 						}
 						else{
@@ -104,6 +106,7 @@ exports.product_properties = function(req, res){
 exports.fetch_rfq_line_items = function(req, res){
 	connection.query("SELECT * FROM `rfq_lines` WHERE `id`='"+req.params.rfq_lines_id+"'", function(err, rfq_lines) {
 		if(err){
+			console.log(err);
 				res.json({"statusCode":500, "success":"false", "message": "internal error"});
 		}
 		else{
