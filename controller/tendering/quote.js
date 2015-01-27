@@ -20,7 +20,7 @@ exports.tendering_teams_quotes = function(req, res){
 				});
 			}
 			else{
-				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0')) ORDER BY  `rfq`.`updated_at` DESC";
+				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0')) ORDER BY  `rfq`.`updated_at` DESC";
 
 				connection.query(query, function(err, rfq) {
 					if(err){
@@ -638,6 +638,7 @@ exports.tendering_calculate_sales_price = function(req, res){
 					else{
 						var product_cost_data=[{'labor_cost':0,'labor_hours':0, 'material_cost':0, 'currency':'EUR', 'extra_engineering_hours':0}];
 						var overheadQuery = "SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+rfq_lines[0].plants_id+"'";
+						console.log(overheadQuery);
 						connection.query(overheadQuery, function(err, overheads){
 							if(err){
 								console.log(err);
@@ -689,6 +690,7 @@ exports.tendering_calculate_sales_price = function(req, res){
 											res.json({"statusCode": 422, "success":"false", "message": "Not enough technical specifications available about this product design"});
 										}
 										var overheadQuery = "SELECT `id`, `overhead_name`, `value` FROM `plants_master_data` WHERE `plant_id`='"+rfq_lines[0].plants_id+"'";
+										console.log(overheadQuery);
 										connection.query(overheadQuery, function(err, overheads){
 											if(err){
 												console.log(err);
