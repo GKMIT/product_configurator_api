@@ -1,0 +1,8 @@
+CREATE TRIGGER `rfq_create_status_change` AFTER INSERT ON `rfq`
+ FOR EACH ROW INSERT INTO rfq_status_change (rfq_id, new_status) VALUES (NEW.id, NEW.rfq_status_id)
+
+CREATE TRIGGER `rfq_update_status_change` AFTER UPDATE ON `rfq`
+ FOR EACH ROW IF OLD.rfq_status_id != NEW.rfq_status_id THEN
+INSERT INTO rfq_status_change (rfq_id, old_status, new_status) VALUES (NEW.id, OLD.rfq_status_id, NEW.rfq_status_id);
+END IF
+
