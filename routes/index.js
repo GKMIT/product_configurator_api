@@ -130,6 +130,8 @@ module.exports = function(){
 
 	app.post("/customer", customerValidation.add, customer.add);
 	app.get("/customer/:user_id", customerValidation.show, customer.show);
+	app.get("/customer/:cid/:user_id", customerValidation.showOne, customer.showOne);
+	app.put("/customer", customerValidation.edit, customer.edit);
 
 	var archive_followup_validation = require('../controller/validation/followup.js');
 	var archive_followup = require('../controller/rfq/followup.js');
