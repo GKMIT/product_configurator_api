@@ -29,20 +29,7 @@ exports.add = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `customers` where `name`='"+req.body.name+"' LIMIT 1", function(err, info){
-						if(err){
-							console.log(err);
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if(info.length>0){
-								res.json({"statusCode": 422, "success":"false", "message": "user already exist"});
-							}
-							else{
-								next();
-							}
-						}
-					});
+					next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
@@ -152,20 +139,7 @@ exports.edit = function(req, res, next){
 			}
 			else{
 				if (organization_users.length>0) {
-					connection.query("SELECT * FROM `customers` where `name`='"+req.body.name+"' LIMIT 1", function(err, info){
-						if(err){
-							console.log(err);
-							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-						}
-						else{
-							if(info.length>0){
-								res.json({"statusCode": 422, "success":"false", "message": "user already exist"});
-							}
-							else{
-								next();
-							}
-						}
-					});
+					next();
 				}
 				else{
 					res.json({"statusCode": 404, "success":"false", "message": "user not found"});
