@@ -34,7 +34,45 @@ exports.tendering_teams_quotes = function(req, res){
 			}
 		}
 	});
+};
+
+exports.design_requests = function(req, res){
+	connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			if(admin.length>0){
+				var query="SELECT `rfq`.`document_no`, `product_lines`.`name` as `product_line`, `plants`.`name` as `plant_name`, `rfq_lines`.`design_request_date`, `rfq_lines`.`design_submit_date`, `rfq_lines`.`id` FROM  `rfq_lines` JOIN `rfq` ON `rfq_lines`.`rfq_id`=`rfq`.`id` JOIN `product_lines` on `rfq_lines`.`product_lines_id` = `product_lines`.`id` JOIN `plants` on `rfq_lines`.`plants_id` = `plants`.`id` WHERE  `rfq_lines`.`design_request` = 1 ORDER BY  `rfq_lines`.`design_request_date` DESC";
+
+				connection.query(query, function(err, rfq_lines) {
+					if(err){
+						console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq_lines":rfq_lines});
+					}
+				});
+			}
+			else{
+				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0')) ORDER BY  `rfq`.`updated_at` DESC";
+
+				connection.query(query, function(err, rfq) {
+					if(err){
+						console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+					}
+				});
+			}
+		}
+	});
 }
+
 
 exports.tendering_fetch_particular_quote = function(req, res){
 	var query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`rfq_status_id` FROM `rfq` WHERE `rfq_status_id`='4' AND `id`='"+req.params.rfq_id+"' LIMIT 1";
@@ -44,7 +82,7 @@ exports.tendering_fetch_particular_quote = function(req, res){
 				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `r_lines`.`id`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id`, `r_lines`.`minimum_sales_price`, `r_lines`.`rfq_lines_calculated_sales_price_id`, `r_lines`.`variant_to` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
+			connection.query("SELECT `r_lines`.`id`, `r_lines`.`design_request`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id`, `r_lines`.`minimum_sales_price`, `r_lines`.`rfq_lines_calculated_sales_price_id`, `r_lines`.`variant_to` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
 					console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
@@ -884,4 +922,61 @@ function match(item, filter) {
   return keys.some(function (key) {
     return item[key] == filter[key];
   });
+}
+
+exports.tendering_request_design = function(req, res){
+	var arr= [];
+
+	for (var i = 0; i < req.body.line_items.length; i++) {
+		arr.push(req.body.line_items[i].id);
+	};
+
+	arr = arr.join();
+	console.log(arr);
+	var query = "UPDATE `rfq_lines` SET `design_request` = 1, `design_request_date` = NOW() WHERE `id` IN ("+arr+") ";
+	//console.log(query);
+	connection.query(query, function(err, info){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": ""});
+		}
+	});
+
+	// connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
+	// 	if(err){
+	// 		console.log(err);
+	// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+	// 	}
+	// 	else{
+	// 		if(admin.length>0){
+	// 			var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`, `organization_users` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`updated_at` DESC";
+
+	// 			connection.query(query, function(err, rfq) {
+	// 				if(err){
+	// 					console.log(err);
+	// 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+	// 				}
+	// 				else{
+	// 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+	// 				}
+	// 			});
+	// 		}
+	// 		else{
+	// 			var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0')) ORDER BY  `rfq`.`updated_at` DESC";
+
+	// 			connection.query(query, function(err, rfq) {
+	// 				if(err){
+	// 					console.log(err);
+	// 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+	// 				}
+	// 				else{
+	// 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+	// 				}
+	// 			});
+	// 		}
+	// 	}
+	// });
 }

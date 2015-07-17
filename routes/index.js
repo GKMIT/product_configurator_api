@@ -76,10 +76,13 @@ module.exports = function(){
 	var tendering_calls=require('../controller/tendering/quote');
 	var tendering_validation=require('../controller/validation/tendering/quote');
 	app.get("/tendering_teams_quotes/:user_id", tendering_validation.tendering_teams_quotes, tendering_calls.tendering_teams_quotes);
+	app.get("/design_requests/:user_id", tendering_validation.design_requests, tendering_calls.design_requests);
 
 	app.get("/tendering_fetch_particular_quote/:user_id/:rfq_id", tendering_validation.tendering_fetch_particular_quote, tendering_calls.tendering_fetch_particular_quote);
 
 	app.post("/tendering_fetch_product_design_detail", tendering_validation.tendering_fetch_product_design_detail, tendering_calls.tendering_fetch_product_design_detail);
+
+	app.post("/tendering_request_designs", tendering_validation.tendering_request_design, tendering_calls.tendering_request_design);
 	
 	app.get("/tendering_fetch_particular_design/:user_id/:product_designs_id/:rfq_lines_id",tendering_validation.tendering_fetch_particular_design,  tendering_calls.tendering_fetch_particular_design);
 
