@@ -44,7 +44,7 @@ exports.design_requests = function(req, res){
 		}
 		else{
 			if(admin.length>0){
-				var query="SELECT `rfq`.`document_no`, `product_lines`.`name` as `product_line`, `plants`.`name` as `plant_name`, `rfq_lines`.`design_request_date`, `rfq_lines`.`design_submit_date`, `rfq_lines`.`id` FROM  `rfq_lines` JOIN `rfq` ON `rfq_lines`.`rfq_id`=`rfq`.`id` JOIN `product_lines` on `rfq_lines`.`product_lines_id` = `product_lines`.`id` JOIN `plants` on `rfq_lines`.`plants_id` = `plants`.`id` WHERE  `rfq_lines`.`design_request` = 1 ORDER BY  `rfq_lines`.`design_request_date` DESC";
+				var query="SELECT `rfq`.`document_no`, `product_lines`.`name` as `product_line`, `plants`.`name` as `plant_name`, `rfq_lines`.`design_request_date`, `rfq_lines`.`design_submit_date`, `rfq_lines`.`id` FROM  `rfq_lines` JOIN `rfq` ON `rfq_lines`.`rfq_id`=`rfq`.`id` JOIN `product_lines` on `rfq_lines`.`product_lines_id` = `product_lines`.`id` LEFT JOIN `plants` on `rfq_lines`.`plants_id` = `plants`.`id` WHERE  `rfq_lines`.`design_request` = 1 ORDER BY  `rfq_lines`.`design_request_date` DESC";
 
 				connection.query(query, function(err, rfq_lines) {
 					if(err){
@@ -945,38 +945,35 @@ exports.tendering_request_design = function(req, res){
 		}
 	});
 
-	// connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
-	// 	if(err){
-	// 		console.log(err);
-	// 		res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-	// 	}
-	// 	else{
-	// 		if(admin.length>0){
-	// 			var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`, `organization_users` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`updated_at` DESC";
+}
 
-	// 			connection.query(query, function(err, rfq) {
-	// 				if(err){
-	// 					console.log(err);
-	// 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-	// 				}
-	// 				else{
-	// 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
-	// 				}
-	// 			});
-	// 		}
-	// 		else{
-	// 			var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` WHERE  `rfq`.`rfq_status_id` = '4' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"' OR (`rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"' LIMIT 1) AND `rfq`.`tendering_teams_id`!='0')) ORDER BY  `rfq`.`updated_at` DESC";
+exports.save_design_submit = function(req, res){
+	console.log(req.body);
 
-	// 			connection.query(query, function(err, rfq) {
-	// 				if(err){
-	// 					console.log(err);
-	// 						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-	// 				}
-	// 				else{
-	// 					res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
-	// 				}
-	// 			});
-	// 		}
-	// 	}
-	// });
+	var query = "UPDATE `rfq_lines` SET `design_submit_date` = '"+req.body.date_submit+"' WHERE `id` = "+req.body.rfq_lines_id+" ";
+	console.log(query);
+	connection.query(query, function(err, info){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			query_1="SELECT design_request_date, design_submit_date FROM `rfq_lines` WHERE id= "+req.body.rfq_lines_id+" LIMIT 1";
+			connection.query(query_1, function(err, data){
+				if(err){
+					console.log(err);
+					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				}
+				else{
+					if(data.length==0){
+						res.json({"statusCode": 500, "success":"false", "message": "RFQ line not found"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq_line": data});
+					}
+				}
+			});
+		}
+	});
+
 }

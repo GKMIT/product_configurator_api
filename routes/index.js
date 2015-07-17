@@ -83,6 +83,7 @@ module.exports = function(){
 	app.post("/tendering_fetch_product_design_detail", tendering_validation.tendering_fetch_product_design_detail, tendering_calls.tendering_fetch_product_design_detail);
 
 	app.post("/tendering_request_designs", tendering_validation.tendering_request_design, tendering_calls.tendering_request_design);
+	app.post("/save_design_submit", tendering_validation.save_design_submit, tendering_calls.save_design_submit);
 	
 	app.get("/tendering_fetch_particular_design/:user_id/:product_designs_id/:rfq_lines_id",tendering_validation.tendering_fetch_particular_design,  tendering_calls.tendering_fetch_particular_design);
 
