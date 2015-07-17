@@ -8,7 +8,7 @@ exports.followup_archive_quote = function(req, res){
 		}
 		else{
 			if(admin.length>0){
-				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`, `organization_users` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`created_at` asc";
+				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`, `organization_users` WHERE  `rfq`.`rfq_status_id` IN  (3,7) AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`created_at` asc";
 
 				connection.query(query, function(err, rfq) {
 					if(err){
@@ -29,7 +29,7 @@ exports.followup_archive_quote = function(req, res){
 					else{
 						if(info.length>0){
 
-							var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`sales_hub_id` =  `organization_users`.`sales_hubs_id` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
+							var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`sales_hub_id` =  `organization_users`.`sales_hubs_id` WHERE  `rfq`.`rfq_status_id` IN (3,7) AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
 
 							connection.query(query, function(err, rfq){
 								if(err){
@@ -41,7 +41,7 @@ exports.followup_archive_quote = function(req, res){
 							});
 						}
 						else{
-							var query="SELECT DISTINCT `rfq`.`id`, `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id` = '7' AND `organization_users`.`id`='"+req.params.user_id+"' AND `rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
+							var query="SELECT DISTINCT `rfq`.`id`, `rfq`.`document_no`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id` IN (3,7) AND `organization_users`.`id`='"+req.params.user_id+"' AND `rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
 							connection.query(query, function(err, rfq) {
 								if(err){
 									console.log(err);

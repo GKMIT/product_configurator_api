@@ -634,14 +634,15 @@ function technical_sepc(index, rfq_lines_id, technical_specs, callback){
 
 
 exports.revert_to_sales = function(req, res){
-	var query="SELECT `rfq`.`sales_hub_id`, `rfq`.`sales_person_id`, `rfq`.`sales_segments_id`, `rfq`.`sales_agents_id`, `rfq`.`tendering_teams_id`, `rfq`.`tendering_teams_members_id`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `rfq`.`customer_country`, `rfq`.`installation_country`, `rfq`.`version_no`, `document_no`, `created_by`, `organization_users`.`email` FROM `rfq` LEFT JOIN `organization_users` ON `rfq`.`created_by`=`organization_users`.`id` WHERE `rfq`.`id`='"+req.body.rfq_id+"'";
+	var query="SELECT `rfq`.`version_no`, `rfq`.`document_no`, `organization_users`.`email` FROM `rfq` LEFT JOIN `organization_users` ON `rfq`.`created_by`=`organization_users`.`id` WHERE `rfq`.`id`='"+req.body.rfq_id+"' limit 1";
 	connection.query(query, function(err, rfq_info){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
+			console.log(rfq_info);
 			var mailOptions = {
-			    from: "From :  ✔ <"+smtpConfig.email+">", // sender address
+			    from: "CG Global <"+smtpConfig.email+">", // sender address
 			    to: smtpConfig.sales_and_marketing_director_email+', '+rfq_info[0].email, // list of receivers seprated by comma also
 			    subject: 'RFQ Revert to sales ✔', // Subject line
 			    text: 'RFQ #docnr is Reverted to sales', // plaintext body
@@ -650,7 +651,8 @@ exports.revert_to_sales = function(req, res){
 			transporter.sendMail(mailOptions, function(error, info){
 			    if(error){
 			        console.log(error);
-			    }else{
+			    } else {
+			    	console.log("Mail Sent");
 			    	// res.json({"statusCode": 404, "success":"false", "message": "result not found", "product_designs": "[]"});
 			    }
 			});
@@ -661,7 +663,7 @@ exports.revert_to_sales = function(req, res){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
 		}
 		else{
-			res.json({"statusCode":200, "success":"true", "message":"rfq completed successfully"});
+			res.json({"statusCode":200, "success":"true", "message":"rfq reverted successfully"});
 		}
 	});
 };

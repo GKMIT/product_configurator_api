@@ -69,7 +69,7 @@ module.exports = function(){
 	app.get("/get_rejection_remarks/:user_id", rfq_bid_validation.get_rejection_remarks, rfq_bid.get_rejection_remarks);
 	app.put("/rfq_no_bid_submit", rfq_bid_validation.rfq_no_bid_submit, rfq_bid.rfq_no_bid_submit);
 	app.post("/duplicateRfq", rfq_bid_validation.duplicateRfq, rfq_bid.duplicateRfq);
-	// app.post("/revert_to_sales",rfq_bid_validation.revert_to_sales, rfq_bid.revert_to_sales);
+	app.put("/revert_to_sales",rfq_bid_validation.revert_to_sales, rfq_bid.revert_to_sales);
 
 
 	// api for the tendering person
