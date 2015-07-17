@@ -69,7 +69,7 @@ exports.sales_quote_followup_fetch_all = function(req, res){
 }
 
 exports.sales_quote_followup_fetch_one = function(req, res){
-	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id`, `rfq_status_id`, `sales_price`, `won_gross_sale`, `won_gross_sale`, `next_action`, `by_when` FROM `rfq` WHERE `rfq_status_id`='6' AND `id`='"+req.params.rfq_id+"'";
+	var query="SELECT `id`, `document_no`, `version_no`, `quote_creation_date`, `quote_submission_date`, `estimated_sales_price`, `quote_validity_date`, `probability_id`, `rfq_status_id`, `sales_price`, `won_gross_sale`, `won_gross_sale`, `next_action`, `by_when` FROM `rfq` WHERE `rfq_status_id` IN (6,9) AND `id`='"+req.params.rfq_id+"'";
 	connection.query(query, function(err, rfq) {
 		if(err){
 			console.log(err);
@@ -192,6 +192,23 @@ exports.sales_quote_followup_update = function(req, res){
 	});
 }
 
+exports.sales_quote_followup_onhold = function(req, res){
+	// console.log(req.body.quote_submission_date);
+	// var query="UPDATE `rfq` SET `probability_id`='"+req.body.probability+"', `rfq_status_id`='"+req.body.rfq_status_id+"', `sales_price`='"+req.body.sales_price+"' WHERE `id`='"+req.body.rfq_id+"'";
+
+	var query="UPDATE `rfq` SET `rfq_status_id`='"+req.body.rfq_status_id+"' WHERE `id`='"+req.body.rfq_id+"'";
+	connection.query(query, function(err, quote) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "updated successfully"});
+		}
+	});
+}
+
+
 
 exports.sales_quote_followup_obsolete = function(req, res){
 	var async = require("async");
@@ -219,7 +236,16 @@ exports.sales_quote_followup_obsolete = function(req, res){
 					catch(ex){
 						date_rfq_in='0000-00-00 00:00:00';
 					}
-					var requested_quotation_date=moment(new Date(rfq[0].requested_quotation_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+					
+
+					var requested_quotation_date ='0000-00-00 00:00:00';
+					try{
+						requested_quotation_date=moment(new Date(rfq[0].requested_quotation_date).toISOString().substring(0,10), "YYYY-MM-DD").format('YYYY-MM-DD hh:mm:ss');
+					}
+					catch(ex){
+						date_rfq_in='0000-00-00 00:00:00';
+					}
+
 					var document_part=rfq[0].document_no.split("/");
 					var document_no=document_part[0]+"/"+new_version;
 					try{

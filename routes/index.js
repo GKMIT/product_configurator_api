@@ -122,6 +122,7 @@ module.exports = function(){
 	app.put("/sales_quote_followup_update", rfq_followup_validation.sales_quote_followup_update, rfq_followup_calls.sales_quote_followup_update);
 
 	app.post("/sales_quote_followup_obsolete", rfq_followup_validation.sales_quote_followup_obsolete, rfq_followup_calls.sales_quote_followup_obsolete);
+	app.post("/sales_quote_followup_onhold", rfq_followup_validation.sales_quote_followup_obsolete, rfq_followup_calls.sales_quote_followup_onhold);
 
 	app.post("/extend_validity_period_quote", rfq_followup_validation.extend_validity_period_quote, rfq_followup_calls.extend_validity_period_quote);
 
@@ -137,6 +138,7 @@ module.exports = function(){
 	var archive_followup = require('../controller/rfq/followup.js');
 
 	app.get("/archive_followup/:user_id", archive_followup_validation.followup_archive_quote, archive_followup.followup_archive_quote);
+	app.get("/onhold_followup/:user_id", archive_followup_validation.followup_onhold_quote, archive_followup.followup_onhold_quote);
 
 	app.post("/archive_rfq_copy", archive_followup_validation.followup_archive_quote_copy, archive_followup.followup_archive_quote_copy);
 

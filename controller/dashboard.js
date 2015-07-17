@@ -14,7 +14,7 @@ exports.dashboard = function(req, res){
 				var outTenderingRfq="select count(`id`) as `total` from `rfq` where `rfq_status_id`='5'";
 				var completed="select count(`id`) as `total` from `rfq` where `rfq_status_id`='6'";
 				var obsolete="select count(`id`) as `total` from `rfq` where `rfq_status_id`='8'";
-				var expired = "select count(id) as total from rfq where NOW()>quote_validity_date AND `rfq_status_id`='6'";
+				var expired = "select count(id) as total from rfq where NOW() > quote_validity_date AND `rfq_status_id`='6'";
 				var rfq_list="select `rfq`.`id`, `rfq`.`project_name`, `rfq`.`date_rfq_in`, `rfq`.`version_no`, `rfq`.`document_no`, `rfq`.`rfq_status_id`, `rfq`.`probability_id`, `rfq`.`customer_reference`, `rfq_status`.`name` as `status_name`, `customers`.`name` as `customer_name` from `rfq` LEFT JOIN `rfq_status` ON `rfq`.`rfq_status_id`=`rfq_status`.`id` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`";
 				// WHERE `rfq`.`rfq_status_id` IN (0, 1, 2, 4, 6)
 				var totalPartialRfq=0;

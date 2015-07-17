@@ -58,6 +58,66 @@ exports.followup_archive_quote = function(req, res){
 		}
 	});
 };
+
+exports.followup_onhold_quote = function(req, res){
+	connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
+		if(err){
+			console.log(err);
+			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			if(admin.length>0){
+				var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`, `rfq`.`rfq_status_id`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id`, `organization_users` WHERE  `rfq`.`rfq_status_id` = 9 AND `organization_users`.`id`='"+req.params.user_id+"' ORDER BY  `rfq`.`created_at` asc";
+
+				connection.query(query, function(err, rfq) {
+					if(err){
+						console.log(err);
+							res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+					}
+				});
+			}
+			else{
+				connection.query("SELECT * FROM `sales_hubs` WHERE `head_id`='"+req.params.user_id+"' LIMIT 1", function(err, info){
+					if(err){
+						console.log(err);
+						res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+					}
+					else{
+						if(info.length>0){
+
+							var query="SELECT DISTINCT `rfq`.`id` , `rfq`.`document_no`, `rfq`.`rfq_status_id`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`sales_hub_id` =  `organization_users`.`sales_hubs_id` WHERE  `rfq`.`rfq_status_id`= 9 AND `organization_users`.`id`='"+req.params.user_id+"' AND (`created_by`='"+req.params.user_id+"' OR `rfq`.`sales_person_id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
+
+							connection.query(query, function(err, rfq){
+								if(err){
+									res.json({"statusCode":500, "success":"false", "message":"internal error"});
+								}
+								else{
+									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+								}
+							});
+						}
+						else{
+							var query="SELECT DISTINCT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`rfq_status_id`,  `rfq`.`version_no`,  `rfq`.`date_rfq_in`,  `rfq`.`requested_quotation_date`, `customers`.`name` FROM  `rfq` LEFT JOIN `customers` ON `rfq`.`customers_id`=`customers`.`id` INNER JOIN  `organization_users` ON  `rfq`.`tendering_teams_id` =  `organization_users`.`tendering_teams_id` WHERE  `rfq`.`rfq_status_id`= 9 AND `organization_users`.`id`='"+req.params.user_id+"' AND `rfq`.`tendering_teams_id`=(SELECT `tendering_teams_id` FROM `organization_users` WHERE `id`='"+req.params.user_id+"') ORDER BY  `rfq`.`created_at` asc";
+							connection.query(query, function(err, rfq) {
+								if(err){
+									console.log(err);
+									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+								}
+								else{
+									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq});
+								}
+							});
+						}
+					}
+				});	
+			}
+		}
+	});
+};
+
 exports.followup_archive_quote_copy = function(req, res){
 	var query="SELECT * FROM `rfq` WHERE `id`='"+req.body.rfq_id+"'";
 	connection.query(query, function(err, info){
