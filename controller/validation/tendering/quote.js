@@ -602,7 +602,7 @@ exports.tendering_rfq_lines_technical_spec_delete = function(req, res, next){
 
 exports.tendering_request_design = function(req, res, next){
 	var checkValid=1;
-	var fields = ["user_id", "rfq_id"];
+	var fields = ["user_id", "rfq_id","design_require_date"];
 	if(typeof req.header("authentication_token")=="undefined" || req.header("authentication_token")==""){
 		checkValid=0;
 		res.json({"statusCode": 404, "success": "false", "message": "Authentication token not found"});
@@ -614,7 +614,7 @@ exports.tendering_request_design = function(req, res, next){
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" not defined"});
 				break;
 			}
-			if(req.body[fields[i]]==""  || !validator.isNumeric(req.body[fields[i]])){
+			if(req.body[fields[i]]=="" ){
 				checkValid=0;
 				res.json({"statusCode": 404, "success": "false", "message": fields[i]+" value not found"});
 				break;
