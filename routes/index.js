@@ -77,6 +77,8 @@ module.exports = function(){
 	var tendering_validation=require('../controller/validation/tendering/quote');
 	app.get("/tendering_teams_quotes/:user_id", tendering_validation.tendering_teams_quotes, tendering_calls.tendering_teams_quotes);
 	app.get("/design_requests/:user_id", tendering_validation.design_requests, tendering_calls.design_requests);
+	app.get("/available_designs/:user_id", tendering_validation.available_designs, tendering_calls.available_designs);
+	app.get("/available_design_props/:design_id/:user_id", tendering_validation.available_design_props, tendering_calls.available_design_props);
 
 	app.get("/tendering_fetch_particular_quote/:user_id/:rfq_id", tendering_validation.tendering_fetch_particular_quote, tendering_calls.tendering_fetch_particular_quote);
 

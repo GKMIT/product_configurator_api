@@ -73,6 +73,35 @@ exports.design_requests = function(req, res){
 	});
 }
 
+exports.available_designs = function(req, res){
+	var query="SELECT `product_designs`.`id`,`product_designs`.`origional_id`, `product_lines`.`name` as `product_line`, `plants`.`name` as `plant_name`, `product_designs`.`material_code`, `product_designs`.`design_number`, `product_designs`.`design_variant`, `product_designs`.`design_spec_version`, `product_designs`.`design_version_number`, `product_designs`.`updated_at` FROM  `product_designs` JOIN `product_lines` on `product_designs`.`product_lines_id` = `product_lines`.`id` LEFT JOIN `plants` on `product_designs`.`plants_id` = `plants`.`id`";
+
+	connection.query(query, function(err, designs) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "", "designs":designs});
+		}
+	});
+
+}
+
+exports.available_design_props = function(req, res){
+	var query="SELECT product_designs_technical_details.spec_value, product_designs_technical_details.calculated_value, product_designs_technical_details.measured_value, product_designs_technical_details.plus_tolerance, product_designs_technical_details.minus_tolerance, product_designs_technical_details.maximum_value, product_designs_technical_details.minimum_value, product_designs_technical_details.updated_at, product_properties.property_name , product_properties.unit_of_measurement from product_designs_technical_details join product_properties on product_designs_technical_details.product_properties_id = product_properties.id where product_designs_technical_details.product_design_id = "+req.params.design_id+" and product_properties.id != 1 order by product_designs_technical_details.updated_at desc ";
+
+	connection.query(query, function(err, props) {
+		if(err){
+			console.log(err);
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+		}
+		else{
+			res.json({"statusCode": 200, "success":"true", "message": "", "props":props});
+		}
+	});
+
+}
 
 exports.tendering_fetch_particular_quote = function(req, res){
 	var query="SELECT `rfq`.`id`, `rfq`.`document_no`, `rfq`.`version_no`, `rfq`.`rfq_status_id` FROM `rfq` WHERE `rfq_status_id`='4' AND `id`='"+req.params.rfq_id+"' LIMIT 1";
