@@ -326,10 +326,6 @@ exports.save_rfq_general_data = function(req, res){
 					param.push("sales_agents_id");
 					paramValue.push(req.body.sales_agents_id);
 				}
-				if(typeof req.body.strategic_quote!=="undefined" && req.body.strategic_quote!=="" && validator.isNumeric(req.body.strategic_quote)){
-					param.push("strategic_quote");
-					paramValue.push(req.body.strategic_quote);
-				}
 				if(typeof req.body.channel_to_market_id!=="undefined" && req.body.channel_to_market_id!=="" && validator.isNumeric(req.body.channel_to_market_id)){
 					param.push("channel_to_market_id");
 					paramValue.push(req.body.channel_to_market_id);
@@ -545,10 +541,6 @@ exports.update_rfq_general_data = function(req, res){
 			if(typeof req.body.installation_country!=="undefined" && validator.isNumeric(req.body.installation_country)){
 				param.push("installation_country");
 				paramValue.push(req.body.installation_country);
-			}
-			if(typeof req.body.strategic_quote!=="undefined" && validator.isNumeric(req.body.strategic_quote)){
-				param.push("strategic_quote");
-				paramValue.push(req.body.strategic_quote);
 			}
 			if(typeof req.body.channel_to_market_id!=="undefined" && req.body.channel_to_market_id!=="" && validator.isNumeric(req.body.channel_to_market_id)){
 				param.push("channel_to_market_id");
