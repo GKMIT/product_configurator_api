@@ -954,25 +954,22 @@ function match(item, filter) {
 }
 
 exports.tendering_request_design = function(req, res){
-	var arr= [];
+	var total_lines= req.body.line_items.length;
 
 	for (var i = 0; i < req.body.line_items.length; i++) {
-		arr.push(req.body.line_items[i].id);
+		var query = "UPDATE `rfq_lines` SET `design_request` = 1, `plants_id` = "+req.body.line_items[i].plant_id+", `design_require_date` = '"+req.body.design_require_date+"', `design_request_date` = NOW() WHERE `id` = "+req.body.line_items[i].id+" ";
+		console.log(query);
+		connection.query(query, function(err, info){
+			if(err){
+				res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+				if(total_lines == (i+1)) res.json({"statusCode": 200, "success":"true", "message": ""});
+			}
+			else{
+				console.log(i);
+				if(total_lines == i) res.json({"statusCode": 200, "success":"true", "message": ""});
+			}
+		});
 	};
-
-	arr = arr.join();
-	console.log(arr);
-	var query = "UPDATE `rfq_lines` SET `design_request` = 1, `design_require_date` = '"+req.body.design_require_date+"', `design_request_date` = NOW() WHERE `id` IN ("+arr+") ";
-	//console.log(query);
-	connection.query(query, function(err, info){
-		if(err){
-			console.log(err);
-			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-		}
-		else{
-			res.json({"statusCode": 200, "success":"true", "message": ""});
-		}
-	});
 
 }
 
