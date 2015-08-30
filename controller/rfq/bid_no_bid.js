@@ -1,4 +1,6 @@
 var moment = require('moment');
+var async = require("async");
+
 exports.ready_rfq_bid = function(req, res){
 	connection.query("SELECT * FROM `organization_users` WHERE `id`='"+req.params.user_id+"' AND `sysadmin`='1'", function(err, admin){
 		if(err){
@@ -128,95 +130,94 @@ exports.full_rfq_detail = function(req, res){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			connection.query("SELECT `rfq_lines`.`id`, `rfq_lines`.`product_lines_id`, `product_lines`.`name` as `product_lines_name`, `rfq_lines`.`plants_id`, `rfq_lines`.`rfq_id`, `rfq_lines`.`number_of_units`, `rfq_lines`.`req_delivery_date`, `rfq_lines`.`rfq_line_status`, `rfq_lines`.`material_code`, `rfq_lines`.`material_cost`, `rfq_lines`.`labour_cost`, `rfq_lines`.`no_of_labour_hours`, `rfq_lines`.`sales_price`, `rfq_lines`.`confirmed_delivery_date`, `rfq_lines`.`variant_to`, `rfq_lines`.`created_at`, `rfq_lines`.`updated_at`, `plants`.`name` as `plant_name` FROM `rfq_lines` LEFT JOIN `plants` ON `rfq_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_lines` ON `product_lines`.`id`=`rfq_lines`.`product_lines_id` WHERE rfq_id='"+rfq[0].id+"'", function(err, rfq_lines) {
+			connection.query("SELECT `r_lines`.`id`, `r_lines`.`design_request`, `r_lines`.`product_lines_id`, `p_lines`.`mandatory_properties`, `p_lines`.`name` as `product_lines_name`, `r_lines`.`plants_id`, `plants`.`name` as `plants_name`, `r_lines`.`number_of_units`,`r_lines`.`req_delivery_date`, EXTRACT(MONTH FROM req_delivery_date) as month, EXTRACT(YEAR FROM req_delivery_date) as year, `r_lines`.`sales_price`, `r_lines`.`confirmed_delivery_date`, `r_lines`.`product_designs_id`, `r_lines`.`minimum_sales_price`, `r_lines`.`rfq_lines_calculated_sales_price_id`, `r_lines`.`variant_to`, `rfq_lines_calculated_sales_price`.`ebit_percentage`, `rfq_lines_calculated_sales_price`.`ebit` FROM `rfq_lines` `r_lines` LEFT JOIN `product_lines` `p_lines` ON `r_lines`.`product_lines_id`=`p_lines`.`id` LEFT JOIN `plants` ON `r_lines`.`plants_id`=`plants`.`id` LEFT JOIN `product_designs` ON `r_lines`.`product_designs_id`=`product_designs`.`id` LEFT JOIN `rfq_lines_calculated_sales_price` ON `r_lines`.`rfq_lines_calculated_sales_price_id` = `rfq_lines_calculated_sales_price`.`id`  WHERE `rfq_id`='"+req.params.rfq_id+"'", function(err, rfq_lines) {
 				if(err){
+					console.log(err);
 					res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 				}
 				else{
-					if(rfq_lines.length>0){
-						var default_estimated_sales_price = 0;
-						var max_estimated_sales_price = 0;
-						var async = require("async");
-
-						//async.each();
-
-						var not_in_id=0;
-
-
-						async.each(rfq_lines, function(item, done){
-								var line_query="select * from `rfq_lines` where ((rfq_lines.id='"+item.id+"' AND variant_to='0') OR rfq_lines.variant_to='"+item.id+"') AND id NOT IN ("+not_in_id+")";
-								not_in_id+=", "+item.id;
-								connection.query(line_query, function(err, filter_line_items){
+					if(rfq_lines.length==0){
+						res.json({"statusCode": 404, "success":"false", "message": "rfq line items not exist"});
+					}
+					//var complete_rfq_lines=rfq_lines;
+					var complete_rfq_lines=[];
+					var counter=0;
+					// var counter1=0;
+					var counter2=0;
+					var plant_counter=0;
+					async.forEach(rfq_lines,  function(line_item, done){
+						var query="SELECT `id`, `name` FROM `plants` WHERE `product_lines_id`='"+line_item.product_lines_id+"'";
+						console.log(query);
+						connection.query(query, function(err, plants_detail) {
+							if (err) {
+								console.log(err);
+								done(err);
+							}
+							else {
+								line_item["plants"] = plants_detail;
+								complete_rfq_lines.push(line_item);
+								done();
+							}
+						});
+						},function(err){
+							if (err){
+								console.log(err);
+								res.json({"statusCode": 500, "success": "false", "message":"internal error"});
+							}
+							else{
+								connection.query("SELECT `id`, `name`, `examples` FROM `product_types`", function(err, product_types){
 									if(err){
-										done(err);
+										console.log(err);
+										res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 									}
 									else{
-										//console.log(filter_line_items);
-										async.each(filter_line_items, function(line_item, done){
-												var query = "SELECT * FROM  `rfq_lines_technical_specs` WHERE `rfq_lines_id`='"+line_item.id+"'";
-												connection.query(query, function(err, spec_line_item){
-													if(err){
-														done(err);
-													}
-													else{
-														async.each(spec_line_item, function(specs, done){
-																if(specs.product_properties_id==3 && specs.rfq_lines_id==line_item.id){
-																	mva=parseInt(specs.value)/1000;
-																	if(max_estimated_sales_price<(line_item.number_of_units*(mva*10000))){
-																		console.log(line_item.id);
-																		max_estimated_sales_price=line_item.number_of_units*(mva*10000);
-																		done();
-																	}
-																	else{
-																		done();
-																	}
-																	//max_estimated_sales_price=line_item.number_of_units*(mva*10000);
-																	//if()
-																}
-																else{
-																	done();
-																}
-															},
-															function(err){
-																if(err){
-																	done(err);
-																}
-																else{
-																	done();
-																}
-															});
-													}
-												});
-											},
-											function(err){
+										for (var i = 0; i < rfq_lines.length; i++) {
+											connection.query("SELECT `rlts`.`id`, `rlts`.`rfq_lines_id`, `rlts`.`product_properties_id`, `rlts`.`value`, `rlts`.`remark`, `pp`.`property_name`, `pp`.`unit_of_measurement`, `pp`.`data_type` FROM `rfq_lines_technical_specs` `rlts` LEFT JOIN `product_properties` `pp` ON `rlts`.`product_properties_id`=`pp`.id WHERE `rfq_lines_id`='"+rfq_lines[i].id+"'", function(err, rfq_lines_technical_specs) {
 												if(err){
-													done();
+													console.log(err);
+													console.log("sokokosks");
+													res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 												}
 												else{
-													console.log(max_estimated_sales_price);
-													default_estimated_sales_price+=max_estimated_sales_price;
-													max_estimated_sales_price=0;
-													done();
+													// , `product_designs`.`acc`
+													var loopCounter=0;
+													var quarter=Math.ceil(rfq_lines[counter].month/3);
+													connection.query("SELECT `product_designs`.`id` as `product_design_id`, `product_designs`.`product_lines_id`, `product_designs`.`material_code`, `product_designs`.`design_number`, `product_designs`.`design_variant`, `product_designs`.`design_version`, `product_designs_costs`.`id` as `product_designs_costs_id`, `product_designs_costs`.`year`, `product_designs_costs`.`quarter`, `product_designs_costs`.`currency`, `product_designs_costs`.`labor_cost`, `product_designs_costs`.`labor_hours`, `product_designs_costs`.`material_cost` FROM `product_designs` LEFT JOIN `product_designs_costs` ON `product_designs`.id=`product_designs_costs`.`product_design_id` AND `product_designs_costs`.`quarter`='"+quarter+"' AND `product_designs_costs`.`year`='"+rfq_lines[counter].year+"' WHERE `product_designs`.id='"+rfq_lines[counter].product_designs_id+"' LIMIT 1", function(err, product_design_detail) {
+														if(err){
+															console.log(err);
+															res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+														}
+														else{
+															complete_rfq_lines[counter2]["rfq_lines_technical_specs"]=rfq_lines_technical_specs;
+															complete_rfq_lines[counter2]["product_design_detail"]=product_design_detail;
+															counter2++;
+															if(counter2==rfq_lines.length){
+																if(checkComplexity(complete_rfq_lines[0].rfq_lines_technical_specs)){
+																	connection.query("SELECT `id`, `name` FROM `complexities`", function(err, complexities){
+																		if(err){
+																			console.log(err);
+																			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
+																		}
+																		else{
+																			res.json({"statusCode": 200, "success":"true", "message": "","rfq":rfq ,"rfq_lines":complete_rfq_lines, "complexities":complexities, "product_types": product_types});
+																		}
+																	});
+																}
+																else{
+																	res.json({"statusCode": 200, "success":"true", "message": "","rfq":rfq ,"rfq_lines":complete_rfq_lines, "complexities":[], "product_types": product_types});
+																}
+															}
+														}
+														// counter1++;
+													});
+													counter++;
 												}
 											});
+										};
 									}
 								});
-							},
-							function(err){
-								if(err){
-									console.log(err);
-									res.json({"statusCode": 500, "success":"false", "message": "internal error"});
-								}
-								else{
-									rfq[0]["default_estimated_sales_price"]=default_estimated_sales_price;
-									res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": []});
-								}
-							});
-
-					}
-					else{
-						res.json({"statusCode": 200, "success":"true", "message": "", "rfq":rfq, "rfq_lines": rfq_lines, "rfq_lines_technical_specs": []});
-					}
+							}
+						});
 				}
 			});
 		}
@@ -667,3 +668,23 @@ exports.revert_to_sales = function(req, res){
 		}
 	});
 };
+
+function checkComplexity(object){
+	flag=false;
+	object.forEach(function(obj) {
+	  	// console.log('Result: ', match(obj, { "product_properties_id": '2'}));
+	  	if(match(obj, { "product_properties_id": '2'})){
+	  		flag=true;
+	  	}		
+	});
+	return flag;
+}
+
+// extra function 
+function match(item, filter) {
+  var keys = Object.keys(filter);
+  // true if any true
+  return keys.some(function (key) {
+    return item[key] == filter[key];
+  });
+}
