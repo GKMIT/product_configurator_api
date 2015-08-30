@@ -44,7 +44,7 @@ exports.design_requests = function(req, res){
 		}
 		else{
 			if(admin.length>0){
-				var query="SELECT `rfq`.`document_no`, `product_lines`.`name` as `product_line`, `plants`.`name` as `plant_name`, `rfq_lines`.`design_request_date`, `rfq_lines`.`design_require_date`, `rfq_lines`.`design_submit_date`, `rfq_lines`.`id` FROM  `rfq_lines` JOIN `rfq` ON `rfq_lines`.`rfq_id`=`rfq`.`id` JOIN `product_lines` on `rfq_lines`.`product_lines_id` = `product_lines`.`id` LEFT JOIN `plants` on `rfq_lines`.`plants_id` = `plants`.`id` WHERE  `rfq_lines`.`design_request` = 1 ORDER BY  `rfq_lines`.`design_request_date` DESC";
+				var query="SELECT `rfq`.`document_no`, `rfq`.`id` as `rfq_id`, `product_lines`.`name` as `product_line`, `plants`.`name` as `plant_name`, `rfq_lines`.`design_request_date`, `rfq_lines`.`design_require_date`, `rfq_lines`.`design_submit_date`, `rfq_lines`.`id` FROM  `rfq_lines` JOIN `rfq` ON `rfq_lines`.`rfq_id`=`rfq`.`id` JOIN `product_lines` on `rfq_lines`.`product_lines_id` = `product_lines`.`id` LEFT JOIN `plants` on `rfq_lines`.`plants_id` = `plants`.`id` WHERE  `rfq_lines`.`design_request` = 1 ORDER BY  `rfq_lines`.`design_request_date` DESC";
 
 				connection.query(query, function(err, rfq_lines) {
 					if(err){
