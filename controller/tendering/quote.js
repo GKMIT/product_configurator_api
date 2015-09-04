@@ -984,7 +984,7 @@ exports.save_design_submit = function(req, res){
 			res.json({"statusCode": 500, "success":"false", "message": "internal error"});
 		}
 		else{
-			query_1="SELECT design_request_date, design_submit_date FROM `rfq_lines` WHERE id= "+req.body.rfq_lines_id+" LIMIT 1";
+			query_1="SELECT design_require_date, design_submit_date FROM `rfq_lines` WHERE id= "+req.body.rfq_lines_id+" LIMIT 1";
 			connection.query(query_1, function(err, data){
 				if(err){
 					console.log(err);
