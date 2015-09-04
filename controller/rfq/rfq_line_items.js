@@ -404,7 +404,7 @@ exports.fetch_property_detail = function(req, res, next){
 				flag=1;
 			}
 			else if(req.params.property_id==2){
-				query+="SELECT `name` as `id`, `name` FROM `complexities`";
+				query+="SELECT `id` as `id`, `name` FROM `complexities`";
 				flag=1;
 			}
 			else{
