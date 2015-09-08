@@ -635,7 +635,7 @@ function technical_sepc(index, rfq_lines_id, technical_specs, callback){
 
 
 exports.revert_to_sales = function(req, res){
-	var query="SELECT `rfq`.`version_no`, `rfq`.`document_no`, `organization_users`.`email` FROM `rfq` LEFT JOIN `organization_users` ON `rfq`.`created_by`=`organization_users`.`id` WHERE `rfq`.`id`='"+req.body.rfq_id+"' limit 1";
+	var query="SELECT `rfq`.`version_no`, `rfq`.`document_no`, `organization_users1`.`email` as `email1`, `organization_users2`.`email` as `email2` FROM `rfq` LEFT JOIN `organization_users` `organization_users1` ON `rfq`.`created_by`=`organization_users1`.`id` LEFT JOIN `organization_users` `organization_users2` ON `rfq`.`sales_person_id`=`organization_users2`.`id`  WHERE `rfq`.`id`='"+req.body.rfq_id+"' limit 1";
 	connection.query(query, function(err, rfq_info){
 		if(err){
 			res.json({"statusCode":500, "success": "false", "message": "internal error"});
@@ -644,7 +644,7 @@ exports.revert_to_sales = function(req, res){
 			console.log(rfq_info);
 			var mailOptions = {
 			    from: "CG Global <"+smtpConfig.email+">", // sender address
-			    to: smtpConfig.sales_and_marketing_director_email+', '+rfq_info[0].email, // list of receivers seprated by comma also
+			    to: smtpConfig.sales_and_marketing_director_email+', '+rfq_info[0].email1 +', '+rfq_info[0].email2, // list of receivers seprated by comma also
 			    subject: 'RFQ Revert to sales ✔', // Subject line
 			    text: 'RFQ #docnr is Reverted to sales', // plaintext body
 			    html: '<p>RFQ '+rfq_info[0].document_no+' is reverted to sales</p>' // html body
